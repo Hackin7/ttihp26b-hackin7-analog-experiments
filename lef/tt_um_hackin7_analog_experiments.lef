@@ -2,9 +2,9 @@ VERSION 5.7 ;
   NOWIREEXTENSIONATPIN ON ;
   DIVIDERCHAR "/" ;
   BUSBITCHARS "[]" ;
-MACRO tt_um_template
+MACRO tt_um_hackin7_analog_experiments
   CLASS BLOCK ;
-  FOREIGN tt_um_template ;
+  FOREIGN tt_um_hackin7_analog_experiments ;
   ORIGIN 0.000 0.000 ;
   SIZE 202.080 BY 313.740 ;
   PIN clk
@@ -465,6 +465,6 @@ MACRO tt_um_template
       LAYER Metal2 ;
         RECT 32.000 298.780 32.440 306.620 ;
   END
-END tt_um_template
+END tt_um_hackin7_analog_experiments
 END LIBRARY
 
