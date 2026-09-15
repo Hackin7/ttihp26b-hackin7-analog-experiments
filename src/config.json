@@ -1,4 +1,5 @@
 {
   "CLOCK_PORT": "clk",
-  "CLOCK_PERIOD": 20.0
+  "CLOCK_PERIOD": 20.0,
+  "FP_PDN_VOFFSET": 0.0
 }
