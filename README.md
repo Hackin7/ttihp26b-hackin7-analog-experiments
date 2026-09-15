@@ -1,6 +1,14 @@
 ![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg)
 
-# Tiny Tapeout Analog Project Template
+# TinyAnalogExperiments — IHP26b mixed-signal project
+
+This project targets one IHP SG13G2 1×1 Tiny Tapeout tile. The digital portion
+will contain a 64-bit counter, while a three-inverter ring oscillator is added
+as a physical macro in a later integration stage.
+
+Part 1 establishes the standard IHP26b LibreLane CI flow and a lint-clean
+Tiny Tapeout wrapper. The current checked-in GDS/LEF are retained as analog
+reference material until the macro integration stage.
 
 - [Read the documentation for project](docs/info.md)
 

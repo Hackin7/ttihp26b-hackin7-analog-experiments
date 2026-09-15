@@ -1,0 +1,6 @@
+{
+  "CLOCK_PORT": "clk",
+  "CLOCK_PERIOD": 20.0,
+  "PNR_SDC_FILE": "dir::pnr.sdc",
+  "SIGNOFF_SDC_FILE": "dir::signoff.sdc"
+}
