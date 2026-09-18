@@ -10,6 +10,25 @@ Part 1 establishes the standard IHP26b LibreLane CI flow and a lint-clean
 Tiny Tapeout wrapper. The current checked-in GDS/LEF are retained as analog
 reference material until the macro integration stage.
 
+## Local hardening
+
+Instead of pushing and waiting for CI, build the GDS locally (mirrors the
+`gds` workflow — same `tt-support-tools` and `librelane==3.0.5`, same invoked
+LibreLane flow):
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/local/build.ps1
+```
+
+Requirements: Docker Desktop running (with WSL2 integration) and a default WSL
+distro. The build runs inside WSL because LibreLane's `lln-libparse` dependency
+ships prebuilt Linux wheels but no Windows wheels. The first run downloads the
+IHP PDK into `~/ttsetup/pdk` in the WSL distro (a few GB) and creates a venv at
+`~/ttsetup/venv`; later runs are fast. Artifacts appear under
+`runs/wokwi/final/`. Re-runs can use `-SkipSetup`; use `-ForceSetup` to refresh
+`tt-support-tools`/pip dependencies. The underlying flow is in
+`tools/local/build.sh`.
+
 - [Read the documentation for project](docs/info.md)
 
 ## What is Tiny Tapeout?
