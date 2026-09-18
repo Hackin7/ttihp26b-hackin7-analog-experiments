@@ -56,7 +56,7 @@ select, per the TT guidance on auxiliary clocks (`set_clock_groups
 - Add a parameterized counter core instantiated at 64 bits.
 - Reset to zero on `negedge rst_n`; increment on `posedge clk` when `ctr_ena` (`ena && ui_in[0] && !ui_in[1]`).
 - Select one of the eight counter bytes with `ui_in[4:2]`.
-- Add RTL and gate-level cocotb tests for reset, enable, clock-freeze (select), byte selection, rollover, and tied-off outputs.
+- Add RTL and gate-level cocotb tests for reset, enable, clock-freeze (select), byte selection, rollover, and tied-off outputs. *(deferred to a later pass — not required for the Figure submission flow)*
 
 ### 3. Analog macro integration
 
@@ -91,7 +91,7 @@ Commits pushed to `origin/main`:
 - `c379354` - adjust vertical PDN offset
 - `781cc5e` - align vertical and horizontal PDN offsets
 
-### Part 2 - counter RTL and local hardening (in progress)
+### Part 2 - counter RTL and local hardening
 
 - Implemented the parameterized `CTR_W = 64` counter on `clk` with async reset,
   enable (`ui_in[0]` + `ena`), byte select (`ui_in[4:2]`), and tied-off IOs.
@@ -100,12 +100,22 @@ Commits pushed to `origin/main`:
 - Added `DIODE_ON_PORTS: "in"` to `src/config.json`; disconnected-pins check
   passes.
 - Local LibreLane build is green end-to-end (LVS/DRC/antenna/timing signoff).
-- Remaining: RTL and gate-level cocotb tests; CI GDS workflow re-run.
+- CI `gds` and `docs` workflows pass on the pushed commits.
+- cocotb tests (RTL + gate-level) deferred to a later pass.
+
+Commits pushed to `origin/main`:
+
+- `aee5385` - feat: add 64-bit counter with clock-select freeze
+- `10a67ff` - chore: add local LibreLane hardening tooling
+- `834686c` - docs: record Part 2 counter progress and timing findings
 
 ## Current CI Status
 
 - Documentation workflow: passing.
-- Local LibreLane hardening: **green** (80/80 stages). LVS, DRC, antenna, setup, and hold timing all pass; final GDS/LEF written to `runs/wokwi/final/`.
+- GDS workflow (LibreLane build + precheck): **passing** on the Part 2 counter
+  commits; the Part 1 `PDN-0185` failure is resolved.
+- Local LibreLane hardening: **green** (80/80 stages). LVS, DRC, antenna, setup,
+  and hold timing all pass; final GDS/LEF written to `runs/wokwi/final/`.
 - Flow notes for Part 3:
   - `DIODE_ON_PORTS: "in"` is set in `src/config.json` so incoming pins get
     antenna diodes and the disconnected-pins check has no dangling inputs.
@@ -115,5 +125,3 @@ Commits pushed to `origin/main`:
     violation on `ui_in[1]` (endpoint `sg13g2_nor2b_1`, ~-6.2 ns WNS) that
     OpenROAD `repair_timing -hold` cannot repair; this motivated the Part 2
     enable-fold above.
-
-Latest failed run: [GitHub Actions run 35046784810](https://github.com/Hackin7/ttihp26b-hackin7-analog-experiments/actions/runs/35046784810)
