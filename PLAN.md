@@ -25,13 +25,22 @@ The IHP 1x1 tile is 202.08 x 154.98 um. Ring-clock timing is an integration expe
 | `uio_oe[7:0]` | Tied low |
 | `rst_n` | Active-low asynchronous reset |
 
-The clock mux is intentionally the simple combinational form:
+Part 2 implements the clock select by folding it into the counter enable,
+because the ring oscillator is not built yet:
 
 ```verilog
-wire selected_clk = ui_in[1] ? clk_ring : clk;
+wire ctr_ena = ena && ui_in[0] && !ui_in[1];
 ```
 
-Changing the selector while operating can create shortened or extra pulses; software should select the source while reset or counting is inactive.
+With `clk_ring` tied to `0`, muxing the clock and freezing the counter are
+observably identical, and this keeps all combinational logic off the clock
+path. A combinational clock mux would form a gated clock and fail OpenROAD's
+half-period clock-gating hold check at timing signoff (the select must hold
+across the fall edge of `clk`, which an async `ui_in[1]` cannot satisfy).
+
+Part 3 reintroduces the physical mux with the ring oscillator and a registered
+select, per the TT guidance on auxiliary clocks (`set_clock_groups
+-asynchronous` via a custom SDC):
 
 ## Work Plan
 
@@ -45,9 +54,9 @@ Changing the selector while operating can create shortened or extra pulses; soft
 ### 2. Digital counter and simulation
 
 - Add a parameterized counter core instantiated at 64 bits.
-- Reset to zero on `negedge rst_n`; increment on `posedge selected_clk` when `ena && ui_in[0]`.
+- Reset to zero on `negedge rst_n`; increment on `posedge clk` when `ctr_ena` (`ena && ui_in[0] && !ui_in[1]`).
 - Select one of the eight counter bytes with `ui_in[4:2]`.
-- Add RTL and gate-level cocotb tests for reset, enable, both clocks, byte selection, rollover, and tied-off outputs.
+- Add RTL and gate-level cocotb tests for reset, enable, clock-freeze (select), byte selection, rollover, and tied-off outputs.
 
 ### 3. Analog macro integration
 
@@ -82,17 +91,29 @@ Commits pushed to `origin/main`:
 - `c379354` - adjust vertical PDN offset
 - `781cc5e` - align vertical and horizontal PDN offsets
 
+### Part 2 - counter RTL and local hardening (in progress)
+
+- Implemented the parameterized `CTR_W = 64` counter on `clk` with async reset,
+  enable (`ui_in[0]` + `ena`), byte select (`ui_in[4:2]`), and tied-off IOs.
+- Folded the clock select (`ui_in[1]`) into the increment enable; see the
+  Fixed Interface section for why the combinational mux was deferred.
+- Added `DIODE_ON_PORTS: "in"` to `src/config.json`; disconnected-pins check
+  passes.
+- Local LibreLane build is green end-to-end (LVS/DRC/antenna/timing signoff).
+- Remaining: RTL and gate-level cocotb tests; CI GDS workflow re-run.
+
 ## Current CI Status
 
 - Documentation workflow: passing.
-- GDS workflow: still failing during LibreLane PDN generation after the offset adjustments.
-- Original failure was:
-
-  ```text
-  PDN-0185: Insufficient width (18.24 um) to add straps on TopMetal1
-  ```
-
-- Current repository state is clean and synchronized with `origin/main`.
-- Detailed GitHub job logs were not available through the unauthenticated API; the next implementation step is to obtain the latest GDS log or reproduce the flow locally with the IHP PDK and LibreLane.
+- Local LibreLane hardening: **green** (80/80 stages). LVS, DRC, antenna, setup, and hold timing all pass; final GDS/LEF written to `runs/wokwi/final/`.
+- Flow notes for Part 3:
+  - `DIODE_ON_PORTS: "in"` is set in `src/config.json` so incoming pins get
+    antenna diodes and the disconnected-pins check has no dangling inputs.
+  - `PNR_SDC_FILE` / `SIGNOFF_SDC_FILE` unset (generic fallback SDC). A custom
+    SDC with clock groups is needed once the ring clock is real.
+  - The combinational clock mux caused a half-period clock-gating hold
+    violation on `ui_in[1]` (endpoint `sg13g2_nor2b_1`, ~-6.2 ns WNS) that
+    OpenROAD `repair_timing -hold` cannot repair; this motivated the Part 2
+    enable-fold above.
 
 Latest failed run: [GitHub Actions run 35046784810](https://github.com/Hackin7/ttihp26b-hackin7-analog-experiments/actions/runs/35046784810)
