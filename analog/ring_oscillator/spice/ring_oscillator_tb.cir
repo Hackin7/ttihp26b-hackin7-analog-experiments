@@ -1,0 +1,21 @@
+* ring_oscillator ngspice deck
+* Env: IIC-OSIC-TOOLS container; PDK models under /foss/pdks/ihp-sg13g2
+* Note: uses the SG13G2 stdcell *hierarchical/inverter* cell models when available.
+
+.include <pdk_models_file>
+
+* ---- enable, initial condition ----
+.option noacct
+.tran 1n 200n uic
+
+* ---- oscilloscope-ish plot ----
+.control
+  * use the two probe nodes
+  setplot
+  run
+  plot v(intra_a) v(intra_b) v(inv_a_n) v(clk_out)
+  * if freq measurement available in this ngspice (fourier):
+  * fourier 50meg v(clk_out)
+.endc
+
+.end

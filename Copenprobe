@@ -1,0 +1,61 @@
+* ring_oscillator_real_pdk_tb.spice
+* Part 3 proof: 3-stage gated RING using the REAL IHP SG13G2 stdcell SPICE
+* primitives: sg13g2_nand2_1 (enable-gate) + sg13g2_inv_1 x2 + sg13g2_buf_2.
+* Include path below matches the OSIC container (discovered in-container):
+*   /foss/pdks/ihp-sg13g2/libs.ref/sg13g2_stdcell/spice/sg13g2_stdcell.spice
+* Run:  ngspice -b ring_oscillator_real_pdk_tb.spice
+*
+* Args/nodes: full 3-stage refresh; ring is NOT in a .subckt but at top level
+* so ngspice .meas can see clk_out directly (no instance-internal-node trap).
+
+* ---- PDK stdcell SPICE ---- 
+.include /foss/pdks/ihp-sg13g2/libs.ref/sg13g2_stdcell/spice/sg13g2_stdcell.spice
+
+* ---- supplies + enable ----
+vvdd VPWR 0 DC 1.2
+ven  enable 0 DC 1.2
+
+* ---- stage A: NAND2(enable, n3) -> n1 [gated ring input] ----
+xnand2a VPWR 0 n1 enable n3 sg13g2_nand2_1
+r_nanA n1 0 1500
+c_nanA n1 0 45f
+
+* ---- stage B: inv(n1) -> n2 ----
+xinvB VPWR 0 n2 n1 sg13g2_inv_1
+r_invB n2 0 1500
+c_invB n2 0 45f
+
+* ---- stage C: inv(n2) -> n3 ----
+xinvC VPWR 0 n3 n2 sg13g2_inv_1
+r_invC n3 0 1500
+c_invC n3 0 45f
+
+* ---- output buffer: buf(n1) -> clk_out ----
+xbufD VPWR 0 clk_out n1 sg13g2_buf_2
+r_bufD clk_out 0 250
+c_bufD clk_out 0 30f
+
+* ---- asymmetric start (break metastable fixpoint deterministically) ----
+.ic v(n1)=0.0 v(n2)=1.2 v(n3)=0.0
+
+* ---- transient + frequency measurement ----
+.control
+  * skip the first 3 crossings (settling), then use crossing #4..#14
+  tran 10p 100n uic
+  meas tran trise4 when v(clk_out)=0.6 rise=5
+  meas tran trise14 when v(clk_out)=0.6 rise=15
+  set period10 = 0.0
+  let osc_period = (trise14 - trise4)/10
+  let osc_freq = 1/osc_period
+  echo "========================================================"
+  echo " SG13G2 RING OSCILLATOR -- real-PDK oscillation proof"
+  echo " trise4     = $&trise4"
+  echo " trise14    = $&trise14"
+  echo " osc_period = $&osc_period s"
+  echo " osc_freq   = $&osc_freq Hz"
+  echo " osc_freq   = $&osc_freq/1meg MHz"
+  echo "========================================================"
+  write ring_osc_real_raw.raw v(clk_out) v(n1) v(n2) v(n3)
+.endc
+
+.end

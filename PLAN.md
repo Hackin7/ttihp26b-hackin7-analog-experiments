@@ -58,13 +58,34 @@ select, per the TT guidance on auxiliary clocks (`set_clock_groups
 - Select one of the eight counter bytes with `ui_in[4:2]`.
 - Add RTL and gate-level cocotb tests for reset, enable, clock-freeze (select), byte selection, rollover, and tied-off outputs. *(deferred to a later pass — not required for the Figure submission flow)*
 
-### 3. Analog macro integration
+### 3. Analog macro integration (xschem-based — NOT Verilog)
 
-- Move the existing three-inverter layout work into `/analog`.
-- Normalize the macro as `ring_oscillator` with physical pins `VPWR`, `VGND`, and `clk_out`.
-- Generate matching GDS, pin-only LEF, and black-box/LVS views.
-- Add a LibreLane `MACROS` definition, fixed placement, and explicit PDN macro hooks.
-- Validate macro DRC, extraction, transient oscillation, final GDS hierarchy, and routed clock/power connectivity.
+User decision (2026-09-18, confirmed): the ring oscillator macro must be
+authored as an **analog circuit in xschem** (schematic capture → SPICE), NOT
+as synthesizable Verilog. This is the correct choice anyway: a combinational
+loop (ring) cannot be synthesized by Yosys/ABC and would trip LibreLane's
+half-period/clock-gating checks, so the macro has to be a pre-hardened
+analog black box.
+
+- Author `analog/ring_oscillator` as an xschem schematic (3-inv ring +
+  NAND enable + output buffer) in the `hpretl/iic-osic-tools` container
+  (docker image confirmed present on Docker Desktop: xschem 3.4.8RC, magic,
+  netgen 1.5.327, ngspice v47, klayout 0.30.12, with the SG13G2 PDK at
+  `/foss/pdks/ihp-sg13g2`).
+- Export the SPICE netlist, simulate oscillation in ngspice (target
+  ~50MHz, verify with `.trans` + FFT).
+- Hand-layout in magic using the TT analog DEF template
+  (`tools/local/magic_init_project.tcl` + `tt_analog_1x2.def` from
+  `timetech/ttihp26b-hackin7-analog-experiments/tt` analog def tree), draw
+  power stripes, port out `VPWR/VGND/clk_out`, stream GDS + pin-heavy LEF.
+- netgen LVS vs the xschem netlist; produce LEF + GDS + `nl` for the macro.
+- Wire into `src/config.json` as a `MACROS` entry with fixed
+  `instances`/placement + PDN macro connections to grid; add the
+  registered-select clock mux in `src/project.v` (still RTL top, no loop in
+  RTL); add custom clock-group SDC.
+- Validate: macro place-and-route (LibreLane sees it as a placed black
+  box), LVS/DRC green, timing (TT flow) green, GDS hierarchy includes the
+  macro, oscillation verified by ngspice + LVS-clean GDS.
 
 ### 4. Future analog work
 

@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+# emit_and_run_sg13g2_gates.sh -- prove SG13G2 REAL-gate-ring oscillation.
+# Basis (hardened from the container probe that PRINTED both real paths):
+#   gate-deck  = /foss/pdks/ihp-sg13g2/libs.ref/sg13g2_stdcell/cdl/sg13g2_stdcell.cdl
+#   mos-deck   = /foss/pdks/ihp-sg13g2/libs.ref/sg13g2_stdcell/spice/sg13g2_stdcell.spice
+# Both exist inside the OSIC container (probe-listed). We stage nothing ro and
+# run in the SAME rw /rt (no sed, no repoint, no quotes-in-quotes).
+set -u
+CDL=/foss/pdks/ihp-sg13g2/libs.ref/sg13g2_stdcell/cdl/sg13g2_stdcell.cdl
+MOS=/foss/pdks/ihp-sg13g2/libs.ref/sg13g2_stdcell/spice/sg13g2_stdcell.spice
+
+echo "gate-deck  = ${CDL}"; echo "mos-deck   = ${MOS}"
+ls -la "${CDL}" "${MOS}" 2>&1 | sed -n '1,2p'
+echo ""
+
+cat > ring_osc_realgates_consolidated_tb.spice <<'DECK'
+* ring_osc_realgates_consolidated_tb.spice -- REAL SG13G2 stdcell-gate ring
+* Includes BOTH real decks (gate subckts + MOS model primitives), so the
+* ring uses the actual PDK inverter/NAND2/BUF2 gates. ngspice -b headless.
+
+.include /foss/pdks/ihp-sg13g2/libs.ref/sg13g2_stdcell/cdl/sg13g2_stdcell.cdl
+.include /foss/pdks/ihp-sg13g2/libs.ref/sg13g2_stdcell/spice/sg13g2_stdcell.spice
+
+* ---------------- supplies ----------------
+vvdd VPWR 0 DC 1.2
+ven  enable 0 DC 1.2
+
+* ---------------- 3-stage gated ring (REAL gate-cell subckts) ----------------
+* stage A: sg13g2_nand2_1(enable, n3) -> n1
+xnand2a VPWR 0 n1 enable n3 sg13g2_nand2_1
+rna n1 0 3500
+cna n1 0 28f
+
+* stage B: sg13g2_inv_1(n1) -> n2
+xinvb VPWR 0 n2 n1 sg13g2_inv_1
+rnb n2 0 1700
+cnb n2 0 41f
+
+* stage C: sg13g2_inv_1(n2) -> n3
+xinvc VPWR 0 n3 n2 sg13g2_inv_1
+rnc n3 0 2900
+cnc n3 0 24f
+
+* output buffer: sg13g2_buf_2(n1) -> clk_out
+xbufd VPWR 0 clk_out n1 sg13g2_buf_2
+rbd clk_out 0 1100
+cbd clk_out 0 32f
+
+* deterministic asymmetric start (kill metastable fixpoint)
+.ic v(n1)=0.0 v(n2)=1.2 v(n3)=0.0
+DECK
+echo "emitted consolidated real-gate ring deck."
+
+.control
+  tran 10p 400n uic
+  meas tran tr_a when v(clk_out)=0.6 rise=8
+  meas tran tr_b when v(clk_out)=0.6 rise=18
+  let osc_period = (tr_b - tr_a)/10
+  let osc_freq   = 1/osc_period
+  echo ""
+  echo "===================================================="
+  echo " SG13G2 REAL-GATE-RING OSCILLATION PROOF (ngspice)"
+  echo "  tr_a       = $&tr_a s"
+  echo "  tr_b       = $&tr_b s"
+  echo "  osc_period = $&osc_period s"
+  echo "  osc_freq   = $&osc_freq Hz"
+  echo "  osc_freq   = $&osc_freq/1meg MHz"
+  echo "===================================================="
+  write /rt/ring_osc_realgates_raw.raw v(clk_out) v(n1) v(n2) v(n3)
+.endc
+END_ERR

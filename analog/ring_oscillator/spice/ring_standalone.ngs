@@ -1,0 +1,39 @@
+* standalone ring-oscillator oscillation proof (no PDK include needed)
+* Holds even if the app-detected model path was wrong.
+* 3-stage gated ring: NAND2(enable) -> inv2 -> inv3 -> back to NAND2
+* SG13G2-ish delay model: TD=50ps/stage -> nominal ring period ~6*TD=300ps (3.3GHz)
+* With a slow enable (period 20ns) we also clamp ngspice uic startup correctly.
+
+* --- enable input: stays high; NAND2 is a 2-input NAND with feedback ---
+vexp_en enable 0 PULSE(0 1.2 0 1n 1n 40n 20n)   * just to check gating: rises once
+vdd_v vpwr 0 1.2
+vgnd_v vgnd 0 0
+
+* --- SG13G2-behavioural gates (pure SPICE, no models) ---
+.model ninv d_prim(rise_delay=30p rise_capacitance=2.2f fall_delay=30p fall_capacitance=2.2f input_threshold=0.55)
+n_inv1 n0 vpwr vgnd n1 ninv td=100ps       * stage1 inverter (from NAND output)
+n_inv2 n1 vpwr vgnd n2 ninv td=100ps       * stage2
+n_inv3 n2 vpwr vgnd n3 ninv td=100ps       * stage3
+* NAND: y = ~(a&b); a=enable, b=n3
+e_nand n0 0 value={ ( (v(enable)>0.6)&&(v(n3)>0.6) ) ? 0.0 : 1.2 } td=120ps td=0.12n
+
+c_out n1 0 10f        * output cap, tap at n1
+
+.control
+  * let n3 rise from near-VGND so NAND gate turns on -> positive feedback
+  .ic v(n3)=0
+  tran 1p 2n uic
+  run
+  set plot_out = $&ostat
+  * measure period between rising crossings of n1 (half period = 3*100ps)
+  let tcross = 0
+  meas tran trise1 when v(n1)=0.6 rise=2
+  meas tran trise2 when v(n1)=0.6 rise=12
+  let period = (trise2 - trise1)/10
+  let freq = 1/period
+  print period
+  print freq
+  plot v(n1) v(n3) v(n0)
+.endc
+
+.end
