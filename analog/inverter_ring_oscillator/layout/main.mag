@@ -1,0 +1,60 @@
+magic
+tech ihp-sg13g2
+magscale 1 2
+timestamp 1789822257
+<< checkpaint >>
+rect -2356 2414 1702 2418
+rect -2356 -1640 3202 2414
+rect -856 -1644 3202 -1640
+<< nwell >>
+rect 444 480 452 576
+<< pwell >>
+rect 1022 194 1036 220
+<< ndiff >>
+rect 1022 194 1036 220
+<< metal1 >>
+rect -338 860 1154 866
+rect 1408 860 1608 920
+rect -338 766 1608 860
+rect -338 744 1154 766
+rect 1408 720 1608 766
+rect -380 360 -164 432
+rect -120 358 410 424
+rect 466 344 944 424
+rect 1410 408 1610 496
+rect 996 352 1610 408
+rect 1410 282 1610 352
+rect -348 -14 0 118
+rect 200 112 1154 118
+rect 1416 112 1616 140
+rect 200 -14 1616 112
+rect 1416 -60 1616 -14
+<< metal2 >>
+rect -362 336 1206 424
+use via_GQ9R9N  via_GQ9R9N_0
+timestamp 0
+transform 1 0 -327 0 1 389
+box 0 0 1 1
+use via_GQ9R9N  via_GQ9R9N_1
+timestamp 0
+transform 1 0 1173 0 1 385
+box 0 0 1 1
+use sg13g2_inv_1  x1
+timestamp 1789822257
+transform 1 0 288 0 1 48
+box -48 -56 336 834
+use sg13g2_inv_1  x2
+timestamp 1789822257
+transform 1 0 820 0 1 48
+box -48 -56 336 834
+use sg13g2_inv_1  x32
+timestamp 1789822257
+transform 1 0 -292 0 1 60
+box -48 -56 336 834
+<< labels >>
+flabel metal1 1410 296 1610 496 0 FreeSans 1600 0 0 0 out
+port 0 nsew
+flabel metal1 1408 720 1608 920 0 FreeSans 1600 0 0 0 VDD
+flabel metal1 1416 -60 1616 140 0 FreeSans 1600 0 0 0 VSS
+port 1 nsew
+<< end >>
