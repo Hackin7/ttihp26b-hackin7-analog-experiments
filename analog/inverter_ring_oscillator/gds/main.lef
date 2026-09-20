@@ -1,0 +1,22 @@
+MACRO via_VHGR6D
+  CLASS BLOCK ;
+  FOREIGN via_VHGR6D ;
+  ORIGIN 0.820 0.820 ;
+  SIZE 1.640 BY 1.640 ;
+  OBS
+      LAYER Metal1 ;
+        RECT -0.145 -0.105 0.145 0.105 ;
+      LAYER Metal2 ;
+        RECT -0.100 -0.360 0.100 0.360 ;
+      LAYER Metal3 ;
+        RECT -0.360 -0.100 0.360 0.100 ;
+      LAYER Metal4 ;
+        RECT -0.100 -0.360 0.100 0.360 ;
+      LAYER Metal5 ;
+        RECT -0.310 -0.310 0.310 0.310 ;
+      LAYER TopMetal1 ;
+        RECT -0.820 -0.820 0.820 0.820 ;
+  END
+END via_VHGR6D
+END LIBRARY
+

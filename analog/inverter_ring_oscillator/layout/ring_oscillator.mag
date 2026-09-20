@@ -1,0 +1,72 @@
+magic
+tech ihp-sg13g2
+magscale 1 2
+timestamp 1789903535
+<< error_s >>
+rect 2028 1104 2030 1430
+rect 2030 1102 2356 1104
+<< nwell >>
+rect 444 480 452 576
+<< pwell >>
+rect 1022 194 1036 220
+<< ndiff >>
+rect 1022 194 1036 220
+<< metal1 >>
+rect -338 860 1154 866
+rect -338 770 1598 860
+rect -338 766 1408 770
+rect -338 744 1154 766
+rect -380 409 -164 432
+rect -380 369 -347 409
+rect -307 369 -164 409
+rect -380 360 -164 369
+rect -120 358 410 424
+rect 466 344 944 424
+rect 1410 408 1610 496
+rect 996 405 1610 408
+rect 996 365 1153 405
+rect 1193 365 1610 405
+rect 996 352 1610 365
+rect 1410 282 1610 352
+rect -348 112 1154 118
+rect -348 -14 1612 112
+<< via1 >>
+rect -347 369 -307 409
+rect 1153 365 1193 405
+<< metal2 >>
+rect -362 409 1206 424
+rect -362 369 -347 409
+rect -307 405 1206 409
+rect -307 369 1153 405
+rect -362 365 1153 369
+rect 1193 365 1206 405
+rect -362 336 1206 365
+<< metal6 >>
+rect 2028 1102 2030 1104
+use via_VHGR6D  via_VHGR6D_0
+timestamp 1789903535
+transform 1 0 1514 0 1 34
+box -164 -164 164 164
+use via_VHGR6D  via_VHGR6D_1
+timestamp 1789903535
+transform 1 0 1524 0 1 822
+box -164 -164 164 164
+use sg13g2_inv_1  x1
+timestamp 1789822257
+transform 1 0 288 0 1 48
+box -48 -56 336 834
+use sg13g2_inv_1  x2
+timestamp 1789822257
+transform 1 0 820 0 1 48
+box -48 -56 336 834
+use sg13g2_inv_1  x32
+timestamp 1789822257
+transform 1 0 -292 0 1 60
+box -48 -56 336 834
+<< labels >>
+flabel metal1 1410 296 1610 496 0 FreeSans 1600 0 0 0 out
+port 0 nsew
+rlabel metal1 1410 282 1432 380 1 out1
+rlabel space 1350 -130 1678 -28 1 GND
+rlabel space 1360 656 1688 986 1 VPWR
+<< end >>

@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-echo "== find tech lefs / via defs in osic-tools =="
-grep -rn -l "LAYER Via1 " /foss/pdks 2>/dev/null | head -5
-echo "== if none, search python pdk lef =="
-grep -rn -l "LAYER Via1 " /usr/local/lib/python3.12/dist-packages 2>/dev/null | head -5
+echo "== find via_VHGR6D cell source =="
+find / -name 'via_VHGR6D*' 2>/dev/null | head
+echo "== grep analog magical layout for via_VHGR6D =="
+grep -rn 'via_VHGR6D' /foss/pdks/ihp-sg13g2 2>/dev/null | head -5
