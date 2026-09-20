@@ -19,3 +19,5 @@ tt/
 src/user_config.json
 src/config_merged.json
 gds_render*
+tmp_*
+**/__pycache__/
