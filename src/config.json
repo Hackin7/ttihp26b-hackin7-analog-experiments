@@ -8,9 +8,8 @@
 
   "MACROS": {
     "tt_um_hackin7_analog_experiments": {
-      "abstract": "analog/lef/tt_um_hackin7_analog_experiments.lef",
-      "gds": "analog/gds/tt_um_hackin7_analog_experiments.gds",
-      "pdk": "sky130A"
+      "lef": "analog/lef/tt_um_hackin7_analog_experiments.lef",
+      "gds": "analog/gds/tt_um_hackin7_analog_experiments.gds"
     }
   },
 
