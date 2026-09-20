@@ -1,0 +1,5 @@
+.spiceinit
+out/pdk.lib
+out/ring.dat
+out/ring.raw
+out/ngspice.log

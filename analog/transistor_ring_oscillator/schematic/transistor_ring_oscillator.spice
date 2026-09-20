@@ -1,0 +1,13 @@
+* Schematic reference netlist: three-stage CMOS ring of IHP SG13G2 LV MOSFETs.
+* Device W/L matches sg13g2_inv_1. Port order: out VPWR VGND.
+.subckt trosc out VPWR VGND
+* stage 0: in=out, out=n1
+Xp0 n1 out VPWR VPWR sg13_lv_pmos w=1.12u l=0.13u ng=1 m=1
+Xn0 n1 out VGND VGND sg13_lv_nmos w=0.74u l=0.13u ng=1 m=1
+* stage 1: in=n1, out=n2
+Xp1 n2 n1 VPWR VPWR sg13_lv_pmos w=1.12u l=0.13u ng=1 m=1
+Xn1 n2 n1 VGND VGND sg13_lv_nmos w=0.74u l=0.13u ng=1 m=1
+* stage 2: in=n2, out=out
+Xp2 out n2 VPWR VPWR sg13_lv_pmos w=1.12u l=0.13u ng=1 m=1
+Xn2 out n2 VGND VGND sg13_lv_nmos w=0.74u l=0.13u ng=1 m=1
+.ends trosc

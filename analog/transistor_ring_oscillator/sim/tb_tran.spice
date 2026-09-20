@@ -1,0 +1,21 @@
+* Pre-layout transient of transistor ring oscillator (mos_tt, 1.2 V).
+* PDK .lib line is written by run_sim.sh into out/pdk.lib.
+.include out/pdk.lib
+.include ../schematic/transistor_ring_oscillator.spice
+
+.param pre_layout=1
+
+Xdut out VPWR VGND trosc
+vvdd VPWR 0 dc 1.2
+vvss VGND 0 0
+.ic v(xdut.n1)=1.2 v(out)=0 v(xdut.n2)=0
+
+.control
+  tran 10p 5n uic
+  wrdata out/ring.dat v(out) v(xdut.n1) v(xdut.n2)
+  write out/ring.raw v(out) v(xdut.n1) v(xdut.n2)
+  meas tran t_r2 when v(out)=0.6 rise=2
+  meas tran t_r12 when v(out)=0.6 rise=12
+  print t_r2 t_r12
+.endc
+.end
