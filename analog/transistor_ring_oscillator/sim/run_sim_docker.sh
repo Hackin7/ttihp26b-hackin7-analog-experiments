@@ -3,7 +3,9 @@
 set -euo pipefail
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 docker run --rm --entrypoint /bin/bash \
+  -e "LCH=${LCH:-}" \
+  -e "SWEEP=${SWEEP:-}" \
   -v "$REPO:/repo" \
   -w /repo/analog/transistor_ring_oscillator/sim \
   hpretl/iic-osic-tools \
-  -lc 'bash ./run_sim.sh'
+  -lc 'if [ "${SWEEP:-}" = 1 ]; then bash ./sweep_l.sh; else bash ./run_sim.sh; fi'

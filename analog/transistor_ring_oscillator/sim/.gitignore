@@ -1,5 +1,6 @@
 .spiceinit
 out/pdk.lib
+out/lch.param
 out/ring.dat
 out/ring.raw
 out/ngspice.log

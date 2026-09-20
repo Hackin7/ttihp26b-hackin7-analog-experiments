@@ -13,6 +13,7 @@ OUT_DIR = SIM_DIR / "out"
 DAT_PATH = OUT_DIR / "ring.dat"
 PNG_PATH = OUT_DIR / "waveform.png"
 FREQ_PATH = OUT_DIR / "freq.txt"
+PLOT = "--no-plot" not in sys.argv
 
 STARTUP_S = 0.5e-9
 MIDRAIL_V = 0.6
@@ -76,30 +77,32 @@ def main() -> int:
         encoding="utf-8",
     )
 
-    import matplotlib
-
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-
-    fig, ax = plt.subplots(figsize=(10, 4))
-    ax.plot(t * 1e9, v_out, label="out")
-    ax.plot(t * 1e9, v_n1, label="n1")
-    ax.plot(t * 1e9, v_n2, label="n2")
-    ax.axhline(MIDRAIL_V, color="gray", linestyle="--", linewidth=0.8)
-    ax.set_xlabel("time (ns)")
-    ax.set_ylabel("voltage (V)")
-    ax.set_title(f"transistor ring  f = {freq_hz / 1e9:.3f} GHz")
-    ax.legend(loc="upper right")
-    ax.grid(True, alpha=0.3)
-    fig.tight_layout()
-    fig.savefig(PNG_PATH, dpi=120)
-    plt.close(fig)
-
     print(f"period_s={period_s:.6e}")
-    print(f"freq_hz={freq_hz:.6e} ({freq_hz / 1e9:.3f} GHz)")
+    mhz = freq_hz / 1e6
+    print(f"freq_hz={freq_hz:.6e} ({mhz:.1f} MHz)")
     print(f"n_cycles={n_cycles}")
     print(f"wrote {FREQ_PATH}")
-    print(f"wrote {PNG_PATH}")
+
+    if PLOT:
+        import matplotlib
+
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+
+        fig, ax = plt.subplots(figsize=(10, 4))
+        ax.plot(t * 1e9, v_out, label="out")
+        ax.plot(t * 1e9, v_n1, label="n1")
+        ax.plot(t * 1e9, v_n2, label="n2")
+        ax.axhline(MIDRAIL_V, color="gray", linestyle="--", linewidth=0.8)
+        ax.set_xlabel("time (ns)")
+        ax.set_ylabel("voltage (V)")
+        ax.set_title(f"transistor ring  f = {mhz:.1f} MHz")
+        ax.legend(loc="upper right")
+        ax.grid(True, alpha=0.3)
+        fig.tight_layout()
+        fig.savefig(PNG_PATH, dpi=120)
+        plt.close(fig)
+        print(f"wrote {PNG_PATH}")
     return 0
 
 
