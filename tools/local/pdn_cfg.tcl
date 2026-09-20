@@ -208,8 +208,11 @@ add_pdn_stripe \
     -extend_to_boundary
 
 # pdngen always cuts TopMetal1 around CLASS BLOCK macros (~1.6–3.3 µm).
-# After pdngen, drop TT-top jumpers that overlap the analog TM1 pads and
-# the surviving strap remnants so extract sees chip VPWR/VGND.
+# After pdngen, drop full-height TT-top jumpers that overlap the analog TM1
+# pads and the surviving strap remnants so extract sees chip VPWR/VGND.
+# Tiny Tapeout pin check requires every VGND/VDPWR LEF PORT rectangle to
+# start within 10 µm of the bottom and reach within 10 µm of the top, so
+# also replace the cut-strap BPins with one full-height pin on each jumper.
 proc analog_add_tm1_sbox {net_name layer x1 y1 x2 y2} {
     set net [[ord::get_db_block] findNet $net_name]
     if {$net == "NULL"} {
@@ -222,8 +225,25 @@ proc analog_add_tm1_sbox {net_name layer x1 y1 x2 y2} {
     puts "  analog TM1 jumper $net_name [$layer getName] ($x1 $y1) ($x2 $y2)"
 }
 
-proc analog_add_tm1_jumpers {} {
-    puts "Adding analog TopMetal1 PDN jumpers..."
+proc analog_tm1_pin_spans_die {box die_y1 die_y2 edge} {
+    if {([$box yMin] - $die_y1) > $edge} {
+        return 0
+    }
+    if {($die_y2 - [$box yMax]) > $edge} {
+        return 0
+    }
+    return 1
+}
+
+proc analog_add_tm1_bpin {bterm layer x1 y1 x2 y2} {
+    set bpin [odb::dbBPin_create $bterm]
+    $bpin setPlacementStatus "FIRM"
+    odb::dbBox_create $bpin $layer $x1 $y1 $x2 $y2
+    puts "  analog TM1 BPin [$bterm getName] [$layer getName] ($x1 $y1) ($x2 $y2)"
+}
+
+proc analog_fix_power_pins {} {
+    puts "Adding analog TopMetal1 PDN jumpers and full-height power pins..."
     set block [ord::get_db_block]
     set tech [ord::get_db_tech]
     set layer [$tech findLayer TopMetal1]
@@ -236,25 +256,72 @@ proc analog_add_tm1_jumpers {} {
         puts "WARNING: analog TM1 jumper skipped; u_ring_oscillator not found"
         return
     }
+
     set dbu [$tech getDbUnitsPerMicron]
-    set bbox [$inst getBBox]
-    set ix [$bbox xMin]
-    set margin [expr {8 * $dbu}]
-    set y1 [expr {[$bbox yMin] - $margin}]
-    set y2 [expr {[$bbox yMax] + $margin}]
-    # LEF TM1 pads: VPWR 0.970–3.170, VGND 7.170–9.370
-    analog_add_tm1_sbox VPWR $layer \
-        [expr {$ix + round(0.97 * $dbu)}] $y1 \
-        [expr {$ix + round(3.17 * $dbu)}] $y2
-    analog_add_tm1_sbox VGND $layer \
-        [expr {$ix + round(7.17 * $dbu)}] $y1 \
-        [expr {$ix + round(9.37 * $dbu)}] $y2
+    set die [$block getDieArea]
+    set die_y1 [$die yMin]
+    set die_y2 [$die yMax]
+    set edge [expr {10 * $dbu}]
+    set ix [[$inst getBBox] xMin]
+    set layer_name [$layer getName]
+
+    foreach net_name {VPWR VGND} {
+        set bterm [$block findBTerm $net_name]
+        if {$bterm == "NULL"} {
+            puts "WARNING: analog power pin fix skipped; $net_name bterm not found"
+            continue
+        }
+
+        set pin_y1 ""
+        set pin_y2 ""
+        set strap_xs [dict create]
+        foreach bpin [$bterm getBPins] {
+            foreach box [$bpin getBoxes] {
+                set box_layer [$box getTechLayer]
+                if {$box_layer == "NULL" || [$box_layer getName] != $layer_name} {
+                    continue
+                }
+                if {[analog_tm1_pin_spans_die $box $die_y1 $die_y2 $edge]} {
+                    set pin_y1 [$box yMin]
+                    set pin_y2 [$box yMax]
+                    dict set strap_xs [$box xMin] [$box xMax]
+                }
+            }
+        }
+
+        if {$pin_y1 == "" || $pin_y2 == ""} {
+            set pin_y1 [expr {$die_y1 + round(3.15 * $dbu)}]
+            set pin_y2 [expr {$die_y2 - round(3.56 * $dbu)}]
+        }
+
+        if {$net_name == "VPWR"} {
+            set jx1 [expr {$ix + round(0.97 * $dbu)}]
+            set jx2 [expr {$ix + round(3.17 * $dbu)}]
+        } else {
+            set jx1 [expr {$ix + round(7.17 * $dbu)}]
+            set jx2 [expr {$ix + round(9.37 * $dbu)}]
+        }
+        analog_add_tm1_sbox $net_name $layer $jx1 $pin_y1 $jx2 $pin_y2
+        dict set strap_xs $jx1 $jx2
+
+        set to_destroy {}
+        foreach bpin [$bterm getBPins] {
+            lappend to_destroy $bpin
+        }
+        foreach bpin $to_destroy {
+            odb::dbBPin_destroy $bpin
+        }
+
+        foreach x1 [lsort -integer [dict keys $strap_xs]] {
+            analog_add_tm1_bpin $bterm $layer $x1 $pin_y1 [dict get $strap_xs $x1] $pin_y2
+        }
+    }
 }
 
 if {[llength [info commands ::pdngen_orig]] == 0 && [llength [info commands ::pdngen]]} {
     rename ::pdngen ::pdngen_orig
     proc ::pdngen {args} {
         ::pdngen_orig {*}$args
-        analog_add_tm1_jumpers
+        analog_fix_power_pins
     }
 }
