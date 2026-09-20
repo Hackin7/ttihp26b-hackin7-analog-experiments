@@ -1,10 +1,6 @@
 magic
 tech ihp-sg13g2
 magscale 1 2
-timestamp 1789903535
-<< error_s >>
-rect 2028 1104 2030 1430
-rect 2030 1102 2356 1104
 timestamp 1789918000
 << nwell >>
 rect 444 480 452 576
