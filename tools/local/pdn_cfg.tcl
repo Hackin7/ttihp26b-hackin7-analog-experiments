@@ -194,34 +194,67 @@ define_pdn_grid \
     -starts_with POWER \
     -halo "$::env(PDN_HORIZONTAL_HALO) $::env(PDN_VERTICAL_HALO)"
 
-# Analog power pins are Metal1. Follow those pins, draw TopMetal1 over the
-# block (aligned to the tile straps), and via Metal1 up to TopMetal1.
-add_pdn_stripe \
-    -grid macro \
-    -layer Metal1 \
-    -width 0.44 \
-    -followpins
-
+# Analog GDS vias Metal1 rails up to TopMetal1 pads. A dummy stripe is
+# required on this grid so pdngen does not trip PDN-0232/0233; keep it on
+# TopMetal1 (not followpins — followpins here drew illegal TM1 slivers).
 add_pdn_stripe \
     -grid macro \
     -layer $::env(PDN_VERTICAL_LAYER) \
     -width $::env(PDN_VWIDTH) \
     -nets {VPWR} \
-    -offset 2.55 \
+    -offset 0.97 \
     -pitch $::env(PDN_VPITCH) \
     -number_of_straps 1 \
     -extend_to_boundary
 
-add_pdn_stripe \
-    -grid macro \
-    -layer $::env(PDN_VERTICAL_LAYER) \
-    -width $::env(PDN_VWIDTH) \
-    -nets {VGND} \
-    -offset 7.78 \
-    -pitch $::env(PDN_VPITCH) \
-    -number_of_straps 1 \
-    -extend_to_boundary
+# pdngen always cuts TopMetal1 around CLASS BLOCK macros (~1.6–3.3 µm).
+# After pdngen, drop TT-top jumpers that overlap the analog TM1 pads and
+# the surviving strap remnants so extract sees chip VPWR/VGND.
+proc analog_add_tm1_sbox {net_name layer x1 y1 x2 y2} {
+    set net [[ord::get_db_block] findNet $net_name]
+    if {$net == "NULL"} {
+        puts "WARNING: analog TM1 jumper skipped; net $net_name not found"
+        return
+    }
+    $net setSpecial
+    set swire [odb::dbSWire_create $net "ROUTED"]
+    odb::dbSBox_create $swire $layer $x1 $y1 $x2 $y2 "STRIPE"
+    puts "  analog TM1 jumper $net_name [$layer getName] ($x1 $y1) ($x2 $y2)"
+}
 
-add_pdn_connect \
-    -grid macro \
-    -layers "Metal1 $::env(PDN_VERTICAL_LAYER)"
+proc analog_add_tm1_jumpers {} {
+    puts "Adding analog TopMetal1 PDN jumpers..."
+    set block [ord::get_db_block]
+    set tech [ord::get_db_tech]
+    set layer [$tech findLayer TopMetal1]
+    if {$layer == "NULL"} {
+        puts "WARNING: analog TM1 jumper skipped; TopMetal1 not found"
+        return
+    }
+    set inst [$block findInst u_ring_oscillator]
+    if {$inst == "NULL"} {
+        puts "WARNING: analog TM1 jumper skipped; u_ring_oscillator not found"
+        return
+    }
+    set dbu [$tech getDbUnitsPerMicron]
+    set bbox [$inst getBBox]
+    set ix [$bbox xMin]
+    set margin [expr {8 * $dbu}]
+    set y1 [expr {[$bbox yMin] - $margin}]
+    set y2 [expr {[$bbox yMax] + $margin}]
+    # LEF TM1 pads: VPWR 0.970–3.170, VGND 7.170–9.370
+    analog_add_tm1_sbox VPWR $layer \
+        [expr {$ix + round(0.97 * $dbu)}] $y1 \
+        [expr {$ix + round(3.17 * $dbu)}] $y2
+    analog_add_tm1_sbox VGND $layer \
+        [expr {$ix + round(7.17 * $dbu)}] $y1 \
+        [expr {$ix + round(9.37 * $dbu)}] $y2
+}
+
+if {[llength [info commands ::pdngen_orig]] == 0 && [llength [info commands ::pdngen]]} {
+    rename ::pdngen ::pdngen_orig
+    proc ::pdngen {args} {
+        ::pdngen_orig {*}$args
+        analog_add_tm1_jumpers
+    }
+}

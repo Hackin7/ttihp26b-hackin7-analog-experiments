@@ -139,19 +139,23 @@ def shifted_rect(line: str) -> str:
 
 
 def normalize_lef() -> None:
-    if not SOURCE_LEF.exists():
-        # Keep the already-written pin LEF; only GDS origin/name is regenerated.
+    source_path = SOURCE_LEF if SOURCE_LEF.exists() else OUTPUT_LEF
+    if not source_path.exists():
         return
-    source = SOURCE_LEF.read_text(encoding="ascii").splitlines()
+    source = source_path.read_text(encoding="ascii").splitlines()
     obs_lines: list[str] = []
     in_obs = False
     layer = None
     pin_rectangles = {
         "Metal1": [
             (8.950, 1.780, 9.950, 2.780),  # out
-            (0.210, 4.150, 9.890, 4.600),  # VPWR
-            (0.160, 0.230, 9.960, 0.860),  # VGND
-        ]
+            (0.210, 4.150, 9.890, 4.600),  # VPWR rail
+            (0.160, 0.230, 9.960, 0.860),  # VGND rail
+        ],
+        "TopMetal1": [
+            (0.970, 3.260, 3.170, 4.900),
+            (7.170, 0.000, 9.370, 1.640),
+        ],
     }
     for line in source:
         stripped = line.strip()
@@ -167,10 +171,10 @@ def normalize_lef() -> None:
                 obs_lines.append(line)
                 continue
 
-            shifted = shifted_rect(line)
+            obs_rect = shifted_rect(line) if source_path == SOURCE_LEF else line
             rect_match = re.match(
                 r"\s*RECT\s+([-0-9.]+)\s+([-0-9.]+)\s+([-0-9.]+)\s+([-0-9.]+)\s*;",
-                shifted,
+                obs_rect,
             )
             if rect_match and layer in pin_rectangles:
                 rect = tuple(float(rect_match.group(index)) for index in range(1, 5))
@@ -183,7 +187,7 @@ def normalize_lef() -> None:
                 )
                 if overlaps_pin:
                     continue
-            obs_lines.append(shifted)
+            obs_lines.append(obs_rect)
 
     lef = [
         "VERSION 5.7 ;",
@@ -209,6 +213,8 @@ def normalize_lef() -> None:
         "    PORT",
         "      LAYER Metal1 ;",
         "        RECT 0.210 4.150 9.890 4.600 ;",
+        "      LAYER TopMetal1 ;",
+        "        RECT 0.970 3.260 3.170 4.900 ;",
         "    END",
         "  END VPWR",
         "  PIN VGND",
@@ -217,6 +223,8 @@ def normalize_lef() -> None:
         "    PORT",
         "      LAYER Metal1 ;",
         "        RECT 0.160 0.230 9.960 0.860 ;",
+        "      LAYER TopMetal1 ;",
+        "        RECT 7.170 0.000 9.370 1.640 ;",
         "    END",
         "  END VGND",
         "  OBS",

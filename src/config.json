@@ -14,7 +14,7 @@
     "ring_oscillator": {
       "instances": {
         "u_ring_oscillator": {
-          "location": [51.7, 18.90],
+          "location": [53.28, 18.90],
           "orientation": "N"
         }
       },
@@ -32,6 +32,8 @@
   "FP_MACRO_VERTICAL_HALO": 2,
   "PDN_HORIZONTAL_HALO": 2,
   "PDN_VERTICAL_HALO": 2,
+  "FP_PDN_SKIPTRIM": 1,
+  "PDN_SKIPTRIM": 1,
   "RUN_KLAYOUT_XOR": 0,
   "RUN_KLAYOUT_DRC": 0,
   "DESIGN_REPAIR_BUFFER_OUTPUT_PORTS": 0,

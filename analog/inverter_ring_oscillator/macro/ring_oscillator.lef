@@ -21,6 +21,8 @@ MACRO ring_oscillator
     PORT
       LAYER Metal1 ;
         RECT 0.210 4.150 9.890 4.600 ;
+      LAYER TopMetal1 ;
+        RECT 0.970 3.260 3.170 4.900 ;
     END
   END VPWR
   PIN VGND
@@ -29,6 +31,8 @@ MACRO ring_oscillator
     PORT
       LAYER Metal1 ;
         RECT 0.160 0.230 9.960 0.860 ;
+      LAYER TopMetal1 ;
+        RECT 7.170 0.000 9.370 1.640 ;
     END
   END VGND
   OBS

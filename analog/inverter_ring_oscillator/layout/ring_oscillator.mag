@@ -27,9 +27,12 @@ rect 996 352 1610 365
 rect 1410 282 1610 352
 rect -348 112 1154 118
 rect -348 -14 1612 112
+rect 4 754 64 814
 << via1 >>
 rect -347 369 -307 409
 rect 1153 365 1193 405
+rect 14 754 54 794
+rect 1254 66 1294 106
 << metal2 >>
 rect -362 409 1206 424
 rect -362 369 -347 409
@@ -38,6 +41,32 @@ rect -307 369 1153 405
 rect -362 365 1153 369
 rect 1193 365 1206 405
 rect -362 336 1206 365
+rect -6 734 74 814
+rect 1234 46 1314 126
+<< via2 >>
+rect 14 754 54 794
+rect 1254 66 1294 106
+<< metal3 >>
+rect -6 734 74 814
+rect 1234 46 1314 126
+<< via3 >>
+rect 14 754 54 794
+rect 1254 66 1294 106
+<< metal4 >>
+rect -6 734 74 814
+rect 1234 46 1314 126
+<< via4 >>
+rect 14 754 54 794
+rect 1254 66 1294 106
+<< metal5 >>
+rect -48 692 116 856
+rect 1192 4 1356 168
+<< via5 >>
+rect -28 712 96 836
+rect 1212 24 1336 148
+<< metal6 >>
+rect -186 592 254 920
+rect 1054 -60 1494 268
 use sg13g2_inv_1  x1
 timestamp 1789822257
 transform 1 0 288 0 1 48
@@ -55,7 +84,11 @@ flabel metal1 1410 296 1610 496 0 FreeSans 1600 0 0 0 out
 port 0 nsew
 flabel metal1 -338 770 1598 860 0 FreeSans 1600 0 0 0 VPWR
 port 1 nsew
+flabel metal6 -186 592 254 920 0 FreeSans 1600 0 0 0 VPWR
+port 1 nsew
 flabel metal1 -348 -14 1612 112 0 FreeSans 1600 0 0 0 VGND
+port 2 nsew
+flabel metal6 1054 -60 1494 268 0 FreeSans 1600 0 0 0 VGND
 port 2 nsew
 rlabel metal1 1410 282 1432 380 1 out1
 << end >>
