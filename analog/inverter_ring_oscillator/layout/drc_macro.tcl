@@ -1,5 +1,5 @@
 drc on
-load main
+load ring_oscillator
 select top cell
 drc check
 drc catchup

@@ -2,13 +2,18 @@
 
 # TinyAnalogExperiments — IHP26b mixed-signal project
 
-This project targets one IHP SG13G2 1×1 Tiny Tapeout tile. The digital portion
-will contain a 64-bit counter, while a three-inverter ring oscillator is added
-as a physical macro in a later integration stage.
+This project targets one IHP SG13G2 1×1 Tiny Tapeout tile. The top cell is a
+thin hierarchical assembler:
 
-Part 1 establishes the standard IHP26b LibreLane CI flow and a lint-clean
-Tiny Tapeout wrapper. The current checked-in GDS/LEF are retained as analog
-reference material until the macro integration stage.
+- analog leaf `ring_oscillator` (pre-hardened GDS/LEF)
+- digital leaf `digital_counter` (synthesized RTL)
+- clock mux glue in `src/project.v`
+
+LibreLane auto-routes all Verilog signal nets, including the ring output.
+See [docs/hierarchy.md](docs/hierarchy.md) for how to add more leaves.
+
+Part 1 established the IHP26b LibreLane CI flow. Analog source layout lives
+under `analog/inverter_ring_oscillator/`.
 
 ## Local hardening
 

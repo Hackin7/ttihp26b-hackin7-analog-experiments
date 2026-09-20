@@ -27,12 +27,40 @@ EXTRACTED_SPICE = OUTPUT_DIR / "ring_oscillator_extracted.spice"
 
 SHIFT_DBU = (1900, 300)
 SHIFT_UM = (1.9, 0.3)
+SIZE_DBU = (9980, 4900)  # LEF SIZE 9.980 x 4.900 µm at 1 nm database units
+PR_BOUNDARY_LAYER = 189  # IHP BOUND / prBoundary
+PR_BOUNDARY_DATATYPE = 4
+
+TOP_CELLS = ("main", "ring_oscillator")
 
 
 def record(record_type: int, data_type: int, payload: bytes) -> bytes:
     if len(payload) % 2:
         payload += b"\0"
     return struct.pack(">HBB", len(payload) + 4, record_type, data_type) + payload
+
+
+def pr_boundary_element(width: int, height: int) -> bytes:
+    """GDS BOUNDARY on the IHP PR-boundary layer covering the LEF outline."""
+    x1, y1 = 0, 0
+    x2, y2 = width, height
+    xy = struct.pack(
+        ">10i",
+        x1, y1,
+        x2, y1,
+        x2, y2,
+        x1, y2,
+        x1, y1,
+    )
+    return b"".join(
+        [
+            record(0x08, 0, b""),  # BOUNDARY
+            record(0x0D, 2, struct.pack(">H", PR_BOUNDARY_LAYER)),
+            record(0x0E, 2, struct.pack(">H", PR_BOUNDARY_DATATYPE)),
+            record(0x10, 3, xy),  # XY
+            record(0x11, 0, b""),  # ENDEL
+        ]
+    )
 
 
 def normalize_gds() -> None:
@@ -48,24 +76,55 @@ def normalize_gds() -> None:
 
         if record_type == 0x06:  # STRNAME
             structure = payload.rstrip(b"\0").decode("ascii")
-            if structure == "main":
+            if structure in TOP_CELLS:
                 payload = b"ring_oscillator"
-        elif structure == "main" and record_type == 0x10:  # XY
+        elif structure in TOP_CELLS and record_type == 0x10:  # XY
             values = list(struct.unpack(">" + "i" * (len(payload) // 4), payload))
             for index in range(0, len(values), 2):
                 values[index] += SHIFT_DBU[0]
                 values[index + 1] += SHIFT_DBU[1]
             payload = struct.pack(">" + "i" * len(values), *values)
-        elif structure == "main" and record_type == 0x19:  # STRING
+        elif structure in TOP_CELLS and record_type == 0x19:  # STRING
             label = payload.rstrip(b"\0").decode("ascii")
             if label == "VDD":
                 payload = b"VPWR"
-            elif label == "VSS":
+            elif label in ("VSS", "GND"):
                 payload = b"VGND"
 
         output.append(record(record_type, data_type, payload))
 
     OUTPUT_GDS.write_bytes(b"".join(output))
+    inject_pr_boundary(OUTPUT_GDS)
+
+
+def inject_pr_boundary(path: Path, width: int = SIZE_DBU[0], height: int = SIZE_DBU[1]) -> None:
+    """Insert a PR-boundary box on cell ring_oscillator if one is not present."""
+    raw = path.read_bytes()
+    output: list[bytes] = []
+    offset = 0
+    structure = None
+    in_top = False
+    has_pr = False
+    while offset < len(raw):
+        length, record_type, data_type = struct.unpack(">HBB", raw[offset : offset + 4])
+        payload = raw[offset + 4 : offset + length]
+        chunk = raw[offset : offset + length]
+        offset += length
+
+        if record_type == 0x06:  # STRNAME
+            structure = payload.rstrip(b"\0").decode("ascii")
+            in_top = structure == "ring_oscillator"
+            has_pr = False
+        elif in_top and record_type == 0x0D and len(payload) >= 2:
+            if struct.unpack(">H", payload[:2])[0] == PR_BOUNDARY_LAYER:
+                has_pr = True
+        elif in_top and record_type == 0x07 and not has_pr:
+            output.append(pr_boundary_element(width, height))
+            in_top = False
+
+        output.append(chunk)
+
+    path.write_bytes(b"".join(output))
 
 
 def shifted_rect(line: str) -> str:
@@ -80,6 +139,9 @@ def shifted_rect(line: str) -> str:
 
 
 def normalize_lef() -> None:
+    if not SOURCE_LEF.exists():
+        # Keep the already-written pin LEF; only GDS origin/name is regenerated.
+        return
     source = SOURCE_LEF.read_text(encoding="ascii").splitlines()
     obs_lines: list[str] = []
     in_obs = False
@@ -87,8 +149,8 @@ def normalize_lef() -> None:
     pin_rectangles = {
         "Metal1": [
             (8.950, 1.780, 9.950, 2.780),  # out
-            (8.940, 3.900, 9.940, 4.900),  # VPWR
-            (8.980, 0.000, 9.980, 1.000),  # VGND
+            (0.210, 4.150, 9.890, 4.600),  # VPWR
+            (0.160, 0.230, 9.960, 0.860),  # VGND
         ]
     }
     for line in source:
@@ -146,7 +208,7 @@ def normalize_lef() -> None:
         "    USE POWER ;",
         "    PORT",
         "      LAYER Metal1 ;",
-        "        RECT 8.940 3.900 9.940 4.900 ;",
+        "        RECT 0.210 4.150 9.890 4.600 ;",
         "    END",
         "  END VPWR",
         "  PIN VGND",
@@ -154,7 +216,7 @@ def normalize_lef() -> None:
         "    USE GROUND ;",
         "    PORT",
         "      LAYER Metal1 ;",
-        "        RECT 8.980 0.000 9.980 1.000 ;",
+        "        RECT 0.160 0.230 9.960 0.860 ;",
         "    END",
         "  END VGND",
         "  OBS",

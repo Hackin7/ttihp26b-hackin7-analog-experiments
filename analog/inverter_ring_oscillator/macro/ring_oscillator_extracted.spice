@@ -1,4 +1,4 @@
-* NGSPICE file created from main.ext - technology: ihp-sg13g2
+* NGSPICE file created from ring_oscillator.ext - technology: ihp-sg13g2
 
 .subckt sg13g2_inv_1 Y A VSS VDD
 X0 Y A VDD VDD sg13_lv_pmos ad=0.3808p pd=2.92u as=0.3808p ps=2.92u w=1.12u l=0.13u

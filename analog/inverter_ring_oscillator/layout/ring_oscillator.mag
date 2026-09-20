@@ -5,6 +5,7 @@ timestamp 1789903535
 << error_s >>
 rect 2028 1104 2030 1430
 rect 2030 1102 2356 1104
+timestamp 1789918000
 << nwell >>
 rect 444 480 452 576
 << pwell >>
@@ -41,16 +42,6 @@ rect -307 369 1153 405
 rect -362 365 1153 369
 rect 1193 365 1206 405
 rect -362 336 1206 365
-<< metal6 >>
-rect 2028 1102 2030 1104
-use via_VHGR6D  via_VHGR6D_0
-timestamp 1789903535
-transform 1 0 1514 0 1 34
-box -164 -164 164 164
-use via_VHGR6D  via_VHGR6D_1
-timestamp 1789903535
-transform 1 0 1524 0 1 822
-box -164 -164 164 164
 use sg13g2_inv_1  x1
 timestamp 1789822257
 transform 1 0 288 0 1 48
@@ -66,7 +57,9 @@ box -48 -56 336 834
 << labels >>
 flabel metal1 1410 296 1610 496 0 FreeSans 1600 0 0 0 out
 port 0 nsew
+flabel metal1 -338 770 1598 860 0 FreeSans 1600 0 0 0 VPWR
+port 1 nsew
+flabel metal1 -348 -14 1612 112 0 FreeSans 1600 0 0 0 VGND
+port 2 nsew
 rlabel metal1 1410 282 1432 380 1 out1
-rlabel space 1350 -130 1678 -28 1 GND
-rlabel space 1360 656 1688 986 1 VPWR
 << end >>
