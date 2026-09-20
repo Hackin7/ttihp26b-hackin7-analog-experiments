@@ -1,0 +1,12 @@
+* Schematic reference netlist for the three-stage free-running IHP SG13G2
+* inverter ring oscillator. Port order matches the hardened macro interface.
+.subckt sg13g2_inv_1 Y A VSS VDD
+X0 Y A VDD VDD sg13_lv_pmos ad=0.3808p pd=2.92u as=0.3808p ps=2.92u w=1.12u l=0.13u
+X1 Y A VSS VSS sg13_lv_nmos ad=0.2516p pd=2.16u as=0.2516p ps=2.16u w=0.74u l=0.13u
+.ends sg13g2_inv_1
+
+.subckt ring_oscillator out VPWR VGND
+XINV0 n1 out VGND VPWR sg13g2_inv_1
+XINV1 n2 n1  VGND VPWR sg13g2_inv_1
+XINV2 out n2 VGND VPWR sg13g2_inv_1
+.ends ring_oscillator

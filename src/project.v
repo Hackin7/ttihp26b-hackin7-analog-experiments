@@ -18,18 +18,21 @@ module tt_um_hackin7_analog_experiments #(
     input  wire       rst_n     // reset_n - low to reset
 );
 
-  // Part 2: the ring oscillator does not exist yet (clk_ring is a tied-off 0),
-  // so selecting it is observably identical to freezing the counter. Folding
-  // the clock-select into the increment enable keeps all combinational logic
-  // off the clock path: a combinational mux would form a gated clock and fail
-  // the OpenROAD half-period clock-gating hold check (the select must hold
-  // across the fall edge of clk; an async input cannot). Part 3 reintroduces
-  // the physical mux with a registered select and the ring oscillator.
-  wire ctr_ena = ena && ui_in[0] && !ui_in[1];
+  // The ring oscillator is a pre-hardened physical macro. Its power pins are
+  // connected by LibreLane through PDN_MACRO_CONNECTIONS.
+  wire clk_ring;
+  ring_oscillator u_ring_oscillator (
+      .out(clk_ring)
+  );
+
+  // Direct clock selection is intentional. Change ui_in[1] only while reset
+  // is asserted, since an asynchronous live change can create a clock glitch.
+  wire counter_clk = ui_in[1] ? clk_ring : clk;
+  wire ctr_ena = ena && ui_in[0];
 
   // Part 2: 64-bit continuously counting counter.
   reg [CTR_W-1:0] counter;
-  always @(posedge clk or negedge rst_n) begin
+  always @(posedge counter_clk or negedge rst_n) begin
     if (!rst_n)
       counter <= 64'd0;
     else if (ctr_ena)

@@ -1,34 +1,48 @@
 {
-  "//": "tt_um_hackin7_analog_experiments - SG13G2 real-gate analog lane (Plan B: schematic-meas as timing truth)",
-  "//": "The analog block is a HARD macro (pre-hardened GDS+LEF). OpenLane consumes it as a black-box",
-  "//": "placed instance; it never pushes logic inside the analog ring (real SG13G2 gates stay opaque).",
-
-  "//": "OpenLane expects macros as LEF class CORE with pins. The consolidated gate ring proof gave the",
-  "//": "real measured osc period the SDC derives its create_clock from.",
-
+  "//": "Tiny Tapeout IHP 1x1 digital flow with a pre-hardened ring-oscillator macro.",
+  "PL_TARGET_DENSITY_PCT": 60,
+  "CLOCK_PERIOD": 20,
+  "PL_RESIZER_HOLD_SLACK_MARGIN": 0.1,
+  "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.05,
+  "RUN_LINTER": 1,
+  "LINTER_INCLUDE_PDK_MODELS": 1,
+  "DIODE_ON_PORTS": "in",
+  "CLOCK_PORT": "clk",
+  "PNR_SDC_FILE": "dir::pnr.sdc",
+  "SIGNOFF_SDC_FILE": "dir::signoff.sdc",
   "MACROS": {
-    "tt_um_hackin7_analog_experiments": {
-      "lef": "analog/lef/tt_um_hackin7_analog_experiments.lef",
-      "gds": "analog/gds/tt_um_hackin7_analog_experiments.gds"
+    "ring_oscillator": {
+      "instances": {
+        "u_ring_oscillator": {
+          "location": [20.16, 18.90],
+          "orientation": "N"
+        }
+      },
+      "gds": ["dir::../analog/inverter_ring_oscillator/macro/ring_oscillator.gds"],
+      "lef": ["dir::../analog/inverter_ring_oscillator/macro/ring_oscillator.lef"],
+      "spice": ["dir::../analog/inverter_ring_oscillator/macro/ring_oscillator.spice"]
     }
   },
-
-  "EXTRA_LEF_FILES": [
-    "analog/lef/tt_um_hackin7_analog_experiments.lef"
+  "PDN_MACRO_CONNECTIONS": [
+    "u_ring_oscillator VPWR VGND VPWR VGND"
   ],
-
-  "EXTRA_GDS_FILES": [
-    "analog/gds/tt_um_hackin7_analog_experiments.gds"
-  ],
-
-  "//": "Tell OpenLane the ring oscillator output is a real (measured) clock domain, so the digital",
-  "//": "flow treats out/outb as a 200 MHz-ish source of truth rather than unconstrined comb init.",
+  "PDN_CONNECT_MACROS_TO_GRID": 1,
+  "FP_MACRO_HORIZONTAL_HALO": 2,
+  "FP_MACRO_VERTICAL_HALO": 2,
+  "RUN_KLAYOUT_XOR": 0,
+  "RUN_KLAYOUT_DRC": 0,
+  "DESIGN_REPAIR_BUFFER_OUTPUT_PORTS": 0,
+  "TOP_MARGIN_MULT": 1,
+  "BOTTOM_MARGIN_MULT": 1,
+  "LEFT_MARGIN_MULT": 6,
+  "RIGHT_MARGIN_MULT": 6,
+  "FP_SIZING": "absolute",
+  "GRT_ALLOW_CONGESTION": 1,
+  "FP_IO_HLENGTH": 2,
+  "FP_IO_VLENGTH": 2,
+  "FP_PDN_VPITCH": 38.87,
   "RUN_CTS": 1,
-
-  "//": "Keep the emitter's own timing lane: the SDC create_clock at src/sdc/timing.sdc uses the",
-  "//": "period echoed by the consolidated emitter's ngspice .meas proof (osc_period/osc_freq rows).",
-  "CLOCK_PORT": "clk",
-
-  "//": "OpenLane macro placement: put the hardened ring flush against the analog pins it drives.",
-  "MACRO_PLACEMENT_TCL": "tools/local/integrate_and_place_macro_oosc.tcl"
+  "FP_PDN_MULTILAYER": 0,
+  "MAGIC_DEF_LABELS": 0,
+  "MAGIC_WRITE_LEF_PINONLY": 1
 }

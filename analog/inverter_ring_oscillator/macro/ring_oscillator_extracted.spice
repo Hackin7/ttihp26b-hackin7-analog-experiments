@@ -1,0 +1,13 @@
+* NGSPICE file created from main.ext - technology: ihp-sg13g2
+
+.subckt sg13g2_inv_1 Y A VSS VDD
+X0 Y A VDD VDD sg13_lv_pmos ad=0.3808p pd=2.92u as=0.3808p ps=2.92u w=1.12u l=0.13u
+X1 Y A VSS VSS sg13_lv_nmos ad=0.2516p pd=2.16u as=0.2516p ps=2.16u w=0.74u l=0.13u
+.ends
+
+.subckt ring_oscillator out VPWR VGND
+Xx1 x2/A x1/A VGND VPWR sg13g2_inv_1
+Xx2 out x2/A VGND VPWR sg13g2_inv_1
+Xx32 x1/A out VGND VPWR sg13g2_inv_1
+.ends
+

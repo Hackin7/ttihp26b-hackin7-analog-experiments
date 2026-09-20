@@ -31,14 +31,9 @@ rect 200 -14 1616 112
 rect 1416 -60 1616 -14
 << metal2 >>
 rect -362 336 1206 424
-use via_GQ9R9N  via_GQ9R9N_0
-timestamp 0
-transform 1 0 -327 0 1 389
-box 0 0 1 1
-use via_GQ9R9N  via_GQ9R9N_1
-timestamp 0
-transform 1 0 1173 0 1 385
-box 0 0 1 1
+<< via1 >>
+rect -347 369 -307 409
+rect 1153 365 1193 405
 use sg13g2_inv_1  x1
 timestamp 1789822257
 transform 1 0 288 0 1 48
@@ -54,7 +49,8 @@ box -48 -56 336 834
 << labels >>
 flabel metal1 1410 296 1610 496 0 FreeSans 1600 0 0 0 out
 port 0 nsew
-flabel metal1 1408 720 1608 920 0 FreeSans 1600 0 0 0 VDD
-flabel metal1 1416 -60 1616 140 0 FreeSans 1600 0 0 0 VSS
+flabel metal1 1408 720 1608 920 0 FreeSans 1600 0 0 0 VPWR
 port 1 nsew
+flabel metal1 1416 -60 1616 140 0 FreeSans 1600 0 0 0 VGND
+port 2 nsew
 << end >>
