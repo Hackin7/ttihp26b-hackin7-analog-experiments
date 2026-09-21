@@ -1,4 +1,4 @@
-﻿v {xschem version=3.4.8RC file_version=1.3}
+v {xschem version=3.4.8RC file_version=1.3}
 G {}
 K {}
 V {}
@@ -8,7 +8,7 @@ E {}
 T {Charge Pump} 220 -430 0 0 0.8 0.8 {}
 T {Phase
 Frequency
-Detector} -150 -440 0 0 0.8 0.8 {}
+Detector} -190 -480 0 0 0.8 0.8 {}
 T {Low Pass 
 Filter} 610 -430 0 0 0.8 0.8 {}
 T {Voltage Controlled Oscillator} 960 -430 0 0 0.8 0.8 {}
@@ -18,7 +18,6 @@ N -130 110 -100 110 {lab=#net1}
 N -130 -10 -80 -10 {lab=#net1}
 N -130 -80 -130 -10 {lab=#net1}
 N -130 -80 -100 -80 {lab=#net1}
-N -160 -120 -100 -120 {lab=clk_ref_gate}
 N 80 -120 210 -120 {lab=pfd_up}
 N 30 -30 80 -30 {lab=pfd_up}
 N 80 -120 80 -30 {lab=pfd_up}
@@ -53,28 +52,28 @@ N 700 100 700 310 {lab=VGND}
 N 610 100 700 100 {lab=VGND}
 N 630 310 700 310 {lab=VGND}
 N 1430 90 1430 110 {lab=#net5}
-N 1430 60 1450 60 {lab=#net6}
-N 1430 0 1430 30 {lab=#net7}
-N 1490 -0 1580 -0 {lab=#net7}
-N 1430 -30 1430 0 {lab=#net7}
-N 1370 -60 1390 -60 {lab=#net8}
-N 1370 0 1370 60 {lab=#net8}
-N 1370 60 1390 60 {lab=#net8}
-N 1280 90 1280 110 {lab=#net9}
-N 1280 60 1300 60 {lab=#net10}
-N 1280 0 1280 30 {lab=#net8}
-N 1280 0 1370 0 {lab=#net8}
-N 1220 -60 1240 -60 {lab=#net11}
-N 1220 0 1220 60 {lab=#net11}
-N 1220 60 1240 60 {lab=#net11}
-N 1140 90 1140 110 {lab=#net12}
-N 1140 60 1160 60 {lab=#net13}
-N 1140 0 1140 30 {lab=#net11}
-N 1140 0 1220 0 {lab=#net11}
-N 1140 -30 1140 0 {lab=#net11}
-N 1070 -0 1070 60 {lab=#net7}
-N 1370 -60 1370 0 {lab=#net8}
-N 1220 -60 1220 0 {lab=#net11}
+N 1430 60 1450 60 {lab=VGND}
+N 1430 0 1430 30 {lab=#net6}
+N 1490 -0 1580 -0 {lab=#net6}
+N 1430 -30 1430 0 {lab=#net6}
+N 1370 -60 1390 -60 {lab=#net7}
+N 1370 0 1370 60 {lab=#net7}
+N 1370 60 1390 60 {lab=#net7}
+N 1280 90 1280 110 {lab=#net8}
+N 1280 60 1300 60 {lab=VGND}
+N 1280 0 1280 30 {lab=#net7}
+N 1280 0 1370 0 {lab=#net7}
+N 1220 -60 1240 -60 {lab=#net9}
+N 1220 0 1220 60 {lab=#net9}
+N 1220 60 1240 60 {lab=#net9}
+N 1140 90 1140 110 {lab=#net10}
+N 1140 60 1160 60 {lab=VGND}
+N 1140 0 1140 30 {lab=#net9}
+N 1140 0 1220 0 {lab=#net9}
+N 1140 -30 1140 0 {lab=#net9}
+N 1070 -0 1070 60 {lab=#net6}
+N 1370 -60 1370 0 {lab=#net7}
+N 1220 -60 1220 0 {lab=#net9}
 N 1640 -80 1640 -60 {lab=out}
 N 1640 90 1640 310 {lab=VGND}
 N 1640 60 1660 60 {lab=VGND}
@@ -86,10 +85,10 @@ N 1640 -30 1650 -30 {lab=out}
 N 1640 0 1640 30 {lab=out}
 N 1640 0 1860 -0 {lab=out}
 N 1640 -30 1640 0 {lab=out}
-N 1580 -60 1600 -60 {lab=#net7}
-N 1580 -0 1580 60 {lab=#net7}
-N 1580 60 1600 60 {lab=#net7}
-N 1580 -60 1580 -0 {lab=#net7}
+N 1580 -60 1600 -60 {lab=#net6}
+N 1580 -0 1580 60 {lab=#net6}
+N 1580 60 1600 60 {lab=#net6}
+N 1580 -60 1580 -0 {lab=#net6}
 N 1140 -190 1160 -190 {lab=VPWR}
 N 1160 -220 1160 -190 {lab=VPWR}
 N 1140 -220 1160 -220 {lab=VPWR}
@@ -99,18 +98,18 @@ N 1280 -220 1300 -220 {lab=VPWR}
 N 1430 -190 1460 -190 {lab=VPWR}
 N 1460 -220 1460 -190 {lab=VPWR}
 N 1430 -220 1460 -220 {lab=VPWR}
-N 1430 -160 1430 -90 {lab=#net14}
-N 1360 -190 1390 -190 {lab=#net15}
-N 1280 -160 1280 -90 {lab=#net16}
-N 1360 -190 1360 -140 {lab=#net15}
-N 1220 -140 1360 -140 {lab=#net15}
-N 1220 -190 1220 -140 {lab=#net15}
-N 1220 -190 1240 -190 {lab=#net15}
-N 1140 -160 1140 -90 {lab=#net17}
-N 1080 -140 1220 -140 {lab=#net15}
-N 1080 -190 1080 -140 {lab=#net15}
-N 1080 -190 1100 -190 {lab=#net15}
-N 1280 -30 1280 -0 {lab=#net8}
+N 1430 -160 1430 -90 {lab=#net11}
+N 1360 -190 1390 -190 {lab=#net12}
+N 1280 -160 1280 -90 {lab=#net13}
+N 1360 -190 1360 -140 {lab=#net12}
+N 1220 -140 1360 -140 {lab=#net12}
+N 1220 -190 1220 -140 {lab=#net12}
+N 1220 -190 1240 -190 {lab=#net12}
+N 1140 -160 1140 -90 {lab=#net14}
+N 1080 -140 1220 -140 {lab=#net12}
+N 1080 -190 1080 -140 {lab=#net12}
+N 1080 -190 1100 -190 {lab=#net12}
+N 1280 -30 1280 -0 {lab=#net7}
 N 1140 -60 1180 -60 {lab=VPWR}
 N 1430 -300 1430 -220 {lab=VPWR}
 N 1640 -300 1690 -300 {lab=VPWR}
@@ -128,11 +127,11 @@ N 1480 -300 1480 -60 {lab=VPWR}
 N 1430 -300 1480 -300 {lab=VPWR}
 N 1640 -300 1640 -90 {lab=VPWR}
 N 1480 -300 1640 -300 {lab=VPWR}
-N 1430 310 1640 310 {lab=VGND}
+N 1450 310 1640 310 {lab=VGND}
 N 1430 170 1430 310 {lab=VGND}
-N 1280 310 1430 310 {lab=VGND}
+N 1300 310 1430 310 {lab=VGND}
 N 1280 170 1280 310 {lab=VGND}
-N 1140 310 1280 310 {lab=VGND}
+N 1160 310 1280 310 {lab=VGND}
 N 1140 170 1140 310 {lab=VGND}
 N 950 310 1140 310 {lab=VGND}
 N 1370 140 1390 140 {lab=vctrl}
@@ -141,14 +140,14 @@ N 1240 240 1370 240 {lab=vctrl}
 N 1100 140 1100 240 {lab=vctrl}
 N 1240 140 1240 240 {lab=vctrl}
 N 1100 240 1240 240 {lab=vctrl}
-N 990 -190 1080 -190 {lab=#net15}
+N 990 -190 1080 -190 {lab=#net12}
 N 920 -190 950 -190 {lab=VPWR}
 N 920 -230 920 -190 {lab=VPWR}
 N 920 -230 950 -230 {lab=VPWR}
 N 950 -230 950 -220 {lab=VPWR}
 N 950 -300 950 -230 {lab=VPWR}
 N 950 -300 1140 -300 {lab=VPWR}
-N 950 -160 950 -30 {lab=#net18}
+N 950 -160 950 -30 {lab=#net12}
 N 950 -0 980 -0 {lab=VGND}
 N 980 -0 980 30 {lab=VGND}
 N 950 30 980 30 {lab=VGND}
@@ -158,17 +157,15 @@ N 880 -0 880 240 {lab=vctrl}
 N 880 240 1100 240 {lab=vctrl}
 N 950 30 950 310 {lab=VGND}
 N 700 310 950 310 {lab=VGND}
-N 1490 -0 1490 200 {lab=#net7}
-N 1430 0 1490 -0 {lab=#net7}
-N 1040 200 1490 200 {lab=#net7}
-N 1040 0 1040 200 {lab=#net7}
-N 1040 0 1070 -0 {lab=#net7}
-N 1070 -60 1070 -0 {lab=#net7}
-N 1070 -60 1100 -60 {lab=#net7}
-N 1070 60 1100 60 {lab=#net7}
-N 1790 -10 1790 480 {lab=#net19}
-N -250 70 -100 70 {lab=#net19}
-N -250 70 -250 480 {lab=#net19}
+N 1490 -0 1490 200 {lab=#net6}
+N 1430 0 1490 -0 {lab=#net6}
+N 1040 200 1490 200 {lab=#net6}
+N 1040 0 1040 200 {lab=#net6}
+N 1040 0 1070 -0 {lab=#net6}
+N 1070 -60 1070 -0 {lab=#net6}
+N 1070 -60 1100 -60 {lab=#net6}
+N 1070 60 1100 60 {lab=#net6}
+N -250 70 -100 70 {lab=vco_out_div}
 N 380 -300 950 -300 {lab=VPWR}
 N 700 -80 810 -80 {lab=vctrl}
 N 810 -80 810 -0 {lab=vctrl}
@@ -209,11 +206,31 @@ N 380 -120 410 -120 {lab=#net4}
 N 410 -150 410 -120 {lab=#net4}
 N 380 -150 410 -150 {lab=#net4}
 N 320 710 340 710 {lab=vbp}
+N 990 -190 990 -160 {lab=#net12}
+N 950 -160 990 -160 {lab=#net12}
+N -160 90 -100 90 {lab=VPWR}
+N -190 -120 -100 -120 {lab=clk_ref_gate}
+N -160 -100 -100 -100 {lab=VPWR}
+N -160 -100 -160 90 {lab=VPWR}
+N -160 -300 160 -300 {lab=VPWR}
+N -160 -300 -160 -100 {lab=VPWR}
+N 1140 140 1160 140 {lab=VGND}
+N 1160 140 1160 310 {lab=VGND}
+N 1160 60 1160 140 {lab=VGND}
+N 1140 310 1160 310 {lab=VGND}
+N 1280 140 1300 140 {lab=VGND}
+N 1300 140 1300 310 {lab=VGND}
+N 1300 60 1300 140 {lab=VGND}
+N 1450 140 1450 310 {lab=VGND}
+N 1430 310 1450 310 {lab=VGND}
+N 1430 140 1450 140 {lab=VGND}
+N 1450 60 1450 140 {lab=VGND}
+N 1280 310 1300 310 {lab=VGND}
 C {sg13g2_dfrbpq_1.sym} -10 -100 0 0 {name=x1 VDD=VPWR VSS=VGND prefix=sg13g2_ }
 C {sg13g2_dfrbpq_1.sym} -10 90 0 0 {name=x2 VDD=VPWR VSS=VGND prefix=sg13g2_ }
 C {sg13g2_and2_1.sym} -20 -10 2 0 {name=x3 VDD=VPWR VSS=VGND prefix=sg13g2_ }
-C {ipin.sym} -160 -120 0 0 {name=clk_pin0 lab=clk_ref_gate}
-C {ipin.sym} -260 70 0 0 {name=clk_pin1 lab=vco_out_div}
+C {ipin.sym} -190 -120 0 0 {name=clk_pin0 lab=clk_ref_gate}
+C {ipin.sym} -250 70 0 0 {name=clk_pin1 lab=vco_out_div}
 C {sg13g2_inv_1.sym} 250 -120 0 0 {name=x4 VDD=VPWR VSS=VGND prefix=sg13g2_}
 C {sg13g2_pr/sg13_lv_pmos.sym} 360 -210 0 0 {name=M1
 l=1.0u
