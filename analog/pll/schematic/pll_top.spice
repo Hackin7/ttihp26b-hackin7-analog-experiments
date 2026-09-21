@@ -1,56 +1,113 @@
-* LVS / Magic gold for pll_top — derived from xschem pll_top.sch netlist.
-* Cleaned: bulk ties to VPWR/VGND, classic PFD D=VPWR, clk_fb=vco_out_div.
-* Ports match sch: clk_ref_gate vco_out_div out VPWR VGND
-.subckt pll_top clk_ref_gate vco_out_div out VPWR VGND
+** sch_path: /foss/designs/ttihp26b-hackin7-analog-experiments/analog/pll/schematic/pll_top.sch
+**.subckt pll_top clk_ref_gate vco_out_div VGND out VPWR
+*.ipin clk_ref_gate
+*.ipin vco_out_div
+*.iopin VGND
+*.opin out
+*.iopin VPWR
+x1 pfd_up clk_ref_gate VPWR net1 VPWR VGND sg13g2_dfrbpq_1
+x2 pfd_down vco_out_div VPWR net1 VPWR VGND sg13g2_dfrbpq_1
+x3 net1 pfd_down pfd_up VPWR VGND sg13g2_and2_1
+x4 net2 pfd_up VPWR VGND sg13g2_inv_1
+XM1 net4 vbp VPWR VPWR sg13_lv_pmos w=1.0u l=1.0u ng=1 m=1 mm_ok=1
+XM2 vctrl pfd_down net3 net3 sg13_lv_nmos w=0.5u l=0.13u ng=1 m=1 mm_ok=1
+XM3 vctrl net2 net4 net4 sg13_lv_pmos w=0.5u l=0.13u ng=1 m=1 mm_ok=1
+XM4 net3 vbn VGND VGND sg13_lv_nmos w=0.5u l=1.0u ng=1 m=1 mm_ok=1
+XC1 net15 VGND cap_cmim w=20.0e-6 l=20.0e-6 m=1 mm_ok=1
+XR1 vctrl net15 VGND rhigh w=0.50e-6 l=70.0e-6 m=1 b=0 mm_ok=1
+XC2 vctrl VGND cap_cmim w=8.0e-6 l=8.0e-6 m=1 mm_ok=1
+XMp2 net6 net7 net11 VPWR sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1 mm_ok=1
+XMn2 net6 net7 net5 VGND sg13_lv_nmos w=0.74u l=0.25u ng=1 m=1 mm_ok=1
+XMp1 net7 net9 net13 VPWR sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1 mm_ok=1
+XMn1 net7 net9 net8 VGND sg13_lv_nmos w=0.74u l=0.25u ng=1 m=1 mm_ok=1
+XMp3 net9 net6 net14 VPWR sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1 mm_ok=1
+XMn3 net9 net6 net10 VGND sg13_lv_nmos w=0.74u l=0.25u ng=1 m=1 mm_ok=1
+XMp4 out net6 VPWR out sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1 mm_ok=1
+XMn4 out net6 VGND VGND sg13_lv_nmos w=0.74u l=0.25u ng=1 m=1 mm_ok=1
+XMp5 net11 net12 VPWR VPWR sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1 mm_ok=1
+XMp6 net13 net12 VPWR VPWR sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1 mm_ok=1
+XMp7 net14 net12 VPWR VPWR sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1 mm_ok=1
+XMn5 net8 vctrl VGND VGND sg13_lv_nmos w=0.74u l=0.25u ng=1 m=1 mm_ok=1
+XMn6 net5 vctrl VGND VGND sg13_lv_nmos w=0.74u l=0.25u ng=1 m=1 mm_ok=1
+XMn7 net10 vctrl VGND VGND sg13_lv_nmos w=0.74u l=0.25u ng=1 m=1 mm_ok=1
+XMp8 net12 net12 VPWR VPWR sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1 mm_ok=1
+XMn8 net12 vctrl VGND VGND sg13_lv_nmos w=0.74u l=0.25u ng=1 m=1 mm_ok=1
+XM5 vbp vbn VGND VGND sg13_lv_nmos w=0.5u l=1.0u ng=1 m=1 mm_ok=1
+XM6 vbn vbn VGND VGND sg13_lv_nmos w=0.5u l=1.0u ng=1 m=1 mm_ok=1
+XM7 vbp vbp VPWR VPWR sg13_lv_pmos w=1.0u l=1.0u ng=1 m=1 mm_ok=1
+XR2 VPWR vbn VGND rhigh w=0.50e-6 l=260.0e-6 m=1 b=0 mm_ok=1
+**.ends
 
-* --- PFD (IHP stdcells as in sch) ---
-* dfrbpq_1: Q CLK D RESET_B VDD VSS
-Xx1 pfd_up   clk_ref_gate VPWR n_rst VPWR VGND sg13g2_dfrbpq_1
-Xx2 pfd_down vco_out_div  VPWR n_rst VPWR VGND sg13g2_dfrbpq_1
-Xx3 n_rst pfd_down pfd_up VPWR VGND sg13g2_and2_1
-Xx4 up_b pfd_up VPWR VGND sg13g2_inv_1
+* expanding   symbol:  sg13g2_dfrbpq_1.sym # of pins=4
+** sym_path: /foss/pdks/ihp-sg13g2/libs.ref/sg13g2_stdcell/sym/xschem/sg13g2_dfrbpq_1.sym
+** sch_path: /foss/pdks/ihp-sg13g2/libs.ref/sg13g2_stdcell/sch/xschem/sg13g2_dfrbpq_1.sch
+.subckt sg13g2_dfrbpq_1 Q CLK D RESET_B VDD VSS
 
-* --- CP stack (M1..M4) ---
-XM1 net4 vbp VPWR VPWR sg13_lv_pmos w=1.0u l=1.0u ng=1 m=1
-XM3 vctrl up_b net4 VPWR sg13_lv_pmos w=0.5u l=0.13u ng=1 m=1
-XM2 vctrl pfd_down net3 VGND sg13_lv_nmos w=0.5u l=0.13u ng=1 m=1
-XM4 net3 vbn VGND VGND sg13_lv_nmos w=0.5u l=1.0u ng=1 m=1
+*.opin Q
+*.ipin CLK
+*.ipin D
+*.ipin RESET_B
+XM1 Db D net12 VSS sg13_lv_nmos w=420.00n l=130.00n ng=1 m=1 mm_ok=1
+XM2 net12 RESET_B VSS VSS sg13_lv_nmos w=420.00n l=130.00n ng=1 m=1 mm_ok=1
+XM3 net3 clkneg net11 VSS sg13_lv_nmos w=420.00n l=130.00n ng=1 m=1 mm_ok=1
+XM4 net11 net1 VSS VSS sg13_lv_nmos w=420.00n l=130.00n ng=1 m=1 mm_ok=1
+XM5 net1 net3 net7 VSS sg13_lv_nmos w=420.00n l=130.00n ng=1 m=1 mm_ok=1
+XM6 net7 RESET_B VSS VSS sg13_lv_nmos w=420.00n l=130.00n ng=1 m=1 mm_ok=1
+XM7 net2 net3 VSS VSS sg13_lv_nmos w=740.00n l=130.00n ng=1 m=1 mm_ok=1
+XM8 Q net2 VSS VSS sg13_lv_nmos w=740.00n l=130.00n ng=1 m=1 mm_ok=1
+XM9 clkneg CLK VSS VSS sg13_lv_nmos w=740.00n l=130.00n ng=1 m=1 mm_ok=1
+XM10 clkpos clkneg VSS VSS sg13_lv_nmos w=740.00n l=130.00n ng=1 m=1 mm_ok=1
+XM11 Db clkneg net5 VSS sg13_lv_nmos w=420.00n l=130.00n ng=1 m=1 mm_ok=1
+XM12 net5 clkpos net10 VSS sg13_lv_nmos w=420.00n l=130.00n ng=1 m=1 mm_ok=1
+XM13 net10 net4 net6 VSS sg13_lv_nmos w=420.00n l=130.00n ng=1 m=1 mm_ok=1
+XM14 net6 RESET_B VSS VSS sg13_lv_nmos w=420.00n l=130.00n ng=1 m=1 mm_ok=1
+XM15 net4 net5 VSS VSS sg13_lv_nmos w=740.00n l=130.00n ng=1 m=1 mm_ok=1
+XM16 net4 clkpos net3 VSS sg13_lv_nmos w=740.00n l=130.00n ng=1 m=1 mm_ok=1
+XM17 Db RESET_B VDD VDD sg13_lv_pmos w=420.00n l=130.00n ng=1 m=1 mm_ok=1
+XM18 Db D VDD VDD sg13_lv_pmos w=420.00n l=130.00n ng=1 m=1 mm_ok=1
+XM19 net9 net1 VDD VDD sg13_lv_pmos w=420.00n l=130.00n ng=1 m=1 mm_ok=1
+XM20 net3 clkpos net9 VDD sg13_lv_pmos w=420.00n l=130.00n ng=1 m=1 mm_ok=1
+XM21 net1 net3 VDD VDD sg13_lv_pmos w=420.00n l=130.00n ng=1 m=1 mm_ok=1
+XM22 net1 RESET_B VDD VDD sg13_lv_pmos w=420.00n l=130.00n ng=1 m=1 mm_ok=1
+XM23 net2 net3 VDD VDD sg13_lv_pmos w=1.12u l=130.00n ng=1 m=1 mm_ok=1
+XM24 Q net2 VDD VDD sg13_lv_pmos w=1.12u l=130.00n ng=1 m=1 mm_ok=1
+XM25 clkneg CLK VDD VDD sg13_lv_pmos w=1.12u l=130.00n ng=1 m=1 mm_ok=1
+XM26 clkpos clkneg VDD VDD sg13_lv_pmos w=1.12u l=130.00n ng=1 m=1 mm_ok=1
+XM27 Db clkpos net5 VDD sg13_lv_pmos w=420.00n l=130.00n ng=1 m=1 mm_ok=1
+XM28 net8 net4 VDD VDD sg13_lv_pmos w=420.00n l=130.00n ng=1 m=1 mm_ok=1
+XM29 net5 clkneg net8 VDD sg13_lv_pmos w=420.00n l=130.00n ng=1 m=1 mm_ok=1
+XM30 net5 RESET_B VDD VDD sg13_lv_pmos w=420.00n l=130.00n ng=1 m=1 mm_ok=1
+XM31 net4 net5 VDD VDD sg13_lv_pmos w=1.000u l=130.00n ng=1 m=1 mm_ok=1
+XM32 net4 clkneg net3 VDD sg13_lv_pmos w=1.000u l=130.00n ng=1 m=1 mm_ok=1
+.ends
 
-* --- CP bias (M5..M7 + R2) ---
-XR2 VPWR vbn VGND rhigh w=0.50e-6 l=260.0e-6 m=1
-XM6 vbn vbn VGND VGND sg13_lv_nmos w=0.5u l=1.0u ng=1 m=1
-XM5 vbp vbn VGND VGND sg13_lv_nmos w=0.5u l=1.0u ng=1 m=1
-XM7 vbp vbp VPWR VPWR sg13_lv_pmos w=1.0u l=1.0u ng=1 m=1
 
-* --- Loop filter ---
-XR1 vctrl vz VGND rhigh w=0.50e-6 l=70.0e-6 m=1
-XC1 vz VGND cap_cmim w=20.0e-6 l=20.0e-6 m=1
-XC2 vctrl VGND cap_cmim w=8.0e-6 l=8.0e-6 m=1
+* expanding   symbol:  sg13g2_and2_1.sym # of pins=3
+** sym_path: /foss/pdks/ihp-sg13g2/libs.ref/sg13g2_stdcell/sym/xschem/sg13g2_and2_1.sym
+** sch_path: /foss/pdks/ihp-sg13g2/libs.ref/sg13g2_stdcell/sch/xschem/sg13g2_and2_1.sch
+.subckt sg13g2_and2_1 X A B VDD VSS
 
-* --- VCO bias replica ---
-XMn8 n_bias vctrl VGND VGND sg13_lv_nmos w=0.74u l=0.25u ng=1 m=1
-XMp8 n_bias n_bias VPWR VPWR sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1
+*.ipin A
+*.ipin B
+*.opin X
+XM1 net1 A net2 VSS sg13_lv_nmos w=640.00n l=130.00n ng=1 m=1 mm_ok=1
+XM2 net2 B VSS VSS sg13_lv_nmos w=640.00n l=130.00n ng=1 m=1 mm_ok=1
+XM3 X net1 VSS VSS sg13_lv_nmos w=740.00n l=130.00n ng=1 m=1 mm_ok=1
+XM4 net1 B VDD VDD sg13_lv_pmos w=840.00n l=130.00n ng=1 m=1 mm_ok=1
+XM5 net1 A VDD VDD sg13_lv_pmos w=840.00n l=130.00n ng=1 m=1 mm_ok=1
+XM6 X net1 VDD VDD sg13_lv_pmos w=1.12u l=130.00n ng=1 m=1 mm_ok=1
+.ends
 
-* --- VCO stage 0: in=o2 out=o0 ---
-XMp7 vs0 n_bias VPWR VPWR sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1
-XMp3 o0 o2 vs0 VPWR sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1
-XMn3 o0 o2 nt0 VGND sg13_lv_nmos w=0.74u l=0.25u ng=1 m=1
-XMn7 nt0 vctrl VGND VGND sg13_lv_nmos w=0.74u l=0.25u ng=1 m=1
 
-* --- VCO stage 1: in=o0 out=o1 ---
-XMp6 vs1 n_bias VPWR VPWR sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1
-XMp1 o1 o0 vs1 VPWR sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1
-XMn1 o1 o0 nt1 VGND sg13_lv_nmos w=0.74u l=0.25u ng=1 m=1
-XMn5 nt1 vctrl VGND VGND sg13_lv_nmos w=0.74u l=0.25u ng=1 m=1
+* expanding   symbol:  sg13g2_inv_1.sym # of pins=2
+** sym_path: /foss/pdks/ihp-sg13g2/libs.ref/sg13g2_stdcell/sym/xschem/sg13g2_inv_1.sym
+** sch_path: /foss/pdks/ihp-sg13g2/libs.ref/sg13g2_stdcell/sch/xschem/sg13g2_inv_1.sch
+.subckt sg13g2_inv_1 Y A VDD VSS
 
-* --- VCO stage 2: in=o1 out=o2 ---
-XMp5 vs2 n_bias VPWR VPWR sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1
-XMp2 o2 o1 vs2 VPWR sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1
-XMn2 o2 o1 nt2 VGND sg13_lv_nmos w=0.74u l=0.25u ng=1 m=1
-XMn6 nt2 vctrl VGND VGND sg13_lv_nmos w=0.74u l=0.25u ng=1 m=1
+*.opin Y
+*.ipin A
+XM1 Y A VSS VSS sg13_lv_nmos w=740.00n l=130.00n ng=1 m=1 mm_ok=1
+XM2 Y A VDD VDD sg13_lv_pmos w=1.12u l=130.00n ng=1 m=1 mm_ok=1
+.ends
 
-* --- VCO buffer ---
-XMp4 out o2 VPWR VPWR sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1
-XMn4 out o2 VGND VGND sg13_lv_nmos w=0.74u l=0.25u ng=1 m=1
-
-.ends pll_top
+.end
