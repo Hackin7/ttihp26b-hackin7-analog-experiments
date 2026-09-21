@@ -11,10 +11,16 @@ from cocotb.triggers import ClockCycles, Timer
 # [0]    counter enable
 # [1]    clock select: 0 = Tiny Tapeout clk, 1 = ring oscillator
 # [4:2]  counter byte select
+# [5]    ring frequency: 0 = 100 MHz, 1 = 500 MHz (only when [1]=1)
 
 
-def ui_in_val(enable=0, clk_ring=0, byte_sel=0):
-    return (enable & 1) | ((clk_ring & 1) << 1) | ((byte_sel & 7) << 2)
+def ui_in_val(enable=0, clk_ring=0, byte_sel=0, sel_500=0):
+    return (
+        (enable & 1)
+        | ((clk_ring & 1) << 1)
+        | ((byte_sel & 7) << 2)
+        | ((sel_500 & 1) << 5)
+    )
 
 
 def read_u8(signal):

@@ -10,7 +10,22 @@
   "CLOCK_PORT": "clk",
   "PNR_SDC_FILE": "dir::pnr.sdc",
   "SIGNOFF_SDC_FILE": "dir::signoff.sdc",
+  "IGNORE_DISCONNECTED_MODULES": [
+    "chips_art",
+    "u_chips_art"
+  ],
+  "ERROR_ON_DISCONNECTED_PINS": false,
   "MACROS": {
+    "chips_art": {
+      "instances": {
+        "u_chips_art": {
+          "location": [10.0, 40.0],
+          "orientation": "N"
+        }
+      },
+      "gds": ["dir::../analog/gds_art/macro/chips_art.gds"],
+      "lef": ["dir::../analog/gds_art/macro/chips_art.lef"]
+    },
     "ring_oscillator": {
       "instances": {
         "u_ring_oscillator": {
@@ -21,10 +36,22 @@
       "gds": ["dir::../analog/transistor_ring_oscillator/macro/ring_oscillator.gds"],
       "lef": ["dir::../analog/transistor_ring_oscillator/macro/ring_oscillator.lef"],
       "spice": ["dir::../analog/transistor_ring_oscillator/macro/ring_oscillator.spice"]
+    },
+    "ring_oscillator_500mhz": {
+      "instances": {
+        "u_ring_oscillator_500mhz": {
+          "location": [53.28, 40.0],
+          "orientation": "N"
+        }
+      },
+      "gds": ["dir::../analog/transistor_ring_oscillator_500mhz/macro/ring_oscillator_500mhz.gds"],
+      "lef": ["dir::../analog/transistor_ring_oscillator_500mhz/macro/ring_oscillator_500mhz.lef"],
+      "spice": ["dir::../analog/transistor_ring_oscillator_500mhz/macro/ring_oscillator_500mhz.spice"]
     }
   },
   "PDN_MACRO_CONNECTIONS": [
-    "u_ring_oscillator VPWR VGND VPWR VGND"
+    "u_ring_oscillator VPWR VGND VPWR VGND",
+    "u_ring_oscillator_500mhz VPWR VGND VPWR VGND"
   ],
   "PDN_CONNECT_MACROS_TO_GRID": 1,
   "PDN_CFG": "dir::../tools/local/pdn_cfg.tcl",

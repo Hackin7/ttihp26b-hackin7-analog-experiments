@@ -7,6 +7,8 @@
 
 // Digital leaf: synthesized into the Tiny Tapeout top (not a GDS macro).
 // 64-bit async ripple T-FF counter. Same binary sequence as counter+1.
+/* verilator lint_off MULTIDRIVEN */
+/* verilator lint_off SYNCASYNCNET */
 module digital_counter #(
     parameter integer CTR_W = 64
 ) (
@@ -41,3 +43,5 @@ module digital_counter #(
   assign uo_out = counter[byte_sel * 8 +: 8];
 
 endmodule
+/* verilator lint_on SYNCASYNCNET */
+/* verilator lint_on MULTIDRIVEN */

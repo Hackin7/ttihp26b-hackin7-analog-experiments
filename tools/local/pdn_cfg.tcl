@@ -187,25 +187,11 @@ if { $::env(PDN_CORE_RING) == 1 } {
     }
 }
 
-define_pdn_grid \
-    -macro \
-    -default \
-    -name macro \
-    -starts_with POWER \
-    -halo "$::env(PDN_HORIZONTAL_HALO) $::env(PDN_VERTICAL_HALO)"
-
-# Analog GDS vias Metal1 rails up to TopMetal1 pads. A dummy stripe is
-# required on this grid so pdngen does not trip PDN-0232/0233; keep it on
-# TopMetal1 (not followpins — followpins here drew illegal TM1 slivers).
-add_pdn_stripe \
-    -grid macro \
-    -layer $::env(PDN_VERTICAL_LAYER) \
-    -width $::env(PDN_VWIDTH) \
-    -nets {VPWR} \
-    -offset 0.97 \
-    -pitch $::env(PDN_VPITCH) \
-    -number_of_straps 1 \
-    -extend_to_boundary
+# Skip LibreLane's per-instance -macro -default grid. With two ring macros it
+# either leaves an empty instance grid (PDN-0232/0233) or opens an irreparable
+# Metal1 channel between them (PDN-0179). Power for the rings is added after
+# pdngen by analog_fix_power_pins (full-height TopMetal1 jumpers onto the
+# VPWR/VGND pads).
 
 # pdngen always cuts TopMetal1 around CLASS BLOCK macros (~1.6–3.3 µm).
 # After pdngen, drop full-height TT-top jumpers that overlap the analog TM1
@@ -251,9 +237,16 @@ proc analog_fix_power_pins {} {
         puts "WARNING: analog TM1 jumper skipped; TopMetal1 not found"
         return
     }
-    set inst [$block findInst u_ring_oscillator]
-    if {$inst == "NULL"} {
-        puts "WARNING: analog TM1 jumper skipped; u_ring_oscillator not found"
+    set ring_insts {}
+    foreach inst_name {u_ring_oscillator u_ring_oscillator_500mhz} {
+        set inst [$block findInst $inst_name]
+        if {$inst == "NULL"} {
+            puts "WARNING: analog TM1 jumper skipped; $inst_name not found"
+        } else {
+            lappend ring_insts $inst
+        }
+    }
+    if {[llength $ring_insts] == 0} {
         return
     }
 
@@ -262,7 +255,6 @@ proc analog_fix_power_pins {} {
     set die_y1 [$die yMin]
     set die_y2 [$die yMax]
     set edge [expr {10 * $dbu}]
-    set ix [[$inst getBBox] xMin]
     set layer_name [$layer getName]
 
     foreach net_name {VPWR VGND} {
@@ -294,15 +286,18 @@ proc analog_fix_power_pins {} {
             set pin_y2 [expr {$die_y2 - round(3.56 * $dbu)}]
         }
 
-        if {$net_name == "VPWR"} {
-            set jx1 [expr {$ix + round(0.00 * $dbu)}]
-            set jx2 [expr {$ix + round(2.20 * $dbu)}]
-        } else {
-            set jx1 [expr {$ix + round(13.93 * $dbu)}]
-            set jx2 [expr {$ix + round(16.13 * $dbu)}]
+        foreach inst $ring_insts {
+            set ix [[$inst getBBox] xMin]
+            if {$net_name == "VPWR"} {
+                set jx1 [expr {$ix + round(0.00 * $dbu)}]
+                set jx2 [expr {$ix + round(2.20 * $dbu)}]
+            } else {
+                set jx1 [expr {$ix + round(13.93 * $dbu)}]
+                set jx2 [expr {$ix + round(16.13 * $dbu)}]
+            }
+            analog_add_tm1_sbox $net_name $layer $jx1 $pin_y1 $jx2 $pin_y2
+            dict set strap_xs $jx1 $jx2
         }
-        analog_add_tm1_sbox $net_name $layer $jx1 $pin_y1 $jx2 $pin_y2
-        dict set strap_xs $jx1 $jx2
 
         set to_destroy {}
         foreach bpin [$bterm getBPins] {

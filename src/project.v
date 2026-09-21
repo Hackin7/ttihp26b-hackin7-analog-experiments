@@ -6,7 +6,7 @@
 `default_nettype none
 
 // Tiny Tapeout top: instantiates analog and digital leaves and glues clocks.
-// LibreLane auto-routes every Verilog signal net, including clk_ring.
+// LibreLane auto-routes every Verilog signal net, including clk_ring_*.
 module tt_um_hackin7_analog_experiments #(
     parameter integer CTR_W = 64
 ) (
@@ -20,14 +20,20 @@ module tt_um_hackin7_analog_experiments #(
     input  wire       rst_n     // reset_n - low to reset
 );
 
-  // Analog leaf (pre-hardened GDS/LEF). Power pins are connected by PDN.
-  wire clk_ring;
+  // Analog leaves (pre-hardened GDS/LEF). Power pins are connected by PDN.
+  wire clk_ring_100;
+  wire clk_ring_500;
   ring_oscillator u_ring_oscillator (
-      .out(clk_ring)
+      .out(clk_ring_100)
+  );
+  ring_oscillator_500mhz u_ring_oscillator_500mhz (
+      .out(clk_ring_500)
   );
 
-  // Direct clock selection is intentional. Change ui_in[1] only while reset
-  // is asserted, since an asynchronous live change can create a clock glitch.
+  // Direct clock selection is intentional. Change ui_in[1]/ui_in[5] only while
+  // reset is asserted, since an asynchronous live change can create a clock glitch.
+  // ui_in[1]=0 -> TT clk; ui_in[1]=1 && ui_in[5]=0 -> 100 MHz; ui_in[5]=1 -> 500 MHz.
+  wire clk_ring = ui_in[5] ? clk_ring_500 : clk_ring_100;
   wire counter_clk = ui_in[1] ? clk_ring : clk;
 
   digital_counter #(
@@ -43,6 +49,9 @@ module tt_um_hackin7_analog_experiments #(
   assign uio_out = 8'b0;
   assign uio_oe  = 8'b0;
 
-  wire _unused = &{uio_in, ui_in[7:5], 1'b0};
+  (* keep *)
+  chips_art u_chips_art ();
+
+  wire _unused = &{uio_in, ui_in[7:6], 1'b0};
 
 endmodule

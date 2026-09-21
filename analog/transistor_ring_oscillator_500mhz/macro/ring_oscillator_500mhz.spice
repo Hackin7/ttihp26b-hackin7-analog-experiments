@@ -1,0 +1,15 @@
+* NGSPICE file created from ring_oscillator.ext - technology: ihp-sg13g2
+
+.subckt cmos_inv Y A VSS VDD
+X0 Y A VDD VDD sg13_lv_pmos ad=0.3808p pd=2.92u as=0.3808p ps=2.92u w=1.12u l=0.555u
+X1 Y A VSS VSS sg13_lv_nmos ad=0.2516p pd=2.16u as=0.2516p ps=2.16u w=0.74u l=0.555u
+.ends
+
+.subckt ring_oscillator_500mhz out VPWR VGND
+Xx0 x1/A out VGND VPWR cmos_inv
+Xx1 x2/A x1/A VGND VPWR cmos_inv
+Xx2 x3/A x2/A VGND VPWR cmos_inv
+Xx3 x4/A x3/A VGND VPWR cmos_inv
+Xx4 out x4/A VGND VPWR cmos_inv
+.ends
+

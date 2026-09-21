@@ -1,0 +1,15 @@
+# Minimal LEF for decorative TopMetal1 macro
+VERSION 5.8 ;
+NAMESCASESENSITIVE ON ;
+DIVIDERCHAR "/" ;
+BUSBITCHARS "[]" ;
+UNITS
+   DATABASE MICRONS 1000 ;
+END UNITS
+
+MACRO chips_art
+   CLASS COVER ;
+   FOREIGN chips_art 0 0 ;
+   SIZE 78.720 BY 82.000 ;
+   SYMMETRY X Y ;
+END chips_art

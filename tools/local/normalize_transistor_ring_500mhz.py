@@ -1,8 +1,8 @@
-"""Origin-normalize the 5-stage transistor ring for LibreLane.
+"""Origin-normalize the 500 MHz transistor ring for LibreLane.
 
-Magic writes ring_oscillator with negative coordinates (feedback / TopMetal1
-overhang). LibreLane needs cell origin (0, 0), a PR-boundary, and Metal1 /
-TopMetal1 pins named out / VPWR / VGND.
+Magic writes ring_oscillator with negative coordinates. LibreLane needs cell
+origin (0, 0), a PR-boundary, pins out/VPWR/VGND, and a unique cell name
+ring_oscillator_500mhz (distinct from the 100 MHz leaf).
 """
 
 from pathlib import Path
@@ -13,19 +13,20 @@ ROOT = Path(__file__).resolve().parents[2]
 MACRO = ROOT / "analog/transistor_ring_oscillator_500mhz/macro"
 SOURCE_GDS = MACRO / "main_fixed.gds"
 SOURCE_LEF = MACRO / "ring_oscillator.lef"
-OUTPUT_GDS = MACRO / "ring_oscillator.gds"
-OUTPUT_LEF = MACRO / "ring_oscillator.lef"
+OUTPUT_GDS = MACRO / "ring_oscillator_500mhz.gds"
+OUTPUT_LEF = MACRO / "ring_oscillator_500mhz.lef"
 EXTRACTED_SPICE = MACRO / "ring_oscillator_extracted.spice"
-OUTPUT_SPICE = MACRO / "ring_oscillator.spice"
+OUTPUT_SPICE = MACRO / "ring_oscillator_500mhz.spice"
 
-UNIT_UM = 0.005
+CELL_NAME = "ring_oscillator_500mhz"
+MAGIC_CELL = "ring_oscillator"
+
 SHIFT_UM = (0.930, 0.730)
 SHIFT_DBU = (930, 730)  # 1 nm database units
 SIZE_UM = (16.130, 5.330)
 SIZE_DBU = (16130, 5330)
 PR_BOUNDARY_LAYER = 189
 PR_BOUNDARY_DATATYPE = 4
-TOP_CELLS = ("ring_oscillator",)
 
 PIN_OUT_M1 = (13.730, 2.130, 14.730, 3.130)
 PIN_VPWR_M1 = (0.930, 4.290, 15.330, 4.730)
@@ -72,7 +73,11 @@ def normalize_gds():
 
         if record_type == 0x06:
             structure = payload.rstrip(b"\0").decode("ascii")
-        elif structure in TOP_CELLS and record_type == 0x10 and data_type == 3:
+            if structure == MAGIC_CELL:
+                payload = CELL_NAME.encode("ascii")
+                # Keep tracking as MAGIC_CELL so XY shift still applies.
+            # structure variable stays MAGIC_CELL for shift matching
+        elif structure == MAGIC_CELL and record_type == 0x10 and data_type == 3:
             values = list(struct.unpack(">" + "i" * (len(payload) // 4), payload))
             for index in range(0, len(values), 2):
                 values[index] += SHIFT_DBU[0]
@@ -89,7 +94,6 @@ def inject_pr_boundary(path):
     raw = path.read_bytes()
     output = []
     offset = 0
-    structure = None
     in_top = False
     has_pr = False
     while offset < len(raw):
@@ -100,7 +104,7 @@ def inject_pr_boundary(path):
 
         if record_type == 0x06:
             structure = payload.rstrip(b"\0").decode("ascii")
-            in_top = structure == "ring_oscillator"
+            in_top = structure == CELL_NAME
             has_pr = False
         elif in_top and record_type == 0x0D and len(payload) >= 2:
             if struct.unpack(">H", payload[:2])[0] == PR_BOUNDARY_LAYER:
@@ -184,9 +188,9 @@ def normalize_lef():
         "NOWIREEXTENSIONATPIN ON ;",
         'DIVIDERCHAR "/" ;',
         'BUSBITCHARS "[]" ;',
-        "MACRO ring_oscillator",
+        "MACRO %s" % CELL_NAME,
         "  CLASS BLOCK ;",
-        "  FOREIGN ring_oscillator 0.000 0.000 ;",
+        "  FOREIGN %s 0.000 0.000 ;" % CELL_NAME,
         "  ORIGIN 0.000 0.000 ;",
         "  SIZE %.3f BY %.3f ;" % SIZE_UM,
         "  PIN out",
@@ -220,7 +224,7 @@ def normalize_lef():
         "  OBS",
         *obs_lines,
         "  END",
-        "END ring_oscillator",
+        "END %s" % CELL_NAME,
         "END LIBRARY",
         "",
     ]
@@ -228,20 +232,31 @@ def normalize_lef():
 
 
 def copy_spice():
-    if EXTRACTED_SPICE.exists():
-        OUTPUT_SPICE.write_text(EXTRACTED_SPICE.read_text(encoding="ascii"), encoding="ascii")
+    if not EXTRACTED_SPICE.exists():
+        return
+    text = EXTRACTED_SPICE.read_text(encoding="ascii")
+    text = re.sub(
+        r"\.subckt\s+%s\b" % re.escape(MAGIC_CELL),
+        ".subckt %s" % CELL_NAME,
+        text,
+    )
+    text = re.sub(
+        r"\.ends\s+%s\b" % re.escape(MAGIC_CELL),
+        ".ends %s" % CELL_NAME,
+        text,
+    )
+    OUTPUT_SPICE.write_text(text, encoding="ascii")
 
 
 def main():
     if not SOURCE_GDS.exists():
         raise SystemExit("missing %s; run layout_5/run_export_osic.sh first" % SOURCE_GDS)
-    # Read Magic LEF before overwriting ring_oscillator.lef.
     if not SOURCE_LEF.exists():
         raise SystemExit("missing %s" % SOURCE_LEF)
     normalize_gds()
     normalize_lef()
     copy_spice()
-    print("wrote %s shift_dbu=%s" % (OUTPUT_GDS, SHIFT_DBU))
+    print("wrote %s shift_dbu=%s cell=%s" % (OUTPUT_GDS, SHIFT_DBU, CELL_NAME))
     print("wrote %s SIZE %.3f x %.3f um" % (OUTPUT_LEF, SIZE_UM[0], SIZE_UM[1]))
     print("wrote %s" % OUTPUT_SPICE)
 

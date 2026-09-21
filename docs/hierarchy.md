@@ -2,13 +2,21 @@
 
 The Tiny Tapeout cell `tt_um_hackin7_analog_experiments` is a thin assembler:
 
-- Analog leaf: `ring_oscillator` (pre-hardened GDS/LEF, see
-  `analog/transistor_ring_oscillator/`)
+- Analog leaves:
+  - `ring_oscillator` (~100 MHz, `analog/transistor_ring_oscillator/`) at `[53.28, 18.90]`
+  - `ring_oscillator_500mhz` (~500 MHz, `analog/transistor_ring_oscillator_500mhz/`) at `[53.28, 40.0]`
+- Decorative `chips_art` (TopMetal1 COVER macro)
 - Digital leaf: `digital_counter` (RTL in `src/counter.v`, synthesized into the top)
-- Glue: clock mux `ui_in[1] ? clk_ring : clk` in `src/project.v`
+- Glue: clock mux in `src/project.v`
+  - `ui_in[1]=0` → Tiny Tapeout `clk`
+  - `ui_in[1]=1`, `ui_in[5]=0` → 100 MHz ring
+  - `ui_in[1]=1`, `ui_in[5]=1` → 500 MHz ring
 
 `tt_tool.py --harden` runs LibreLane on this top. Every Verilog signal net is
-auto-routed, including `clk_ring`. Power uses PDN.
+auto-routed, including `clk_ring_100` / `clk_ring_500`. Power uses PDN.
+
+How the analog leaf was built and swapped in:
+[transistor_ring_flow.md](transistor_ring_flow.md).
 
 ## How to add another analog block
 
@@ -21,6 +29,8 @@ auto-routed, including `clk_ring`. Power uses PDN.
    name matches RTL, and `gds`/`lef`/`spice` point at the macro views.
 7. If it has `VPWR`/`VGND`, append a `PDN_MACRO_CONNECTIONS` line:
    `"<inst> VPWR VGND VPWR VGND"`.
+8. If it needs TopMetal1 PDN jumpers like the rings, extend
+   `tools/local/pdn_cfg.tcl` `analog_fix_power_pins` for the new instance.
 
 ## How to add another digital block
 
