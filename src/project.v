@@ -23,11 +23,15 @@ module tt_um_hackin7_analog_experiments #(
   // Analog leaves (pre-hardened GDS/LEF). Power pins are connected by PDN.
   wire clk_ring_100;
   wire clk_ring_500;
+  wire clk_ring_1g;
   ring_oscillator u_ring_oscillator (
       .out(clk_ring_100)
   );
   ring_oscillator_500mhz u_ring_oscillator_500mhz (
       .out(clk_ring_500)
+  );
+  ring_oscillator_1ghz u_ring_oscillator_1ghz (
+      .out(clk_ring_1g)
   );
 
   // PLL digital (feedback ÷N + output ÷M). clk_vco stubbed until pll_analog
@@ -47,12 +51,14 @@ module tt_um_hackin7_analog_experiments #(
       .clk_out(pll_clk_out)
   );
 
-  // Direct clock selection is intentional. Change ui_in[1]/ui_in[5]/ui_in[7]
-  // only while reset is asserted, since an asynchronous live change can create
-  // a clock glitch.
+  // Direct clock selection is intentional. Change ui_in[1]/ui_in[5]/ui_in[6]
+  // /ui_in[7] only while reset is asserted, since an asynchronous live change
+  // can create a clock glitch.
   // ui_in[7]=1 -> PLL ÷M (stubbed idle until analog bind)
-  // ui_in[1]=0 -> TT clk; ui_in[1]=1 && ui_in[5]=0 -> 100 MHz; ui_in[5]=1 -> 500 MHz.
-  wire clk_ring = ui_in[5] ? clk_ring_500 : clk_ring_100;
+  // ui_in[1]=0 -> TT clk
+  // ui_in[1]=1, ui_in[6:5]=00 -> 100 MHz; 01 -> 500 MHz; 1x -> 1 GHz.
+  // ui_in[6] is dual-use as pll_m_sel[4] when ui_in[7]=1.
+  wire clk_ring = ui_in[6] ? clk_ring_1g : (ui_in[5] ? clk_ring_500 : clk_ring_100);
   wire counter_clk = ui_in[7] ? pll_clk_out : (ui_in[1] ? clk_ring : clk);
 
   digital_counter #(

@@ -238,7 +238,7 @@ proc analog_fix_power_pins {} {
         return
     }
     set ring_insts {}
-    foreach inst_name {u_ring_oscillator u_ring_oscillator_500mhz} {
+    foreach inst_name {u_ring_oscillator u_ring_oscillator_500mhz u_ring_oscillator_1ghz} {
         set inst [$block findInst $inst_name]
         if {$inst == "NULL"} {
             puts "WARNING: analog TM1 jumper skipped; $inst_name not found"

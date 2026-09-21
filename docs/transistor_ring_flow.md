@@ -268,6 +268,13 @@ Then harden (step 10) if the chip GDS must pick up the new leaf.
 
 A second 5-stage ring sized for 500 MHz lives in
 `analog/transistor_ring_oscillator_500mhz/` (`L=0.555 µm`, schematic 540.6 MHz,
-PEX+C 499.2 MHz). LibreLane cell name is `ring_oscillator_500mhz`. It is
-instantiated beside the 100 MHz leaf; select with `ui_in[1]`/`ui_in[5]` (see
-`docs/hierarchy.md`).
+PEX+C 499.2 MHz). LibreLane cell name is `ring_oscillator_500mhz`.
+
+## 1 GHz duplicate
+
+A third 5-stage ring sized for 1 GHz lives in
+`analog/transistor_ring_oscillator_1ghz/` (`L=0.345 µm`, schematic 1105.2 MHz,
+PEX+C 995.6 MHz). LibreLane cell name is `ring_oscillator_1ghz`.
+
+Both siblings are instantiated beside the 100 MHz leaf; select with
+`ui_in[1]` / `ui_in[6:5]` (see `docs/hierarchy.md`).

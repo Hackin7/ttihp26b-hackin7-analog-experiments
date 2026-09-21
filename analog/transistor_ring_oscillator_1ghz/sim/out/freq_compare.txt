@@ -1,6 +1,6 @@
-schematic_5stage_mhz=540.6
-layout_pex_coupling_c_mhz=499.2
-lch_um=0.555
+schematic_5stage_mhz=1105.2
+layout_pex_coupling_c_mhz=995.6
+lch_um=0.345
 wn_um=0.74
 wp_um=1.12
-notes=L retuned so PEX+C lands ~500 MHz; not in TT config.json
+notes=L retuned so PEX+C lands ~1 GHz

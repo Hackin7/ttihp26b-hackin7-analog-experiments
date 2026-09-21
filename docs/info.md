@@ -13,16 +13,21 @@ Hierarchical Tiny Tapeout top with analog ring leaves and a digital counter:
 
 - 100 MHz transistor ring (`ring_oscillator` GDS macro).
 - 500 MHz transistor ring (`ring_oscillator_500mhz` GDS macro).
+- 1 GHz transistor ring (`ring_oscillator_1ghz` GDS macro).
 - 64-bit digital counter (`digital_counter` RTL). `ui_in[0]` enables counting,
   `ui_in[4:2]` selects which counter byte drives `uo_out`.
 
 Clock select (change only while `rst_n` is low):
 
-| `ui_in[1]` | `ui_in[5]` | Counter clock |
+| `ui_in[1]` | `ui_in[6:5]` | Counter clock |
 | --- | --- | --- |
-| 0 | x | Tiny Tapeout `clk` |
-| 1 | 0 | 100 MHz ring |
-| 1 | 1 | 500 MHz ring |
+| 0 | xx | Tiny Tapeout `clk` |
+| 1 | 00 | 100 MHz ring |
+| 1 | 01 | 500 MHz ring |
+| 1 | 1x | 1 GHz ring |
+
+`ui_in[7]=1` selects the PLL ÷M path instead (stubbed until analog VCO bind).
+`ui_in[6]` is dual-use as `pll_m_sel[4]` in that mode.
 
 Ring-clock modes are not timing qualified.
 
@@ -30,7 +35,7 @@ How to add more analog or digital leaves: see `docs/hierarchy.md`.
 
 ## How to test
 
-Hold reset, set `ui_in[1]` / `ui_in[5]` for the clock source, release reset,
+Hold reset, set `ui_in[1]` / `ui_in[6:5]` for the clock source, release reset,
 set `ui_in[0]` to enable the counter, and read `uo_out` while sweeping
 `ui_in[4:2]`.
 

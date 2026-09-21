@@ -5,9 +5,10 @@
 This project targets one IHP SG13G2 1×1 Tiny Tapeout tile. The top cell is a
 thin hierarchical assembler:
 
-- analog leaves `ring_oscillator` (~100 MHz) and `ring_oscillator_500mhz` (~500 MHz)
+- analog leaves `ring_oscillator` (~100 MHz), `ring_oscillator_500mhz` (~500 MHz),
+  and `ring_oscillator_1ghz` (~1 GHz)
 - digital leaf `digital_counter` (synthesized RTL)
-- clock mux glue in `src/project.v` (`ui_in[1]` / `ui_in[5]`)
+- clock mux glue in `src/project.v` (`ui_in[1]` / `ui_in[6:5]`)
 
 LibreLane auto-routes all Verilog signal nets, including the ring outputs.
 See [docs/hierarchy.md](docs/hierarchy.md) for how to add more leaves.
@@ -15,8 +16,9 @@ See [docs/transistor_ring_flow.md](docs/transistor_ring_flow.md) for the
 analog ring schematic → layout → LVS → GDS flow.
 
 Part 1 established the IHP26b LibreLane CI flow. Analog source layout lives
-under `analog/transistor_ring_oscillator/` and
-`analog/transistor_ring_oscillator_500mhz/`. The older stdcell ring under
+under `analog/transistor_ring_oscillator/`,
+`analog/transistor_ring_oscillator_500mhz/`, and
+`analog/transistor_ring_oscillator_1ghz/`. The older stdcell ring under
 `analog/inverter_ring_oscillator/` is kept as reference.
 
 ## Local hardening

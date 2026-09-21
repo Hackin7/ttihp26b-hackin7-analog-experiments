@@ -47,11 +47,23 @@
       "gds": ["dir::../analog/transistor_ring_oscillator_500mhz/macro/ring_oscillator_500mhz.gds"],
       "lef": ["dir::../analog/transistor_ring_oscillator_500mhz/macro/ring_oscillator_500mhz.lef"],
       "spice": ["dir::../analog/transistor_ring_oscillator_500mhz/macro/ring_oscillator_500mhz.spice"]
+    },
+    "ring_oscillator_1ghz": {
+      "instances": {
+        "u_ring_oscillator_1ghz": {
+          "location": [53.28, 61.0],
+          "orientation": "N"
+        }
+      },
+      "gds": ["dir::../analog/transistor_ring_oscillator_1ghz/macro/ring_oscillator_1ghz.gds"],
+      "lef": ["dir::../analog/transistor_ring_oscillator_1ghz/macro/ring_oscillator_1ghz.lef"],
+      "spice": ["dir::../analog/transistor_ring_oscillator_1ghz/macro/ring_oscillator_1ghz.spice"]
     }
   },
   "PDN_MACRO_CONNECTIONS": [
     "u_ring_oscillator VPWR VGND VPWR VGND",
-    "u_ring_oscillator_500mhz VPWR VGND VPWR VGND"
+    "u_ring_oscillator_500mhz VPWR VGND VPWR VGND",
+    "u_ring_oscillator_1ghz VPWR VGND VPWR VGND"
   ],
   "PDN_CONNECT_MACROS_TO_GRID": 1,
   "PDN_CFG": "dir::../tools/local/pdn_cfg.tcl",
