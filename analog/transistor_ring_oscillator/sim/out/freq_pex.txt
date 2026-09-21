@@ -1,0 +1,4 @@
+period_s=1.044578e-08
+freq_hz=9.573247e+07
+n_cycles=18
+period_std_s=1.258352e-11

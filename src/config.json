@@ -18,9 +18,9 @@
           "orientation": "N"
         }
       },
-      "gds": ["dir::../analog/inverter_ring_oscillator/macro/ring_oscillator.gds"],
-      "lef": ["dir::../analog/inverter_ring_oscillator/macro/ring_oscillator.lef"],
-      "spice": ["dir::../analog/inverter_ring_oscillator/macro/ring_oscillator.spice"]
+      "gds": ["dir::../analog/transistor_ring_oscillator/macro/ring_oscillator.gds"],
+      "lef": ["dir::../analog/transistor_ring_oscillator/macro/ring_oscillator.lef"],
+      "spice": ["dir::../analog/transistor_ring_oscillator/macro/ring_oscillator.spice"]
     }
   },
   "PDN_MACRO_CONNECTIONS": [

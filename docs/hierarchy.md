@@ -3,7 +3,7 @@
 The Tiny Tapeout cell `tt_um_hackin7_analog_experiments` is a thin assembler:
 
 - Analog leaf: `ring_oscillator` (pre-hardened GDS/LEF, see
-  `analog/inverter_ring_oscillator/`)
+  `analog/transistor_ring_oscillator/`)
 - Digital leaf: `digital_counter` (RTL in `src/counter.v`, synthesized into the top)
 - Glue: clock mux `ui_in[1] ? clk_ring : clk` in `src/project.v`
 

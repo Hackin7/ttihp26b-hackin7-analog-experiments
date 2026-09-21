@@ -1,0 +1,9 @@
+schematic_5stage_hz=1.009175e+08
+schematic_5stage_mhz=100.9
+layout_lvs_devices_mhz=100.9
+layout_pex_coupling_c_hz=9.573247e+07
+layout_pex_coupling_c_mhz=95.7
+lch_um=1.45
+wn_um=0.74
+wp_um=1.12
+notes=PEX C drops f by ~5%; no L retune

@@ -1,5 +1,5 @@
 /* Analog leaf blackbox. Physical views:
- *   analog/inverter_ring_oscillator/macro/ring_oscillator.{gds,lef,spice}
+ *   analog/transistor_ring_oscillator/macro/ring_oscillator.{gds,lef,spice}
  * LibreLane binds this module name to those views via src/config.json MACROS.
  * Power ports are only present when the powered netlist is generated.
  */

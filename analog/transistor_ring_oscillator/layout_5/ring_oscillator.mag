@@ -1,0 +1,89 @@
+magic
+tech ihp-sg13g2
+magscale 1 2
+timestamp 1789919000
+<< metal1 >>
+rect 435 321 701 353
+rect 1011 321 1277 353
+rect 1587 321 1853 353
+rect 2163 321 2429 353
+rect 2739 321 2960 353
+rect 2928 -128 2960 353
+rect -80 -128 2960 -96
+rect -80 -128 -48 353
+rect -48 321 125 353
+rect 0 -44 2880 44
+rect 0 712 2880 800
+rect 2739 280 2939 480
+<< via1 >>
+rect 14 754 54 794
+<< metal2 >>
+rect -6 734 74 814
+<< via2 >>
+rect 14 754 54 794
+<< metal3 >>
+rect -6 734 74 814
+<< via3 >>
+rect 14 754 54 794
+<< metal4 >>
+rect -6 734 74 814
+<< via4 >>
+rect 14 754 54 794
+<< metal5 >>
+rect -48 692 116 856
+<< via5 >>
+rect -28 712 96 836
+<< metal6 >>
+rect -186 592 254 920
+<< via1 >>
+rect 2800 -20 2840 20
+<< metal2 >>
+rect 2780 -40 2860 40
+<< via2 >>
+rect 2800 -20 2840 20
+<< metal3 >>
+rect 2780 -40 2860 40
+<< via3 >>
+rect 2800 -20 2840 20
+<< metal4 >>
+rect 2780 -40 2860 40
+<< via4 >>
+rect 2800 -20 2840 20
+<< metal5 >>
+rect 2738 -82 2902 82
+<< via5 >>
+rect 2758 -62 2882 62
+<< metal6 >>
+rect 2600 -146 3040 182
+use cmos_inv  x0
+timestamp 1789919000
+transform 1 0 0 0 1 0
+box -48 -56 624 834
+use cmos_inv  x1
+timestamp 1789919000
+transform 1 0 576 0 1 0
+box -48 -56 624 834
+use cmos_inv  x2
+timestamp 1789919000
+transform 1 0 1152 0 1 0
+box -48 -56 624 834
+use cmos_inv  x3
+timestamp 1789919000
+transform 1 0 1728 0 1 0
+box -48 -56 624 834
+use cmos_inv  x4
+timestamp 1789919000
+transform 1 0 2304 0 1 0
+box -48 -56 624 834
+<< labels >>
+flabel metal1 2739 280 2939 480 0 FreeSans 1600 0 0 0 out
+port 0 nsew
+flabel metal1 0 712 2880 800 0 FreeSans 1600 0 0 0 VPWR
+port 1 nsew
+flabel metal6 -186 592 254 920 0 FreeSans 1600 0 0 0 VPWR
+port 1 nsew
+flabel metal1 0 -44 2880 44 0 FreeSans 1600 0 0 0 VGND
+port 2 nsew
+flabel metal6 2600 -146 3040 182 0 FreeSans 1600 0 0 0 VGND
+port 2 nsew
+<< end >>

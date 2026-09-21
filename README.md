@@ -13,7 +13,9 @@ LibreLane auto-routes all Verilog signal nets, including the ring output.
 See [docs/hierarchy.md](docs/hierarchy.md) for how to add more leaves.
 
 Part 1 established the IHP26b LibreLane CI flow. Analog source layout lives
-under `analog/inverter_ring_oscillator/`.
+under `analog/transistor_ring_oscillator/` (5-stage discrete MOS ring). The
+older stdcell ring under `analog/inverter_ring_oscillator/` is kept as
+reference.
 
 ## Local hardening
 

@@ -295,11 +295,11 @@ proc analog_fix_power_pins {} {
         }
 
         if {$net_name == "VPWR"} {
-            set jx1 [expr {$ix + round(0.97 * $dbu)}]
-            set jx2 [expr {$ix + round(3.17 * $dbu)}]
+            set jx1 [expr {$ix + round(0.00 * $dbu)}]
+            set jx2 [expr {$ix + round(2.20 * $dbu)}]
         } else {
-            set jx1 [expr {$ix + round(7.17 * $dbu)}]
-            set jx2 [expr {$ix + round(9.37 * $dbu)}]
+            set jx1 [expr {$ix + round(13.93 * $dbu)}]
+            set jx2 [expr {$ix + round(16.13 * $dbu)}]
         }
         analog_add_tm1_sbox $net_name $layer $jx1 $pin_y1 $jx2 $pin_y2
         dict set strap_xs $jx1 $jx2

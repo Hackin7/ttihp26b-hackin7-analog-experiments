@@ -23,12 +23,12 @@ MIN_CYCLES = 5
 def load_wrdata(path: Path) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Parse ngspice wrdata: interleaved time/value columns per vector."""
     raw = np.loadtxt(path)
-    if raw.ndim != 2 or raw.shape[1] < 6:
+    if raw.ndim != 2 or raw.shape[1] < 2:
         raise SystemExit(f"unexpected wrdata shape {raw.shape} in {path}")
     t = raw[:, 0]
     v_out = raw[:, 1]
-    v_n1 = raw[:, 3]
-    v_n2 = raw[:, 5]
+    v_n1 = raw[:, 3] if raw.shape[1] >= 4 else v_out
+    v_n2 = raw[:, 5] if raw.shape[1] >= 6 else v_out
     return t, v_out, v_n1, v_n2
 
 
