@@ -21,3 +21,7 @@ src/config_merged.json
 gds_render*
 tmp_*
 **/__pycache__/
+
+*.swp
+*~
+
