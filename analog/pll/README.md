@@ -74,9 +74,14 @@ docker run --rm --entrypoint /bin/bash \
 
 PFD stdcells (`sg13g2_dfrbpq_1` ×2, `sg13g2_and2_1`, `sg13g2_inv_1`) are imported into [`layout/pll_analog.mag`](layout/pll_analog.mag) as instances `x1`–`x4` (see [`layout/import_pfd_stdcells.tcl`](layout/import_pfd_stdcells.tcl)).
 
-Floorplan is schematic-ordered L→R via [`layout/relayout_sections.tcl`](layout/relayout_sections.tcl): **PFD | CP | bias | filter | VCO** (~73 × 53 µm seed).
+Floorplan is schematic-ordered L→R via [`layout/relayout_sections.tcl`](layout/relayout_sections.tcl): **PFD | CP | bias | filter | VCO**.
 
-**Not done yet:** full routing, DRC/LVS macro export, TT bind.
+Manhattan layer-aware seed routing (Metal1 verticals, Metal2 trunks, Via1):
+[`layout/gen_route_pll.py`](layout/gen_route_pll.py) → [`layout/route_pll.tcl`](layout/route_pll.tcl).
+
+LVS (extract + netgen): [`layout/extract_lvs.tcl`](layout/extract_lvs.tcl), [`layout/run_lvs_osic.sh`](layout/run_lvs_osic.sh) → [`macro/lvs.out`](macro/lvs.out). **Currently FAIL** — Mag extract sees top ports shorted together by the seed routes.
+
+**Not done yet:** DRC-clean / LVS-clean routing, macro export, TT bind.
 
 ## Simulate
 

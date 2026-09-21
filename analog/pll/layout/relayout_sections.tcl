@@ -112,37 +112,23 @@ set x [expr {$x0 + 4*$dx}]
 place sg13_lv_pmos_NJKCVT XMp4 $x $yi
 place sg13_lv_nmos_RUYN9Y XMn4 $x $yn
 
-puts "=== Section + pin labels ==="
+puts "=== Pin labels (no decorative section tags) ==="
 load pll_analog
 
-# section markers (non-port)
-proc seclab {text x y} {
-  box ${x}um ${y}um [expr {$x+0.2}]um [expr {$y+0.2}]um
-  paint metal1
-  label $text FreeSans 0.8um 0 0 0
-}
-
-seclab PFD     0   10.5
-seclab CP     20   11.5
-seclab BIAS    8   -18.5
-seclab FILTER 30   22.0
-seclab VCO    60   10.0
-
-# top-level pins near relevant sections
-proc pinlab {name x y portnum} {
+proc pinlab {name x y} {
   box ${x}um ${y}um [expr {$x+1}]um [expr {$y+1}]um
   paint metal1
   label $name FreeSans 1.0um 0 0 0
-  port make $portnum
+  port make
   port connections n s e w
 }
 
-pinlab clk_ref_gate  -2  6.5  0
-pinlab vco_out_div   -2  1.5  1
-pinlab VPWR          20  12.5 2
-pinlab VGND          20 -19.5 3
-pinlab vctrl         36  22.5 4
-pinlab out           70   6.0 5
+pinlab clk_ref_gate  -2  6.5
+pinlab vco_out_div   -2  1.5
+pinlab VPWR          20  12.5
+pinlab VGND          20 -19.5
+pinlab vctrl         36  22.5
+pinlab out           69.5 -11.8
 
 save pll_analog
 

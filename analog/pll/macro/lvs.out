@@ -1,0 +1,659 @@
+
+Circuit 1 cell sg13_lv_pmos and Circuit 2 cell sg13_lv_pmos are black boxes.
+Warning: Equate pins:  cell sg13_lv_pmos is a placeholder, treated as a black box.
+Warning: Equate pins:  cell sg13_lv_pmos is a placeholder, treated as a black box.
+
+Subcircuit pins:
+Circuit 1: sg13_lv_pmos                    |Circuit 2: sg13_lv_pmos                    
+-------------------------------------------|-------------------------------------------
+1                                          |1                                          
+2                                          |2                                          
+3                                          |3                                          
+4                                          |4                                          
+---------------------------------------------------------------------------------------
+Cell pin lists are equivalent.
+Device classes sg13_lv_pmos and sg13_lv_pmos are equivalent.
+
+Circuit 1 cell sg13_lv_nmos and Circuit 2 cell sg13_lv_nmos are black boxes.
+Warning: Equate pins:  cell sg13_lv_nmos is a placeholder, treated as a black box.
+Warning: Equate pins:  cell sg13_lv_nmos is a placeholder, treated as a black box.
+
+Subcircuit pins:
+Circuit 1: sg13_lv_nmos                    |Circuit 2: sg13_lv_nmos                    
+-------------------------------------------|-------------------------------------------
+1                                          |1                                          
+2                                          |2                                          
+3                                          |3                                          
+4                                          |4                                          
+---------------------------------------------------------------------------------------
+Cell pin lists are equivalent.
+Device classes sg13_lv_nmos and sg13_lv_nmos are equivalent.
+
+Circuit 1 cell rhigh and Circuit 2 cell rhigh are black boxes.
+Warning: Equate pins:  cell rhigh is a placeholder, treated as a black box.
+Warning: Equate pins:  cell rhigh is a placeholder, treated as a black box.
+
+Subcircuit pins:
+Circuit 1: rhigh                           |Circuit 2: rhigh                           
+-------------------------------------------|-------------------------------------------
+1                                          |1                                          
+2                                          |2                                          
+3                                          |3                                          
+---------------------------------------------------------------------------------------
+Cell pin lists are equivalent.
+Device classes rhigh and rhigh are equivalent.
+
+Circuit 1 cell cap_cmim and Circuit 2 cell cap_cmim are black boxes.
+Warning: Equate pins:  cell cap_cmim is a placeholder, treated as a black box.
+Warning: Equate pins:  cell cap_cmim is a placeholder, treated as a black box.
+
+Subcircuit pins:
+Circuit 1: cap_cmim                        |Circuit 2: cap_cmim                        
+-------------------------------------------|-------------------------------------------
+1                                          |1                                          
+2                                          |2                                          
+---------------------------------------------------------------------------------------
+Cell pin lists are equivalent.
+Device classes cap_cmim and cap_cmim are equivalent.
+
+Subcircuit summary:
+Circuit 1: sg13g2_dfrbpq_1                 |Circuit 2: sg13g2_dfrbpq_1                 
+-------------------------------------------|-------------------------------------------
+sg13_lv_pmos (16)                          |sg13_lv_pmos (16)                          
+sg13_lv_nmos (16)                          |sg13_lv_nmos (16)                          
+Number of devices: 32                      |Number of devices: 32                      
+Number of nets: 21                         |Number of nets: 21                         
+---------------------------------------------------------------------------------------
+Netlists match uniquely with port and property errors.
+sg13_lv_nmos:17 vs. sg13_lv_nmos:M1:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:17 vs. sg13_lv_nmos:M1:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:21 vs. sg13_lv_nmos:M3:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:21 vs. sg13_lv_nmos:M3:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:10 vs. sg13_lv_nmos:M4:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:10 vs. sg13_lv_nmos:M4:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:4 vs. sg13_lv_nmos:M5:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:4 vs. sg13_lv_nmos:M5:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:29 vs. sg13_lv_nmos:M7:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:29 vs. sg13_lv_nmos:M7:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:31 vs. sg13_lv_nmos:M8:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:31 vs. sg13_lv_nmos:M8:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:6 vs. sg13_lv_nmos:M9:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:6 vs. sg13_lv_nmos:M9:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:9 vs. sg13_lv_nmos:M10:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:9 vs. sg13_lv_nmos:M10:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:25 vs. sg13_lv_nmos:M11:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:25 vs. sg13_lv_nmos:M11:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:28 vs. sg13_lv_nmos:M12:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:28 vs. sg13_lv_nmos:M12:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:26 vs. sg13_lv_nmos:M13:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:26 vs. sg13_lv_nmos:M13:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:14 vs. sg13_lv_nmos:M6:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:14 vs. sg13_lv_nmos:M6:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:2 vs. sg13_lv_nmos:M14:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:2 vs. sg13_lv_nmos:M14:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:1 vs. sg13_lv_nmos:M2:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:1 vs. sg13_lv_nmos:M2:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:12 vs. sg13_lv_nmos:M15:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:12 vs. sg13_lv_nmos:M15:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:24 vs. sg13_lv_nmos:M16:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:24 vs. sg13_lv_nmos:M16:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:7 vs. sg13_lv_pmos:M18:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:7 vs. sg13_lv_pmos:M18:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:22 vs. sg13_lv_pmos:M19:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:22 vs. sg13_lv_pmos:M19:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:18 vs. sg13_lv_pmos:M20:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:18 vs. sg13_lv_pmos:M20:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:19 vs. sg13_lv_pmos:M21:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:19 vs. sg13_lv_pmos:M21:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:23 vs. sg13_lv_pmos:M22:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:23 vs. sg13_lv_pmos:M22:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:11 vs. sg13_lv_pmos:M17:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:11 vs. sg13_lv_pmos:M17:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:15 vs. sg13_lv_pmos:M23:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:15 vs. sg13_lv_pmos:M23:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:16 vs. sg13_lv_pmos:M24:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:16 vs. sg13_lv_pmos:M24:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:8 vs. sg13_lv_pmos:M25:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:8 vs. sg13_lv_pmos:M25:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:13 vs. sg13_lv_pmos:M26:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:13 vs. sg13_lv_pmos:M26:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:5 vs. sg13_lv_pmos:M27:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:5 vs. sg13_lv_pmos:M27:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:27 vs. sg13_lv_pmos:M28:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:27 vs. sg13_lv_pmos:M28:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:3 vs. sg13_lv_pmos:M29:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:3 vs. sg13_lv_pmos:M29:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:0 vs. sg13_lv_pmos:M30:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:0 vs. sg13_lv_pmos:M30:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:30 vs. sg13_lv_pmos:M31:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:30 vs. sg13_lv_pmos:M31:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:20 vs. sg13_lv_pmos:M32:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:20 vs. sg13_lv_pmos:M32:
+Property mm_ok in circuit2 has no matching property in circuit1
+
+Subcircuit pins:
+Circuit 1: sg13g2_dfrbpq_1                 |Circuit 2: sg13g2_dfrbpq_1                 
+-------------------------------------------|-------------------------------------------
+a_38_114#                                  |(no pin, node is Db)                       
+a_741_93#                                  |(no pin, node is clkneg)                   
+D                                          |D                                          
+Q                                          |Q                                          
+CLK                                        |CLK                                        
+VSS                                        |VSS                                        
+a_298_337#                                 |(no pin, node is net5)                     
+RESET_B                                    |RESET_B                                    
+a_843_236#                                 |(no pin, node is clkpos)                   
+a_324_432#                                 |(no pin, node is net4)                     
+VDD                                        |VDD                                        
+---------------------------------------------------------------------------------------
+Cell pin lists for sg13g2_dfrbpq_1 and sg13g2_dfrbpq_1 altered to match.
+Device classes sg13g2_dfrbpq_1 and sg13g2_dfrbpq_1 are equivalent.
+
+Subcircuit summary:
+Circuit 1: sg13g2_and2_1                   |Circuit 2: sg13g2_and2_1                   
+-------------------------------------------|-------------------------------------------
+sg13_lv_pmos (3)                           |sg13_lv_pmos (3)                           
+sg13_lv_nmos (3)                           |sg13_lv_nmos (3)                           
+Number of devices: 6                       |Number of devices: 6                       
+Number of nets: 7                          |Number of nets: 7                          
+---------------------------------------------------------------------------------------
+Netlists match uniquely with port and property errors.
+sg13_lv_nmos:5 vs. sg13_lv_nmos:M2:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:5 vs. sg13_lv_nmos:M2:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:4 vs. sg13_lv_nmos:M1:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:4 vs. sg13_lv_nmos:M1:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:1 vs. sg13_lv_nmos:M3:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:1 vs. sg13_lv_nmos:M3:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:3 vs. sg13_lv_pmos:M4:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:3 vs. sg13_lv_pmos:M4:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:2 vs. sg13_lv_pmos:M5:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:2 vs. sg13_lv_pmos:M5:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:0 vs. sg13_lv_pmos:M6:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:0 vs. sg13_lv_pmos:M6:
+Property mm_ok in circuit2 has no matching property in circuit1
+
+Subcircuit pins:
+Circuit 1: sg13g2_and2_1                   |Circuit 2: sg13g2_and2_1                   
+-------------------------------------------|-------------------------------------------
+VDD                                        |VDD                                        
+a_45_160#                                  |(no pin, node is net1)                     
+VSS                                        |VSS                                        
+B                                          |B                                          
+A                                          |A                                          
+X                                          |X                                          
+---------------------------------------------------------------------------------------
+Cell pin lists for sg13g2_and2_1 and sg13g2_and2_1 altered to match.
+Device classes sg13g2_and2_1 and sg13g2_and2_1 are equivalent.
+
+Subcircuit summary:
+Circuit 1: sg13g2_inv_1                    |Circuit 2: sg13g2_inv_1                    
+-------------------------------------------|-------------------------------------------
+sg13_lv_pmos (1)                           |sg13_lv_pmos (1)                           
+sg13_lv_nmos (1)                           |sg13_lv_nmos (1)                           
+Number of devices: 2                       |Number of devices: 2                       
+Number of nets: 4                          |Number of nets: 4                          
+---------------------------------------------------------------------------------------
+Netlists match uniquely with property errors.
+sg13_lv_nmos:1 vs. sg13_lv_nmos:M1:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_nmos:1 vs. sg13_lv_nmos:M1:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:0 vs. sg13_lv_pmos:M2:
+Property mm_ok in circuit2 has no matching property in circuit1
+sg13_lv_pmos:0 vs. sg13_lv_pmos:M2:
+Property mm_ok in circuit2 has no matching property in circuit1
+
+Subcircuit pins:
+Circuit 1: sg13g2_inv_1                    |Circuit 2: sg13g2_inv_1                    
+-------------------------------------------|-------------------------------------------
+Y                                          |Y                                          
+A                                          |A                                          
+VSS                                        |VSS                                        
+VDD                                        |VDD                                        
+---------------------------------------------------------------------------------------
+Cell pin lists are equivalent.
+Device classes sg13g2_inv_1 and sg13g2_inv_1 are equivalent.
+Flattening unmatched subcell rhigh_R1_snake in circuit pll_analog (0)(1 instance)
+Flattening unmatched subcell sg13_lv_pmos_NJKCVT in circuit pll_analog (0)(8 instances)
+Flattening unmatched subcell rhigh_R2_snake in circuit pll_analog (0)(1 instance)
+Flattening unmatched subcell sg13_lv_nmos_RUYN9Y in circuit pll_analog (0)(8 instances)
+Flattening unmatched subcell sg13_lv_pmos_ESLPQL in circuit pll_analog (0)(2 instances)
+Flattening unmatched subcell sg13_lv_nmos_VQD2M8 in circuit pll_analog (0)(1 instance)
+Flattening unmatched subcell sg13_lv_pmos_XN8759 in circuit pll_analog (0)(1 instance)
+Flattening unmatched subcell sg13_lv_nmos_WRM2S2 in circuit pll_analog (0)(3 instances)
+Flattening unmatched subcell cap_cmim_4SFK5Q in circuit pll_analog (0)(1 instance)
+Flattening unmatched subcell cap_cmim_ZNKAVF in circuit pll_analog (0)(1 instance)
+
+Cell pll_analog (0) disconnected node: VGND
+Class pll_analog (0):  Merged 21 parallel devices.
+Cell pll_analog (0) disconnected node: VGND
+Subcircuit summary:
+Circuit 1: pll_analog                      |Circuit 2: pll_top                         
+-------------------------------------------|-------------------------------------------
+sg13g2_dfrbpq_1 (2)                        |sg13g2_dfrbpq_1 (2)                        
+sg13g2_and2_1 (1)                          |sg13g2_and2_1 (1)                          
+sg13g2_inv_1 (1)                           |sg13g2_inv_1 (1)                           
+rhigh (2)                                  |rhigh (2)                                  
+sg13_lv_pmos (11->1)                       |sg13_lv_pmos (11) **Mismatch**             
+sg13_lv_nmos (12->1)                       |sg13_lv_nmos (12) **Mismatch**             
+cap_cmim (2)                               |cap_cmim (2)                               
+Number of devices: 10 **Mismatch**         |Number of devices: 31 **Mismatch**         
+Number of nets: 6 **Mismatch**             |Number of nets: 36 **Mismatch**            
+---------------------------------------------------------------------------------------
+NET mismatches: Class fragments follow (with fanout counts):
+Circuit 1: pll_analog                      |Circuit 2: pll_top                         
+
+---------------------------------------------------------------------------------------
+Net: out                                   |Net: out                                   
+  sg13_lv_pmos/(1|3) = 2                   |  sg13_lv_pmos/(1|3) = 1                   
+  sg13_lv_nmos/(1|3) = 2                   |  sg13_lv_nmos/(1|3) = 1                   
+  sg13g2_dfrbpq_1/Q = 2                    |                                           
+  sg13g2_dfrbpq_1/CLK = 2                  |                                           
+  sg13g2_dfrbpq_1/VSS = 2                  |                                           
+  sg13g2_dfrbpq_1/RESET_B = 2              |                                           
+  sg13g2_dfrbpq_1/a_741_93# = 2            |                                           
+  sg13g2_dfrbpq_1/a_843_236# = 2           |                                           
+  sg13g2_dfrbpq_1/a_38_114# = 2            |                                           
+  sg13g2_dfrbpq_1/a_324_432# = 2           |                                           
+  sg13g2_dfrbpq_1/a_298_337# = 2           |                                           
+  sg13g2_and2_1/X = 1                      |                                           
+  sg13g2_and2_1/VSS = 1                    |                                           
+  sg13g2_and2_1/VDD = 1                    |                                           
+  sg13g2_and2_1/B = 1                      |                                           
+  sg13g2_and2_1/A = 1                      |                                           
+  sg13g2_and2_1/a_45_160# = 1              |                                           
+  sg13g2_inv_1/Y = 1                       |                                           
+  sg13g2_inv_1/A = 1                       |                                           
+  sg13g2_inv_1/VSS = 1                     |                                           
+  sg13g2_inv_1/VDD = 1                     |                                           
+  rhigh/(1|2) = 2                          |                                           
+  rhigh/3 = 2                              |                                           
+  sg13g2_dfrbpq_1/VDD = 2                  |                                           
+  sg13_lv_pmos/2 = 1                       |                                           
+  sg13g2_dfrbpq_1/D = 2                    |                                           
+  sg13_lv_nmos/2 = 1                       |                                           
+  sg13_lv_nmos/4 = 1                       |                                           
+  cap_cmim/2 = 1                           |                                           
+                                           |                                           
+Net: XR2/R1                                |Net: net15                                 
+  rhigh/(1|2) = 2                          |  cap_cmim/1 = 1                           
+                                           |  rhigh/(1|2) = 1                          
+                                           |                                           
+Net: XC1/C1                                |Net: net11                                 
+  cap_cmim/1 = 1                           |  sg13_lv_pmos/(1|3) = 2                   
+                                           |                                           
+Net: XC2/C1                                |Net: net13                                 
+  cap_cmim/1 = 1                           |  sg13_lv_pmos/(1|3) = 2                   
+                                           |                                           
+Net: XC1/C2                                |Net: net14                                 
+  cap_cmim/2 = 1                           |  sg13_lv_pmos/(1|3) = 2                   
+                                           |                                           
+Net: sg13_lv_pmos_NJKCVT:XMp1/w_n155_n174# |Net: net5                                  
+  sg13_lv_pmos/4 = 1                       |  sg13_lv_nmos/(1|3) = 2                   
+                                           |                                           
+(no matching net)                          |Net: net8                                  
+                                           |  sg13_lv_nmos/(1|3) = 2                   
+                                           |                                           
+(no matching net)                          |Net: net10                                 
+                                           |  sg13_lv_nmos/(1|3) = 2                   
+                                           |                                           
+(no matching net)                          |Net: net2                                  
+                                           |  sg13g2_inv_1/Y = 1                       
+                                           |  sg13_lv_pmos/2 = 1                       
+                                           |                                           
+(no matching net)                          |Net: clk_ref_gate                          
+                                           |  sg13g2_dfrbpq_1/CLK = 1                  
+                                           |                                           
+(no matching net)                          |Net: vco_out_div                           
+                                           |  sg13g2_dfrbpq_1/CLK = 1                  
+                                           |                                           
+(no matching net)                          |Net: dummy_26                              
+                                           |  sg13g2_dfrbpq_1/proxya_741_93# = 1       
+                                           |                                           
+(no matching net)                          |Net: dummy_31                              
+                                           |  sg13g2_dfrbpq_1/proxya_741_93# = 1       
+                                           |                                           
+(no matching net)                          |Net: dummy_27                              
+                                           |  sg13g2_dfrbpq_1/proxya_843_236# = 1      
+                                           |                                           
+(no matching net)                          |Net: dummy_32                              
+                                           |  sg13g2_dfrbpq_1/proxya_843_236# = 1      
+                                           |                                           
+(no matching net)                          |Net: dummy_28                              
+                                           |  sg13g2_dfrbpq_1/proxya_38_114# = 1       
+                                           |                                           
+(no matching net)                          |Net: dummy_33                              
+                                           |  sg13g2_dfrbpq_1/proxya_38_114# = 1       
+                                           |                                           
+(no matching net)                          |Net: dummy_29                              
+                                           |  sg13g2_dfrbpq_1/proxya_324_432# = 1      
+                                           |                                           
+(no matching net)                          |Net: dummy_34                              
+                                           |  sg13g2_dfrbpq_1/proxya_324_432# = 1      
+                                           |                                           
+(no matching net)                          |Net: dummy_30                              
+                                           |  sg13g2_dfrbpq_1/proxya_298_337# = 1      
+                                           |                                           
+(no matching net)                          |Net: dummy_35                              
+                                           |  sg13g2_dfrbpq_1/proxya_298_337# = 1      
+                                           |                                           
+(no matching net)                          |Net: dummy_36                              
+                                           |  sg13g2_and2_1/proxya_45_160# = 1         
+                                           |                                           
+(no matching net)                          |Net: pfd_up                                
+                                           |  sg13g2_dfrbpq_1/Q = 1                    
+                                           |  sg13g2_and2_1/B = 1                      
+                                           |  sg13g2_inv_1/A = 1                       
+                                           |                                           
+(no matching net)                          |Net: net1                                  
+                                           |  sg13g2_dfrbpq_1/RESET_B = 2              
+                                           |  sg13g2_and2_1/X = 1                      
+                                           |                                           
+(no matching net)                          |Net: pfd_down                              
+                                           |  sg13g2_dfrbpq_1/Q = 1                    
+                                           |  sg13g2_and2_1/A = 1                      
+                                           |  sg13_lv_nmos/2 = 1                       
+                                           |                                           
+(no matching net)                          |Net: net4                                  
+                                           |  sg13_lv_pmos/(1|3) = 2                   
+                                           |  sg13_lv_pmos/4 = 1                       
+                                           |                                           
+(no matching net)                          |Net: net3                                  
+                                           |  sg13_lv_nmos/(1|3) = 2                   
+                                           |  sg13_lv_nmos/4 = 1                       
+                                           |                                           
+(no matching net)                          |Net: VPWR                                  
+                                           |  sg13g2_dfrbpq_1/VDD = 2                  
+                                           |  sg13g2_dfrbpq_1/D = 2                    
+                                           |  sg13g2_and2_1/VDD = 1                    
+                                           |  sg13g2_inv_1/VDD = 1                     
+                                           |  sg13_lv_pmos/(1|3) = 7                   
+                                           |  sg13_lv_pmos/4 = 10                      
+                                           |  rhigh/(1|2) = 1                          
+                                           |                                           
+(no matching net)                          |Net: VGND                                  
+                                           |  sg13g2_dfrbpq_1/VSS = 2                  
+                                           |  sg13g2_and2_1/VSS = 1                    
+                                           |  sg13g2_inv_1/VSS = 1                     
+                                           |  sg13_lv_nmos/(1|3) = 8                   
+                                           |  sg13_lv_nmos/4 = 11                      
+                                           |  cap_cmim/2 = 2                           
+                                           |  rhigh/3 = 2                              
+                                           |                                           
+(no matching net)                          |Net: vbp                                   
+                                           |  sg13_lv_pmos/2 = 2                       
+                                           |  sg13_lv_nmos/(1|3) = 1                   
+                                           |  sg13_lv_pmos/(1|3) = 1                   
+                                           |                                           
+(no matching net)                          |Net: net7                                  
+                                           |  sg13_lv_pmos/2 = 1                       
+                                           |  sg13_lv_nmos/2 = 1                       
+                                           |  sg13_lv_pmos/(1|3) = 1                   
+                                           |  sg13_lv_nmos/(1|3) = 1                   
+                                           |                                           
+(no matching net)                          |Net: net9                                  
+                                           |  sg13_lv_pmos/2 = 1                       
+                                           |  sg13_lv_nmos/2 = 1                       
+                                           |  sg13_lv_pmos/(1|3) = 1                   
+                                           |  sg13_lv_nmos/(1|3) = 1                   
+                                           |                                           
+(no matching net)                          |Net: vctrl                                 
+                                           |  sg13_lv_nmos/(1|3) = 1                   
+                                           |  sg13_lv_pmos/(1|3) = 1                   
+                                           |  rhigh/(1|2) = 1                          
+                                           |  cap_cmim/1 = 1                           
+                                           |  sg13_lv_nmos/2 = 4                       
+                                           |                                           
+(no matching net)                          |Net: vbn                                   
+                                           |  sg13_lv_nmos/2 = 3                       
+                                           |  sg13_lv_nmos/(1|3) = 1                   
+                                           |  rhigh/(1|2) = 1                          
+                                           |                                           
+(no matching net)                          |Net: net6                                  
+                                           |  sg13_lv_pmos/(1|3) = 1                   
+                                           |  sg13_lv_nmos/(1|3) = 1                   
+                                           |  sg13_lv_pmos/2 = 2                       
+                                           |  sg13_lv_nmos/2 = 2                       
+                                           |                                           
+(no matching net)                          |Net: net12                                 
+                                           |  sg13_lv_pmos/2 = 4                       
+                                           |  sg13_lv_pmos/(1|3) = 1                   
+                                           |  sg13_lv_nmos/(1|3) = 1                   
+---------------------------------------------------------------------------------------
+DEVICE mismatches: Class fragments follow (with node fanout counts):
+Circuit 1: pll_analog                      |Circuit 2: pll_top                         
+
+---------------------------------------------------------------------------------------
+Instance: sg13_lv_pmos_NJKCVT:XMp1/sg13_lv |Instance: sg13_lv_pmos:M1                  
+  (1,3) = (44,44)                          |  (1,3) = (24,3)                           
+  2 = 44                                   |  2 = 4                                    
+  4 = 1                                    |  4 = 24                                   
+                                           |                                           
+Instance: sg13_lv_nmos_RUYN9Y:XMn1/sg13_lv |Instance: sg13_lv_pmos:M3                  
+  (1,3) = (44,44)                          |  (1,3) = (8,3)                            
+  2 = 44                                   |  2 = 2                                    
+  4 = 44                                   |  4 = 3                                    
+                                           |                                           
+(no matching instance)                     |Instance: sg13_lv_pmos:Mp2                 
+                                           |  (1,3) = (6,2)                            
+                                           |  2 = 4                                    
+                                           |  4 = 24                                   
+                                           |                                           
+                                           |                                           
+(no matching instance)                     |Instance: sg13_lv_pmos:Mp1                 
+                                           |  (1,3) = (4,2)                            
+                                           |  2 = 4                                    
+                                           |  4 = 24                                   
+                                           |                                           
+                                           |                                           
+(no matching instance)                     |Instance: sg13_lv_pmos:Mp3                 
+                                           |  (1,3) = (4,2)                            
+                                           |  2 = 6                                    
+                                           |  4 = 24                                   
+                                           |                                           
+                                           |                                           
+(no matching instance)                     |Instance: sg13_lv_pmos:Mp4                 
+                                           |  (1,3) = (24,2)                           
+                                           |  2 = 6                                    
+                                           |  4 = 24                                   
+                                           |                                           
+                                           |                                           
+(no matching instance)                     |Instance: sg13_lv_pmos:Mp5                 
+                                           |  (1,3) = (24,2)                           
+                                           |  2 = 6                                    
+                                           |  4 = 24                                   
+                                           |                                           
+                                           |                                           
+(no matching instance)                     |Instance: sg13_lv_pmos:Mp6                 
+                                           |  (1,3) = (24,2)                           
+                                           |  2 = 6                                    
+                                           |  4 = 24                                   
+                                           |                                           
+                                           |                                           
+(no matching instance)                     |Instance: sg13_lv_pmos:Mp7                 
+                                           |  (1,3) = (24,2)                           
+                                           |  2 = 6                                    
+                                           |  4 = 24                                   
+                                           |                                           
+                                           |                                           
+(no matching instance)                     |Instance: sg13_lv_pmos:Mp8                 
+                                           |  (1,3) = (24,6)                           
+                                           |  2 = 6                                    
+                                           |  4 = 24                                   
+                                           |                                           
+                                           |                                           
+(no matching instance)                     |Instance: sg13_lv_pmos:M7                  
+                                           |  (1,3) = (24,4)                           
+                                           |  2 = 4                                    
+                                           |  4 = 24                                   
+                                           |                                           
+                                           |                                           
+(no matching instance)                     |Instance: sg13_lv_nmos:M2                  
+                                           |  (1,3) = (8,3)                            
+                                           |  2 = 3                                    
+                                           |  4 = 3                                    
+                                           |                                           
+                                           |                                           
+(no matching instance)                     |Instance: sg13_lv_nmos:M4                  
+                                           |  (1,3) = (27,3)                           
+                                           |  2 = 5                                    
+                                           |  4 = 27                                   
+                                           |                                           
+                                           |                                           
+(no matching instance)                     |Instance: sg13_lv_nmos:Mn2                 
+                                           |  (1,3) = (6,2)                            
+                                           |  2 = 4                                    
+                                           |  4 = 27                                   
+                                           |                                           
+                                           |                                           
+(no matching instance)                     |Instance: sg13_lv_nmos:Mn1                 
+                                           |  (1,3) = (4,2)                            
+                                           |  2 = 4                                    
+                                           |  4 = 27                                   
+                                           |                                           
+                                           |                                           
+(no matching instance)                     |Instance: sg13_lv_nmos:Mn3                 
+                                           |  (1,3) = (4,2)                            
+                                           |  2 = 6                                    
+                                           |  4 = 27                                   
+                                           |                                           
+                                           |                                           
+(no matching instance)                     |Instance: sg13_lv_nmos:Mn4                 
+                                           |  (1,3) = (27,2)                           
+                                           |  2 = 6                                    
+                                           |  4 = 27                                   
+                                           |                                           
+                                           |                                           
+(no matching instance)                     |Instance: sg13_lv_nmos:Mn5                 
+                                           |  (1,3) = (27,2)                           
+                                           |  2 = 8                                    
+                                           |  4 = 27                                   
+                                           |                                           
+                                           |                                           
+(no matching instance)                     |Instance: sg13_lv_nmos:Mn6                 
+                                           |  (1,3) = (27,2)                           
+                                           |  2 = 8                                    
+                                           |  4 = 27                                   
+                                           |                                           
+                                           |                                           
+(no matching instance)                     |Instance: sg13_lv_nmos:Mn7                 
+                                           |  (1,3) = (27,2)                           
+                                           |  2 = 8                                    
+                                           |  4 = 27                                   
+                                           |                                           
+                                           |                                           
+(no matching instance)                     |Instance: sg13_lv_nmos:Mn8                 
+                                           |  (1,3) = (27,6)                           
+                                           |  2 = 8                                    
+                                           |  4 = 27                                   
+                                           |                                           
+                                           |                                           
+(no matching instance)                     |Instance: sg13_lv_nmos:M5                  
+                                           |  (1,3) = (27,4)                           
+                                           |  2 = 5                                    
+                                           |  4 = 27                                   
+                                           |                                           
+                                           |                                           
+(no matching instance)                     |Instance: sg13_lv_nmos:M6                  
+                                           |  (1,3) = (27,5)                           
+                                           |  2 = 5                                    
+                                           |  4 = 27                                   
+                                           |                                           
+---------------------------------------------------------------------------------------
+Netlists do not match.
+Port matching may fail to disambiguate symmetries.
+
+Subcircuit pins:
+Circuit 1: pll_analog                      |Circuit 2: pll_top                         
+-------------------------------------------|-------------------------------------------
+out                                        |(no pin, node is net2)                     
+(no pin, node is sg13_lv_pmos_NJKCVT:XMp1/ |clk_ref_gate                               
+(no pin, node is sg13_lv_pmos_NJKCVT:XMp1/ |vco_out_div                                
+(no pin, node is sg13_lv_pmos_NJKCVT:XMp1/ |VGND                                       
+(no pin, node is sg13_lv_pmos_NJKCVT:XMp1/ |out                                        
+(no pin, node is sg13_lv_pmos_NJKCVT:XMp1/ |VPWR                                       
+VGND                                       |(no matching pin)                          
+---------------------------------------------------------------------------------------
+Cell pin lists for pll_analog and pll_top altered to match.
+Device classes pll_analog and pll_top are equivalent.
+
+Final result: Top level cell failed pin matching.
+
+The following cells had property errors:
+ sg13g2_dfrbpq_1
+ sg13g2_and2_1
+ sg13g2_inv_1

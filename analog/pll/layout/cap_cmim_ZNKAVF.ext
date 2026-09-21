@@ -1,0 +1,15 @@
+timestamp 1790007449
+version 8.3
+tech ihp-sg13g2
+style ngspice()
+scale 1000 1 0.5
+resistclasses 3000000 67000 110 88 88 88 88 18 11 7000 260000 1360000
+parameters cap_rfcmim w=w l=l
+parameters cap_cmim w=w l=l
+port "C1" 1 0 0 0 0 mimcc
+port "C2" 2 820 0 820 0 m5
+node "C1" 0 1087.58 0 0 mimcc 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2310400 6080 0 0 0 0 0 0 0 0
+node "C2" 0 1616.98 820 0 m5 0 0 0 0 0 0 0 0 0 0 0 0 3385600 7360 0 0 0 0 0 0 0 0 0 0
+substrate "sub!" 0 0 -1073741817 -1073741817 space 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+cap "C1" "C2" 764.025
+device csubckt cap_cmim -800 -800 -799 -799 w=1600 l=1600 "None" "C1" 0 0 "C2" 0 3385600,7360
