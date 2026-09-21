@@ -12,14 +12,19 @@ from cocotb.triggers import ClockCycles, Timer
 # [1]    clock select: 0 = Tiny Tapeout clk, 1 = ring oscillator
 # [4:2]  counter byte select
 # [5]    ring frequency: 0 = 100 MHz, 1 = 500 MHz (only when [1]=1)
+# [6]    pll_m_sel[4]
+# [7]    counter clock from PLL ÷M (overrides [1]/[5] when 1)
+# uio: [0]=pll÷M out (oe=1); [4:1]=n_sel; [7:5]=m_sel[2:0]
 
 
-def ui_in_val(enable=0, clk_ring=0, byte_sel=0, sel_500=0):
+def ui_in_val(enable=0, clk_ring=0, byte_sel=0, sel_500=0, sel_pll=0, m_sel4=0):
     return (
         (enable & 1)
         | ((clk_ring & 1) << 1)
         | ((byte_sel & 7) << 2)
         | ((sel_500 & 1) << 5)
+        | ((m_sel4 & 1) << 6)
+        | ((sel_pll & 1) << 7)
     )
 
 
@@ -55,9 +60,10 @@ async def reset(dut, *, enable=0, clk_ring=0, byte_sel=0):
     await wait_cycles(dut, 1)
 
 
-def assert_uio_tied_off(dut):
-    assert read_u8(dut.uio_out) == 0, f"uio_out should be tied off, got {dut.uio_out.value}"
-    assert read_u8(dut.uio_oe) == 0, f"uio_oe should be tied off, got {dut.uio_oe.value}"
+def assert_uio_pll_probe_idle(dut):
+    # uio[0] is the PLL ÷M probe (oe driven); idle while clk_vco is stubbed to 0.
+    assert read_u8(dut.uio_oe) == 0x01, f"uio_oe should enable bit0, got {dut.uio_oe.value}"
+    assert read_u8(dut.uio_out) == 0, f"uio_out idle probe should be 0, got {dut.uio_out.value}"
 
 
 @cocotb.test()
@@ -73,7 +79,7 @@ async def test_reset_clears_counter(dut):
     dut.rst_n.value = 0
     await wait_cycles(dut, 2)
     assert read_u8(dut.uo_out) == 0
-    assert_uio_tied_off(dut)
+    assert_uio_pll_probe_idle(dut)
 
     dut.rst_n.value = 1
     await wait_cycles(dut, 1)
@@ -97,7 +103,7 @@ async def test_enable_and_freeze(dut):
     dut.ui_in.value = ui_in_val(enable=0, byte_sel=0)
     await wait_cycles(dut, 8)
     assert read_u8(dut.uo_out) == 5, "counter must freeze while ui_in[0] is low"
-    assert_uio_tied_off(dut)
+    assert_uio_pll_probe_idle(dut)
 
 
 @cocotb.test()
@@ -154,7 +160,7 @@ async def test_byte_select(dut):
         got = read_u8(dut.uo_out)
         assert got == want, f"byte {byte_sel}: expected {want:#04x}, got {got:#04x}"
 
-    assert_uio_tied_off(dut)
+    assert_uio_pll_probe_idle(dut)
 
 
 @cocotb.test()
@@ -166,7 +172,7 @@ async def test_clock_select_ring_idle(dut):
 
     await wait_cycles(dut, 8)
     assert read_u8(dut.uo_out) == 0, "idle ring stub must not clock the counter"
-    assert_uio_tied_off(dut)
+    assert_uio_pll_probe_idle(dut)
 
 
 @cocotb.test()
