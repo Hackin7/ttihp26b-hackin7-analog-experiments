@@ -1,5 +1,5 @@
 ** sch_path: /foss/designs/ttihp26b-hackin7-analog-experiments/analog/pll/schematic/pll_top.sch
-**.subckt pll_top clk_ref_gate vco_out_div VGND out VPWR
+.subckt pll_top clk_ref_gate vco_out_div VGND out VPWR
 *.ipin clk_ref_gate
 *.ipin vco_out_div
 *.iopin VGND
@@ -22,7 +22,7 @@ XMp1 net7 net9 net13 VPWR sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1 mm_ok=1
 XMn1 net7 net9 net8 VGND sg13_lv_nmos w=0.74u l=0.25u ng=1 m=1 mm_ok=1
 XMp3 net9 net6 net14 VPWR sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1 mm_ok=1
 XMn3 net9 net6 net10 VGND sg13_lv_nmos w=0.74u l=0.25u ng=1 m=1 mm_ok=1
-XMp4 out net6 VPWR out sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1 mm_ok=1
+XMp4 out net6 VPWR VPWR sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1 mm_ok=1
 XMn4 out net6 VGND VGND sg13_lv_nmos w=0.74u l=0.25u ng=1 m=1 mm_ok=1
 XMp5 net11 net12 VPWR VPWR sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1 mm_ok=1
 XMp6 net13 net12 VPWR VPWR sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1 mm_ok=1
@@ -36,7 +36,7 @@ XM5 vbp vbn VGND VGND sg13_lv_nmos w=0.5u l=1.0u ng=1 m=1 mm_ok=1
 XM6 vbn vbn VGND VGND sg13_lv_nmos w=0.5u l=1.0u ng=1 m=1 mm_ok=1
 XM7 vbp vbp VPWR VPWR sg13_lv_pmos w=1.0u l=1.0u ng=1 m=1 mm_ok=1
 XR2 VPWR vbn VGND rhigh w=0.50e-6 l=260.0e-6 m=1 b=0 mm_ok=1
-**.ends
+.ends
 
 * expanding   symbol:  sg13g2_dfrbpq_1.sym # of pins=4
 ** sym_path: /foss/pdks/ihp-sg13g2/libs.ref/sg13g2_stdcell/sym/xschem/sg13g2_dfrbpq_1.sym
@@ -109,5 +109,3 @@ XM6 X net1 VDD VDD sg13_lv_pmos w=1.12u l=130.00n ng=1 m=1 mm_ok=1
 XM1 Y A VSS VSS sg13_lv_nmos w=740.00n l=130.00n ng=1 m=1 mm_ok=1
 XM2 Y A VDD VDD sg13_lv_pmos w=1.12u l=130.00n ng=1 m=1 mm_ok=1
 .ends
-
-.end

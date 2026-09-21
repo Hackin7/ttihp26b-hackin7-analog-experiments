@@ -51,11 +51,11 @@ Result: **PASS** `pll_div_n` N=8/16/22 (edge counts 1250/625/455 at 1 GHz / 10 �
 
 ## Closed-loop note
 
-`tb_pll_lock.spice` exercises VCO + ideal PD + switch-based ÷16. Full transistor PFD/CP + robust digital ÷N lock is a follow-up. Open-loop + RTL cover the sizing and divider goals.
+`tb_pll_lock.spice` instantiates [`schematic/pll_top.spice`](schematic/pll_top.spice) (transistor PFD/CP/filter/VCO) plus a behavioral switch ÷16 on `vco_out_div`. RTL `pll_div_n` remains a separate digital check.
 
 ## Layout (xschem Mag seed)
 
-Primary Mag cell: [`layout/pll_analog.mag`](layout/pll_analog.mag) — devices from [`schematic/pll_analog.spice`](schematic/pll_analog.spice) via IHP gencells, plus snaked `rhigh`.
+Primary Mag cell: [`layout/pll_analog.mag`](layout/pll_analog.mag) — Mag seed from earlier gencell import + snaked `rhigh`.
 
 | Resistor | Snaked Mag bbox |
 | --- | --- |
@@ -72,16 +72,25 @@ docker run --rm --entrypoint /bin/bash \
   'magic -dnull -noconsole -rcfile /foss/pdks/ihp-sg13g2/libs.tech/magic/ihp-sg13g2.magicrc rebuild_analog_snake.tcl'
 ```
 
-**Not done yet:** full routing, PFD stdcell assemble, DRC/LVS macro export, TT bind.
+PFD stdcells (`sg13g2_dfrbpq_1` ×2, `sg13g2_and2_1`, `sg13g2_inv_1`) are imported into [`layout/pll_analog.mag`](layout/pll_analog.mag) as instances `x1`–`x4` (see [`layout/import_pfd_stdcells.tcl`](layout/import_pfd_stdcells.tcl)).
+
+Floorplan is schematic-ordered L→R via [`layout/relayout_sections.tcl`](layout/relayout_sections.tcl): **PFD | CP | bias | filter | VCO** (~73 × 53 µm seed).
+
+**Not done yet:** full routing, DRC/LVS macro export, TT bind.
 
 ## Simulate
 
+Spice decks include [`schematic/pll_top.spice`](schematic/pll_top.spice). Open-loop forces hierarchical `Xpll.vctrl`; closed-loop drives `clk_ref_gate` and feedback into `vco_out_div`.
+
 ```bash
-# VCO single point
-LCH=0.25u TB=tb_vco_point.spice bash sim/run_sim_docker.sh
+# VCO single point (force Xpll.vctrl)
+TB=tb_vco_point.spice bash sim/run_sim_docker.sh
 
 # VCO sweep
-bash sim/sweep_vctrl.sh   # or SWEEP via run_sim_docker.sh if wired
+SWEEP=1 bash sim/run_sim_docker.sh
+
+# Closed-loop lock
+TB=tb_pll_lock.spice bash sim/run_sim_docker.sh
 
 # Divider RTL
 bash sim/run_div_rtl.sh   # inside IIC-OSIC image
@@ -92,12 +101,11 @@ bash sim/run_div_rtl.sh   # inside IIC-OSIC image
 | Path | Role |
 | --- | --- |
 | `schematic/pll_top.sch` | xschem source |
-| `schematic/pll_top.spice` | Cleaned hierarchical netlist (Mag/LVS gold intent) |
-| `schematic/pll_analog.spice` | Analog leaf for Mag gencells |
-| `schematic/pll_vco.spice` | VCO for ngspice |
-| `schematic/pll_cp_filt.spice` | CP + filter (sim) |
-| `schematic/pll_pfd.spice` | NAND PFD (sim) |
+| `schematic/pll_top.spice` | Netlist DUT for ngspice (+ Mag/LVS intent) |
 | `layout/pll_analog.mag` | Mag seed + snaked R |
 | `layout/rebuild_analog_snake.tcl` | Regenerate Mag seed |
 | `rtl/pll_div_n.v` | Parameterized ÷N |
-| `sim/` | TBs + docker runners |
+| `sim/tb_vco_point.spice` | Open-loop via `Xpll.vctrl` force |
+| `sim/tb_pll_lock.spice` | Closed-loop `pll_top` + behavioral ÷16 |
+| `sim/` | runners + RTL TB |
+

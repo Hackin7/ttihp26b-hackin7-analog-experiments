@@ -1,35 +1,61 @@
-* Closed-loop lock check: sized VCO + ideal phase detector + ÷16.
+* Closed-loop lock: pll_top (PFD+CP+filter+VCO) + behavioral ÷16 feedback.
 * f_ref=50 MHz, N=16 -> expect f_out ~800 MHz if lock.
+* Soft-holds vctrl for 50 ns so UIC/IC actually starts the ring (hier .ic on vctrl was ignored).
 .include out/pdk.lib
-.include out/lch.param
-.include ../schematic/pll_vco.spice
-.include ../schematic/pll_div16.spice
+.include ../schematic/pll_top.spice
 
-Xvco out vctrl VPWR VGND pll_vco lch={lch}
+.subckt tff q clk VPWR VGND
+.ic v(q)=0
+Bq qb 0 V = '1.2 - v(q)'
+Ced clk ed 50f
+Red ed 0 1k
+S1 qb q ed 0 tsw
+.model tsw sw(vt=0.3 vh=0.1 ron=100 roff=1e12)
+Rq q 0 500k
+Cq q 0 20f
+.ends tff
+
+.subckt pll_div16 clk_in clk_div VPWR VGND
+Xt1 q1 clk_in VPWR VGND tff
+Xt2 q2 q1     VPWR VGND tff
+Xt3 q3 q2     VPWR VGND tff
+Xt4 clk_div q3 VPWR VGND tff
+.ends pll_div16
+
+Xpll clk_ref clk_fb VGND out VPWR pll_top
 Xdiv out clk_fb VPWR VGND pll_div16
 
 Vvdd VPWR 0 dc 1.2
 Vvss VGND 0 0
 Vref clk_ref 0 pulse(0 1.2 0 50p 50p 10n 20n)
 
-* Ideal charge pump into loop filter (~1 uA scale)
-Bicp 0 vctrl I = '1.5u * (u(v(clk_ref)-0.6) - u(v(clk_fb)-0.6))'
-Rr vctrl mid 191k
-Cc1 mid 0 0.6p
-Cc2 vctrl 0 0.1p
+* Force vctrl=0.8 for 50 ns, then open switch so CP owns the node
+Vhold n_hold 0 dc 0.8
+Svh Xpll.vctrl n_hold start_ctrl 0 sw_hold
+.model sw_hold sw(vt=0.5 vh=0.1 ron=10 roff=1e12)
+Vstart start_ctrl 0 pwl(0 1.2 50n 1.2 51n 0)
 
-.ic v(vctrl)=0.75 v(xvco.o0)=1.2 v(xvco.o1)=0 v(xvco.o2)=0.6
+.ic v(Xpll.net6)=1.2 v(Xpll.net7)=0 v(Xpll.net9)=0.6 v(out)=0
 
 .control
-  tran 5p 800n uic
-  wrdata out/lock.dat v(out) v(clk_fb) v(vctrl)
-  meas tran t_a when v(out)=0.6 rise=200
-  meas tran t_b when v(out)=0.6 rise=400
-  let period = (t_b - t_a)/200
+  tran 5p 1u uic
+  write out/lock.raw v(out) v(clk_fb) v(Xpll.vctrl) v(Xpll.net6) v(Xpll.pfd_up) v(Xpll.pfd_down)
+  * Early (still near soft-start) and late frequency probes
+  meas tran t_e1 when v(out)=0.6 rise=1 from=60n to=200n
+  meas tran t_e2 when v(out)=0.6 rise=21 from=60n to=200n
+  let period_early = (t_e2 - t_e1)/20
+  let freq_early = 1/period_early
+  print period_early freq_early
+  echo freq_early_hz = $&freq_early
+  meas tran t_a when v(out)=0.6 rise=1 from=500n to=1u
+  meas tran t_b when v(out)=0.6 rise=6 from=500n to=1u
+  let period = (t_b - t_a)/5
   let freq = 1/period
   print period freq
   echo freq_hz = $&freq
-  meas tran vctrl_end find v(vctrl) at=800n
-  print vctrl_end
+  meas tran vctrl_50 find v(Xpll.vctrl) at=50n
+  meas tran vctrl_200 find v(Xpll.vctrl) at=200n
+  meas tran vctrl_end find v(Xpll.vctrl) at=1u
+  print vctrl_50 vctrl_200 vctrl_end
 .endc
 .end

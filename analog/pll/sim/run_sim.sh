@@ -19,12 +19,21 @@ else
 fi
 export PDK_ROOT PDK=ihp-sg13g2
 
-LIB="$PDK_ROOT/ihp-sg13g2/libs.tech/ngspice/models/cornerMOSlv.lib"
-if [ ! -f "$LIB" ]; then
-  echo "missing MOS library: $LIB" >&2
-  exit 2
-fi
-printf '.lib %s mos_tt\n' "$LIB" > "$OUT_DIR/pdk.lib"
+MODELS="$PDK_ROOT/ihp-sg13g2/libs.tech/ngspice/models"
+MOS_LIB="$MODELS/cornerMOSlv.lib"
+RES_LIB="$MODELS/cornerRES.lib"
+CAP_LIB="$MODELS/cornerCAP.lib"
+for f in "$MOS_LIB" "$RES_LIB" "$CAP_LIB"; do
+  if [ ! -f "$f" ]; then
+    echo "missing library: $f" >&2
+    exit 2
+  fi
+done
+{
+  printf '.lib %s mos_tt\n' "$MOS_LIB"
+  printf '.lib %s res_typ\n' "$RES_LIB"
+  printf '.lib %s cap_typ\n' "$CAP_LIB"
+} > "$OUT_DIR/pdk.lib"
 
 SPICEINIT="$PDK_ROOT/ihp-sg13g2/libs.tech/ngspice/.spiceinit"
 if [ -f "$SPICEINIT" ]; then

@@ -1,0 +1,38 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * closed-loop lock: pll_top (pfd+cp+filter+vco) + behavioral ÷16 feedback.
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+Operating point simulation skipped by 'uic',
+  now using transient initial conditions.
+
+No. of Data Rows : 200629
+binary raw file "out/lock.raw"
+t_e1                =  6.10948e-08
+
+Error: measure  t_e2  when(WHEN) : out of interval
+ meas tran t_e2 when v(out)=0.6 rise=21 from=60n to=200n failed!
+
+Warning from checkvalid: vector t_e2 is not available or has zero length.
+Error: RHS "(t_e2 - t_e1)/20" invalid
+Warning from checkvalid: vector period_early is not available or has zero length.
+Error: RHS "1/period_early" invalid
+Warning from checkvalid: vector period_early is not available or has zero length.
+Error: &freq_early: no such variable.
+freq_early_hz =
+t_a                 =  5.12612e-07
+t_b                 =  6.60847e-07
+period = 2.964696e-08
+freq = 3.373027e+07
+freq_hz = 3.37303E+07
+vctrl_50            =  7.99958e-01
+vctrl_200           =  3.47823e-01
+vctrl_end           =  3.47589e-01
+vctrl_50 = 7.999576e-01
+vctrl_200 = 3.478235e-01
+vctrl_end = 3.475889e-01
+Note: Simulation executed from .control section 

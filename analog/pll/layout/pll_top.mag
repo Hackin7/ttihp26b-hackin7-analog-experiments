@@ -1,0 +1,144 @@
+magic
+tech ihp-sg13g2
+magscale 1 2
+timestamp 1790011991
+<< checkpaint >>
+rect 3392 4640 7900 14888
+rect -26000 2790 -21616 3290
+rect -26000 -1600 -18424 2790
+rect -23000 -2100 -18424 -1600
+rect -18000 -2600 -11312 2290
+rect -756 2148 7900 4640
+rect -756 2001 9740 2148
+rect -10000 -3600 -3312 1290
+rect -2000 680 9740 2001
+rect 10748 680 15256 52796
+rect -2000 -3600 15256 680
+rect 3392 -3692 15256 -3600
+rect 10748 -3784 15256 -3692
+<< metal1 >>
+rect 0 0 200 200
+rect 0 -400 200 -200
+rect 0 -800 200 -600
+rect 0 -1200 200 -1000
+rect 0 -1600 200 -1400
+use cap_cmim_PSWUYJ  XC1
+timestamp 0
+transform 1 0 3364 0 1 520
+box 0 0 1 1
+use cap_cmim_GCPYP7  XC2
+timestamp 0
+transform 1 0 6820 0 1 -772
+box 0 0 1 1
+use sg13_lv_pmos_XRGQXQ  XM1
+timestamp 0
+transform 1 0 230 0 1 -1426
+box 0 0 1 1
+use sg13_lv_nmos_ZXJ5AD  XM2
+timestamp 0
+transform 1 0 541 0 1 -1476
+box 0 0 1 1
+use sg13_lv_pmos_UPTZ2Y  XM3
+timestamp 0
+transform 1 0 765 0 1 -1476
+box 0 0 1 1
+use sg13_lv_nmos_S66QG6  XM4
+timestamp 0
+transform 1 0 1076 0 1 -1476
+box 0 0 1 1
+use sg13_lv_nmos_S66QG6  XM5
+timestamp 0
+transform 1 0 11876 0 1 -1568
+box 0 0 1 1
+use sg13_lv_nmos_S66QG6  XM6
+timestamp 0
+transform 1 0 12212 0 1 -1568
+box 0 0 1 1
+use sg13_lv_pmos_XRGQXQ  XM7
+timestamp 0
+transform 1 0 12610 0 1 -1518
+box 0 0 1 1
+use sg13_lv_nmos_GUGBHF  XMn1
+timestamp 0
+transform 1 0 8639 0 1 -1544
+box 0 0 1 1
+use sg13_lv_nmos_GUGBHF  XMn2
+timestamp 0
+transform 1 0 8143 0 1 -1544
+box 0 0 1 1
+use sg13_lv_nmos_GUGBHF  XMn3
+timestamp 0
+transform 1 0 9135 0 1 -1544
+box 0 0 1 1
+use sg13_lv_nmos_GUGBHF  XMn4
+timestamp 0
+transform 1 0 9631 0 1 -1544
+box 0 0 1 1
+use sg13_lv_nmos_GUGBHF  XMn5
+timestamp 0
+transform 1 0 10747 0 1 -1544
+box 0 0 1 1
+use sg13_lv_nmos_GUGBHF  XMn6
+timestamp 0
+transform 1 0 10933 0 1 -1544
+box 0 0 1 1
+use sg13_lv_nmos_GUGBHF  XMn7
+timestamp 0
+transform 1 0 11119 0 1 -1544
+box 0 0 1 1
+use sg13_lv_nmos_GUGBHF  XMn8
+timestamp 0
+transform 1 0 11615 0 1 -1544
+box 0 0 1 1
+use sg13_lv_pmos_TCU5JP  XMp1
+timestamp 0
+transform 1 0 8391 0 1 -1506
+box 0 0 1 1
+use sg13_lv_pmos_TCU5JP  XMp2
+timestamp 0
+transform 1 0 7895 0 1 -1506
+box 0 0 1 1
+use sg13_lv_pmos_TCU5JP  XMp3
+timestamp 0
+transform 1 0 8887 0 1 -1506
+box 0 0 1 1
+use sg13_lv_pmos_TCU5JP  XMp4
+timestamp 0
+transform 1 0 9383 0 1 -1506
+box 0 0 1 1
+use sg13_lv_pmos_TCU5JP  XMp5
+timestamp 0
+transform 1 0 9879 0 1 -1506
+box 0 0 1 1
+use sg13_lv_pmos_TCU5JP  XMp6
+timestamp 0
+transform 1 0 10189 0 1 -1506
+box 0 0 1 1
+use sg13_lv_pmos_TCU5JP  XMp7
+timestamp 0
+transform 1 0 10499 0 1 -1506
+box 0 0 1 1
+use sg13_lv_pmos_TCU5JP  XMp8
+timestamp 0
+transform 1 0 11367 0 1 -1506
+box 0 0 1 1
+use rhigh_4XZZK6  XR1
+timestamp 0
+transform 1 0 5646 0 1 5598
+box 0 0 1 1
+use rhigh_ZRMN7J  XR2
+timestamp 0
+transform 1 0 13002 0 1 24506
+box 0 0 1 1
+<< labels >>
+flabel metal1 0 0 200 200 0 FreeSans 1600 0 0 0 clk_ref_gate
+port 0 nsew
+flabel metal1 0 -400 200 -200 0 FreeSans 1600 0 0 0 vco_out_div
+port 1 nsew
+flabel metal1 0 -800 200 -600 0 FreeSans 1600 0 0 0 VGND
+port 2 nsew
+flabel metal1 0 -1200 200 -1000 0 FreeSans 1600 0 0 0 out
+port 3 nsew
+flabel metal1 0 -1600 200 -1400 0 FreeSans 1600 0 0 0 VPWR
+port 4 nsew
+<< end >>
