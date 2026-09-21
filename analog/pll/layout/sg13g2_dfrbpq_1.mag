@@ -1,9 +1,7 @@
 magic
 tech ihp-sg13g2
 magscale 1 2
-timestamp 1790011989
-<< checkpaint >>
-rect -2048 -2056 4640 2834
+timestamp 1790018295
 << nwell >>
 rect -48 443 2640 834
 rect -48 370 454 443

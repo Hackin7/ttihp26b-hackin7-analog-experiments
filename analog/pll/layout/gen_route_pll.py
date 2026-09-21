@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
-"""DRC-aware LVS spine router with geometry-aware paint (no overlapping same-layer rects).
+"""Smarter DRC-aware LVS router for pll_analog.
 
-Signals: exclusive M3 columns + exclusive M4 trunks; jogs on M2/M3/M4 chosen
-so the jog rectangle does not overlap any prior paint on that layer.
-Widths/enclosure/spacing target IHP sg13g2 Magic DRC (W/VIA>=0.20, CLEAR>=0.21).
+Signals:
+  Via up at the pin, jog on M4/M3 (or M5 in side channels) over the cell
+  field with Y-stagger, then M3 vertical to an exclusive M4 trunk.
+  Jog and vertical use different layers so they don't cross-block.
+  Leaf-cell metal1/2/5 rectangles are PaintDB obstacles. Pin via landings may
+  touch existing pin metal; M1/M2 straps and power escapes keep full CLEAR.
+  Exclusive M3 columns feed M4 trunks. Same-net paint may touch.
 
-Power: M2 escape to far-right spine, via-up to M5 there only.
+Power: short M2 escape beside the pin → via-up to M5 → rail.
 """
 from __future__ import annotations
 
@@ -75,20 +79,15 @@ LOWER_NETS = {
     "net5", "net8", "net10", "net12", "out",
 }
 
-# IHP sg13g2 DRC targets (Magic rules):
-#   metal/via width >= 0.20um, metal spacing >= 0.21um,
-#   via enclosure >= 0.045um, metal min area >= 0.144um^2
 W = 0.20
 VIA = 0.20
-ENCL = 0.10  # pad=0.40um -> area 0.16 >= 0.144; enclosure > 0.045
+ENCL = 0.10
 CLEAR = 0.21
-PITCH_Y = 0.70  # trunk pitch: W + CLEAR + margin
-PITCH_X = 0.65  # col pitch: via-pad + CLEAR
-SPINE = 82.0  # unused; power vias are local at pin+offset
+PITCH_Y = 1.00  # trunk pitch; leave room for near-trunk jogs
+PITCH_X = 0.65  # M4 column pitch over cells
+OBS = "__obs__"
 
-
-# ---- geometry ----
-Rect = tuple[float, float, float, float]  # x0,y0,x1,y1
+Rect = tuple[float, float, float, float]
 
 
 def overlaps(a: Rect, b: Rect, clear: float = CLEAR) -> bool:
@@ -99,23 +98,43 @@ def overlaps(a: Rect, b: Rect, clear: float = CLEAR) -> bool:
 
 
 class PaintDB:
+    """Layer paint with per-net clearance (same net may touch)."""
+
     def __init__(self):
-        self.layers: dict[str, list[Rect]] = {
+        self.layers: dict[str, list[tuple[Rect, str | None]]] = {
             L: [] for L in ("metal1", "metal2", "metal3", "metal4", "metal5")
         }
 
-    def can(self, layer: str, r: Rect) -> bool:
-        return all(not overlaps(r, e) for e in self.layers[layer])
+    def can(
+        self,
+        layer: str,
+        r: Rect,
+        net: str | None = None,
+        clear: float = CLEAR,
+        obs_clear: float | None = None,
+    ) -> bool:
+        """obs_clear overrides clearance to OBS (e.g. 0 to land on pin metal)."""
+        oc = clear if obs_clear is None else obs_clear
+        for e, enet in self.layers[layer]:
+            if enet == OBS:
+                c = oc
+            elif net is not None and enet == net:
+                c = 0.0
+            else:
+                c = clear
+            if overlaps(r, e, c):
+                return False
+        return True
 
-    def add(self, layer: str, r: Rect):
-        self.layers[layer].append(r)
+    def add(self, layer: str, r: Rect, net: str | None = None):
+        self.layers[layer].append((r, net))
 
-    def h(self, x0, x1, y, layer, w=W) -> Rect:
+    def h(self, x0, x1, y, w=W) -> Rect:
         lo, hi = sorted([x0, x1])
         hw = w / 2
         return (lo - hw, y - hw, hi + hw, y + hw)
 
-    def v(self, x, y0, y1, layer, w=W) -> Rect:
+    def v(self, x, y0, y1, w=W) -> Rect:
         lo, hi = sorted([y0, y1])
         hw = w / 2
         return (x - hw, lo - hw, x + hw, hi + hw)
@@ -161,10 +180,50 @@ def parse_ports(mag: Path) -> dict[str, tuple[float, float]]:
     return ports
 
 
+def parse_cell_metals_um(mag: Path) -> dict[str, list[Rect]]:
+    """Per-layer metal rectangles of a leaf cell in local µm."""
+    text = mag.read_text()
+    scale = 2 if (mag.name.startswith("cap_cmim") and "magscale" not in text[:120]) else 1
+    want = {"metal1", "metal2", "metal3", "metal4", "metal5"}
+    out: dict[str, list[Rect]] = {L: [] for L in want}
+    cur = None
+    for line in text.splitlines():
+        m = re.match(r"<<\s+(\S+)\s+>>", line)
+        if m:
+            cur = m.group(1)
+            continue
+        m = re.match(r"rect\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)", line)
+        if not m or cur not in want:
+            continue
+        x1, y1, x2, y2 = map(int, m.groups())
+        out[cur].append(
+            (
+                scale * min(x1, x2) * UM,
+                scale * min(y1, y2) * UM,
+                scale * max(x1, x2) * UM,
+                scale * max(y1, y2) * UM,
+            )
+        )
+    return out
+
+
 def xform(pt, t):
     x, y = pt
     a, b, c, d, e, f = t
     return (a * x + b * y + c, d * x + e * y + f)
+
+
+def xform_bbox_um(bbox: Rect, t) -> Rect:
+    """Transform local-µm bbox corners through Mag transform (mag units)."""
+    x0, y0, x1, y1 = bbox
+    corners = [
+        (x0 / UM, y0 / UM), (x1 / UM, y0 / UM),
+        (x0 / UM, y1 / UM), (x1 / UM, y1 / UM),
+    ]
+    abs_pts = [um(xform(p, t)) for p in corners]
+    xs = [p[0] for p in abs_pts]
+    ys = [p[1] for p in abs_pts]
+    return (min(xs), min(ys), max(xs), max(ys))
 
 
 def parse_top_labels(mag: Path) -> dict[str, tuple[float, float]]:
@@ -203,32 +262,35 @@ def paint_v(x, y0, y1, layer, w=W):
     ]
 
 
-def via(layer_via, layer_below, layer_above, x, y, s=VIA, e=ENCL):
+def via(layer_via, layer_below, layer_above, x, y, s=VIA, e=ENCL, paint_below=True):
     h = s / 2
-    return [
-        f"box {x-h-e:.3f}um {y-h-e:.3f}um {x+h+e:.3f}um {y+h+e:.3f}um",
-        f"paint {layer_below}",
+    cmd = []
+    if paint_below:
+        cmd += [
+            f"box {x-h-e:.3f}um {y-h-e:.3f}um {x+h+e:.3f}um {y+h+e:.3f}um",
+            f"paint {layer_below}",
+        ]
+    cmd += [
         f"box {x-h:.3f}um {y-h:.3f}um {x+h:.3f}um {y+h:.3f}um",
         f"paint {layer_via}",
         f"box {x-h-e:.3f}um {y-h-e:.3f}um {x+h+e:.3f}um {y+h+e:.3f}um",
         f"paint {layer_above}",
     ]
-
-
-def stack_to(layer: str, x: float, y: float) -> list[str]:
-    out = via("via1", "metal1", "metal2", x, y)
-    if layer == "metal2":
-        return out
-    out += via("via2", "metal2", "metal3", x, y)
-    if layer == "metal3":
-        return out
-    out += via("via3", "metal3", "metal4", x, y)
-    return out
+    return cmd
 
 
 def via_pad_rect(x, y) -> Rect:
     h = VIA / 2 + ENCL
     return (x - h, y - h, x + h, y + h)
+
+
+def via_cut_rect(x, y) -> Rect:
+    h = VIA / 2
+    return (x - h, y - h, x + h, y + h)
+
+
+def expand(r: Rect, m: float) -> Rect:
+    return (r[0] - m, r[1] - m, r[2] + m, r[3] + m)
 
 
 def main():
@@ -241,17 +303,22 @@ def main():
         "vco_out_div": (-1.5, 2.0),
         "VPWR": (20.5, 12.5),
         "VGND": (20.5, -19.0),
-        "out": (66.97, -11.92),
+        "out": (74.5, -10.7),
         "vctrl": (36.5, 23.0),
     }.items():
         if k not in top:
             top[k] = (x / UM, y / UM)
 
-    leaf = {}
+    leaf_ports: dict[str, dict] = {}
+    leaf_metals: dict[str, dict[str, list[Rect]]] = {}
     for inst, (cell, *_) in uses.items():
         p = LAYOUT / f"{cell}.mag"
-        if p.exists():
-            leaf[cell] = parse_ports(p)
+        if not p.exists():
+            continue
+        if cell not in leaf_ports:
+            leaf_ports[cell] = parse_ports(p)
+        if cell not in leaf_metals:
+            leaf_metals[cell] = parse_cell_metals_um(p)
 
     def abs_pin(inst, pin):
         if inst == "PORT":
@@ -259,10 +326,10 @@ def main():
         if inst not in uses:
             return None
         cell, *t = uses[inst]
-        if cell not in leaf or pin not in leaf[cell]:
+        if cell not in leaf_ports or pin not in leaf_ports[cell]:
             print(f"WARN {inst}/{pin}")
             return None
-        return um(xform(leaf[cell][pin], tuple(t)))
+        return um(xform(leaf_ports[cell][pin], tuple(t)))
 
     resolved = {}
     for net, pins in NETS.items():
@@ -283,96 +350,76 @@ def main():
 
     upper = sorted(n for n in UPPER_NETS if len(resolved.get(n, [])) >= 2)
     lower = sorted(n for n in LOWER_NETS if len(resolved.get(n, [])) >= 2)
+
+    def vco_score(net: str) -> tuple:
+        pts = resolved.get(net, [])
+        n_vco = sum(1 for (x, y), _ in pts if x > 55)
+        return (-n_vco, net)
+
+    lower = sorted(lower, key=vco_score)
+
     track = {}
     for i, n in enumerate(upper):
         track[n] = 14.0 + i * PITCH_Y
     for i, n in enumerate(lower):
         track[n] = -21.0 - i * PITCH_Y
 
-    sig_nets = list(track.keys())
     db = PaintDB()
-    pin_xs = []
-    for n in list(sig_nets) + ["VPWR", "VGND"]:
-        for p, _ in resolved.get(n, []):
-            pin_xs.append(p[0])
 
-    occupied_cols: set[int] = set()
+    # Per-layer leaf metal as obstacles — no carveouts.
+    # Straps/jogs/power keep full CLEAR to cell metal. Pin via landings use
+    # obs_clear=0 on M1/M2 so the stack may sit on existing pin metal.
+    n_obs = 0
+    for inst, (cell, *t) in uses.items():
+        metals = leaf_metals.get(cell)
+        if not metals:
+            continue
+        for layer, rects in metals.items():
+            for lr in rects:
+                ar = expand(xform_bbox_um(lr, tuple(t)), 0.01)
+                db.add(layer, ar, OBS)
+                n_obs += 1
+    print(f"cell metal obstacles: {n_obs} rects")
+
+    vdd_y, vss_y = 12.5, -19.0
+    power_ox_map: dict[tuple[float, float], float] = {}
+    used_ox: set[int] = set()
 
     def q(x: float) -> int:
         return int(round(x / 0.01))
 
-    for px in pin_xs:
-        for d in range(-12, 13):
-            occupied_cols.add(q(px) + d)
-    vdd_y, vss_y = 12.5, -19.0
-
-    # Assign unique via-up X right of each power pin (never through the device body)
-    power_ox_map: dict[tuple[float, float], float] = {}
-    used_ox: set[int] = set()
-
-    def claim_ox(px: float) -> float:
-        for k in range(0, 40):
-            cand = px + 1.00 + k * 0.85
-            if cand > 69.0:
-                break  # leave x>=70 for signal columns
-            qc = q(cand)
-            if any((qc + d) in used_ox for d in range(-42, 43)):
-                continue
-            for d in range(-42, 43):
-                used_ox.add(qc + d)
-            return cand
-        # fallback: below signal channel
-        return min(px + 1.00, 68.5)
+    def claim_ox(px: float, py: float) -> float:
+        """M2 escape X that clears cell obstacles and existing M2/M4 paint."""
+        for k in range(0, 80):
+            for sign in (1, -1):
+                cand = px + sign * (0.80 + k * 0.65)
+                jog = db.h(px, cand, py)
+                if not db.can("metal2", jog, net=None):
+                    continue
+                # via stack landing must be free on M3-M5 too
+                pad = via_pad_rect(cand, py)
+                if not all(db.can(L, pad, net=None) for L in ("metal3", "metal4", "metal5")):
+                    continue
+                qc = q(cand)
+                if any((qc + d) in used_ox for d in range(-40, 41)):
+                    continue
+                for d in range(-40, 41):
+                    used_ox.add(qc + d)
+                return cand
+        return px + 1.0
 
     def power_ox(px, py, net):
         key = (round(px, 3), round(py, 3))
         if key not in power_ox_map:
-            power_ox_map[key] = claim_ox(px)
+            power_ox_map[key] = claim_ox(px, py)
         return power_ox_map[key]
 
-    for n, rail_y in (("VPWR", vdd_y), ("VGND", vss_y)):
-        for p, name in resolved.get(n, []):
-            if name.endswith("/C2"):
-                continue
-            ox = power_ox(p[0], p[1], n)
-            for d in range(-42, 43):
-                occupied_cols.add(q(ox) + d)
-            db.add("metal2", db.h(p[0], ox, p[1], "metal2"))
-            for L in ("metal2", "metal3", "metal4", "metal5"):
-                db.add(L, via_pad_rect(ox, p[1]))
-            db.add("metal5", db.v(ox, p[1], rail_y, "metal5", 0.20))
-    for pname, rail_y in (("VPWR", vdd_y), ("VGND", vss_y)):
-        if pname in top:
-            pxy = um(top[pname])
-            ox = power_ox(pxy[0], pxy[1], pname)
-            for d in range(-42, 43):
-                occupied_cols.add(q(ox) + d)
-            db.add("metal2", db.h(pxy[0], ox, pxy[1], "metal2"))
-            for L in ("metal2", "metal3", "metal4", "metal5"):
-                db.add(L, via_pad_rect(ox, pxy[1]))
-            db.add("metal5", db.v(ox, pxy[1], rail_y, "metal5", 0.20))
-    for p, name in resolved.get("VGND", []):
-        if name.endswith("/C2"):
-            db.add("metal5", (p[0] - 0.4, p[1] - 0.4, p[0] + 0.4, p[1] + 0.4))
-            db.add("metal5", db.v(p[0], p[1], vss_y, "metal5", 0.25))
-    # Reserve power M5 rails so signal M5 jogs cannot touch them
-    db.add("metal5", (-10.0, vdd_y - 0.5, 100.0, vdd_y + 0.5))
-    db.add("metal5", (-10.0, vss_y - 0.5, 100.0, vss_y + 0.5))
-
-    def claim_col(px: float) -> float | None:
-        for k in range(0, 150):
-            for sign in (-1, 1):
-                cand = px + sign * (0.70 + k * PITCH_X)
-                qc = q(cand)
-                if any((qc + d) in occupied_cols for d in range(-32, 33)):
-                    continue
-                # also check M3 vertical strip won't be added yet — mark col
-                occupied_cols.add(qc)
-                return cand
-        return None
+    # Only reserve M5 power rails before signals (signals use M4)
+    db.add("metal5", (-10.0, vdd_y - 0.5, 120.0, vdd_y + 0.5), OBS)
+    db.add("metal5", (-10.0, vss_y - 0.5, 120.0, vss_y + 0.5), OBS)
 
     lines = [
-        "# Geometry-aware LVS spine router",
+        "# Smarter up-and-over M4 spine router",
         "drc off",
         "cd /repo/analog/pll/layout",
         "if {[file exists pll_analog_bare.mag]} {",
@@ -399,121 +446,205 @@ def main():
         if name in SCH_PORTS:
             lines += ["port make", "port connections n s e w"]
 
-    jog_layers = ("metal4", "metal3", "metal2")  # never M5 — reserved for power
     failures = []
 
-    def stack_to_layer(layer, x, y):
-        out = via("via1", "metal1", "metal2", x, y)
-        if layer == "metal2":
-            return out
-        out += via("via2", "metal2", "metal3", x, y)
-        if layer == "metal3":
-            return out
-        out += via("via3", "metal3", "metal4", x, y)
-        return out
+    def stack_to_m3(x, y, on_pin=False):
+        # On existing pin metal, skip re-painting M1 enclosure (avoids M1 spacing DRC)
+        return (
+            via("via1", "metal1", "metal2", x, y, paint_below=not on_pin)
+            + via("via2", "metal2", "metal3", x, y)
+        )
 
-    for net, ty in track.items():
-        pts = resolved[net]
-        lines.append(f"# net {net}  trunk={ty:.3f}")
-        xs = []
-        for (px, py), pname in pts:
-            pad = 0.50 if pname.endswith("/C1") else 0.12
-            placed = False
-            # Prefer local columns (short jogs); far-right / far-left as fallback
-            candidates = []
-            for k in range(0, 100):
-                candidates.append(px - (0.70 + k * PITCH_X))
-                candidates.append(px + (0.70 + k * PITCH_X))
-            for k in range(0, 60):
-                candidates.append(72.0 + k * PITCH_X)
-            for k in range(0, 50):
-                candidates.append(-6.0 - k * PITCH_X)
-            jog_try = list(jog_layers) + ["metal5"]
-            # Offset jog Y so dense same-row pins can share a layer without CLEAR clashes
-            jog_ys = [py]
-            for k in range(1, 8):
-                jog_ys.append(py + k * 0.35)
-                jog_ys.append(py - k * 0.35)
-            for cx in candidates:
-                if placed:
+    def stack_to_m4(x, y, on_pin=False):
+        return stack_to_m3(x, y, on_pin=on_pin) + via("via3", "metal3", "metal4", x, y)
+
+    used_m3_cols: set[int] = set()
+
+    def col_q(x: float) -> int:
+        return int(round(x / PITCH_X))
+
+    def claim_m3_col(x: float) -> bool:
+        q = col_q(x)
+        if any((q + d) in used_m3_cols for d in (-1, 0, 1)):
+            return False
+        used_m3_cols.add(q)
+        return True
+
+    def release_m3_col(x: float):
+        used_m3_cols.discard(col_q(x))
+
+    def try_attach(net: str, px: float, py: float, ty: float, pname: str) -> float | None:
+        """Via-up at pin (or M2 escape), M4 jog, exclusive M3 column to trunk."""
+        pad = 0.50 if pname.endswith("/C1") else 0.12
+        candidates = [px]
+        for k in range(1, 100):
+            candidates.append(px + k * PITCH_X)
+            candidates.append(px - k * PITCH_X)
+        for k in range(0, 40):
+            candidates.append(100.0 + k * PITCH_X)
+            candidates.append(-8.0 - k * PITCH_X)
+
+        # Prefer stack at pin; fall back to a few M2-escape sites if jogs fail
+        sites: list[tuple[float, float, tuple | None]] = [(px, py, None)]
+        pin_m2_ok = db.can(
+            "metal2", via_cut_rect(px, py), net, clear=0.0, obs_clear=0.0
+        )
+        if pin_m2_ok:
+            for k in range(1, 25):
+                dist = k * 0.40
+                for dx, dy in ((dist, 0.0), (-dist, 0.0), (0.0, dist), (0.0, -dist)):
+                    vx, vy = px + dx, py + dy
+                    pad_v = via_pad_rect(vx, vy)
+                    if not all(db.can(L, pad_v, net) for L in ("metal2", "metal3", "metal4")):
+                        continue
+                    parts = []
+                    if abs(vx - px) > 0.01:
+                        parts.append(db.h(px, vx, py, W))
+                    if abs(vy - py) > 0.01:
+                        parts.append(db.v(vx, py, vy, W))
+                    if parts and all(db.can("metal2", r, net) for r in parts):
+                        sites.append((vx, vy, ("metal2", parts)))
+                        if len(sites) >= 12:
+                            break
+                if len(sites) >= 12:
                     break
-                qc = q(cx)
-                if any((qc + d) in occupied_cols for d in range(-32, 33)):
-                    continue
-                for jl in jog_try:
-                    if placed:
-                        break
-                    if jl == "metal5" and cx < 70:
-                        continue  # M5 jogs only in far-right channel
-                    for jy in jog_ys:
-                        jog_r = db.h(px, cx, jy, jl)
-                        stub_r = db.v(px, py, jy, jl)
-                        vert_r = db.v(cx, jy, ty, "metal3")
-                        trunk_touch = via_pad_rect(cx, ty)
-                        if not db.can(jl, jog_r):
+
+        jog_ys_base = [0.0]
+        for k in range(1, 12):
+            jog_ys_base.append(k * 0.35)
+            jog_ys_base.append(-k * 0.35)
+
+        for sx, sy, strap in sites:
+            at_pin = abs(sx - px) < 0.01 and abs(sy - py) < 0.01
+            for jl in ("metal4", "metal3", "metal5"):
+                for cx in candidates:
+                    if jl == "metal5" and -5 < cx < 95:
+                        continue  # M5 jogs only in side channels
+                    if not claim_m3_col(cx):
+                        continue
+                    for dy in jog_ys_base:
+                        jy = sy + dy
+                        jog = db.h(sx, cx, jy, W) if abs(cx - sx) > 0.01 else None
+                        stub = db.v(sx, sy, jy, W) if abs(jy - sy) > 0.01 else None
+                        vert = db.v(cx, jy, ty, W)
+                        pad_bend = via_pad_rect(cx, jy)
+                        pad_top = via_pad_rect(cx, ty)
+
+                        if stub is not None and not db.can(jl, stub, net):
                             continue
-                        if abs(jy - py) > 0.01 and not db.can(jl, stub_r):
+                        if jog is not None and not db.can(jl, jog, net):
                             continue
-                        if not db.can("metal3", vert_r):
+                        if not db.can("metal3", vert, net):
                             continue
-                        occupied_cols.add(qc)
-                        db.add(jl, jog_r)
-                        if abs(jy - py) > 0.01:
-                            db.add(jl, stub_r)
-                        db.add("metal3", vert_r)
-                        db.add("metal4", trunk_touch)
-                        db.add("metal2", via_pad_rect(px, py))
-                        if jl in ("metal3", "metal4", "metal5"):
-                            db.add("metal3", via_pad_rect(px, py))
-                        if jl in ("metal4", "metal5"):
-                            db.add("metal4", via_pad_rect(px, py))
-                        if jl == "metal5":
-                            db.add("metal5", via_pad_rect(px, py))
-                        db.add(jl, via_pad_rect(px, jy))
-                        db.add(jl, via_pad_rect(cx, jy))
-                        db.add("metal3", via_pad_rect(cx, jy))
-                        lines += [
+                        if not db.can("metal3", pad_bend, net):
+                            continue
+                        if not db.can("metal4", pad_top, net):
+                            continue
+                        if not db.can(jl, pad_bend, net):
+                            continue
+
+                        if strap is not None:
+                            s_layer, s_rects = strap
+                            for r in s_rects:
+                                db.add(s_layer, r, net)
+                        if stub is not None:
+                            db.add(jl, stub, net)
+                        if jog is not None:
+                            db.add(jl, jog, net)
+                        db.add("metal3", vert, net)
+                        db.add(jl, pad_bend, net)
+                        db.add("metal3", pad_bend, net)
+                        db.add("metal4", pad_top, net)
+                        if not at_pin:
+                            sc = via_cut_rect(sx, sy)
+                            db.add("metal2", sc, net)
+                            db.add("metal3", sc, net)
+                            if jl in ("metal4", "metal5"):
+                                db.add("metal4", sc, net)
+
+                        cmd = [
                             f"box {px-pad:.3f}um {py-pad:.3f}um {px+pad:.3f}um {py+pad:.3f}um",
                             "paint metal1",
                         ]
-                        if jl == "metal5":
-                            lines += stack_to_layer("metal4", px, py)
-                            lines += via("via4", "metal4", "metal5", px, py)
+                        if strap is not None:
+                            cmd += via("via1", "metal1", "metal2", px, py, paint_below=False)
+                            if abs(sx - px) > 0.01:
+                                cmd += paint_h(px, sx, py, "metal2", W)
+                            if abs(sy - py) > 0.01:
+                                cmd += paint_v(sx, py, sy, "metal2", W)
+                            cmd += via("via2", "metal2", "metal3", sx, sy)
+                            if jl in ("metal4", "metal5"):
+                                cmd += via("via3", "metal3", "metal4", sx, sy)
+                            if jl == "metal5":
+                                cmd += via("via4", "metal4", "metal5", sx, sy)
                         else:
-                            lines += stack_to_layer(jl, px, py)
-                        if abs(jy - py) > 0.01:
-                            lines += paint_v(px, py, jy, jl, W)
-                        lines += paint_h(px, cx, jy, jl, W)
+                            if jl == "metal5":
+                                cmd += stack_to_m4(sx, sy, on_pin=at_pin)
+                                cmd += via("via4", "metal4", "metal5", sx, sy)
+                            elif jl == "metal4":
+                                cmd += stack_to_m4(sx, sy, on_pin=at_pin)
+                            else:
+                                cmd += stack_to_m3(sx, sy, on_pin=at_pin)
+                        if stub is not None:
+                            cmd += paint_v(sx, sy, jy, jl, W)
+                        if jog is not None:
+                            cmd += paint_h(sx, cx, jy, jl, W)
                         if jl == "metal5":
-                            lines += via("via4", "metal4", "metal5", cx, jy)
-                            lines += via("via3", "metal3", "metal4", cx, jy)
+                            cmd += via("via4", "metal4", "metal5", cx, jy)
+                            cmd += via("via3", "metal3", "metal4", cx, jy)
                         elif jl == "metal4":
-                            lines += via("via3", "metal3", "metal4", cx, jy)
-                        elif jl == "metal2":
-                            lines += via("via2", "metal2", "metal3", cx, jy)
-                        lines += paint_v(cx, jy, ty, "metal3", W)
-                        lines += via("via3", "metal3", "metal4", cx, ty)
-                        xs.append(cx)
-                        placed = True
-                        break
-            if not placed:
-                failures.append(f"{net} {pname} @ {px:.3f},{py:.3f}")
+                            cmd += via("via3", "metal3", "metal4", cx, jy)
+                        cmd += paint_v(cx, jy, ty, "metal3", W)
+                        cmd += via("via3", "metal3", "metal4", cx, ty)
+                        lines.extend(cmd)
+                        return cx
+                    release_m3_col(cx)
+        return None
 
-        if xs:
-            trunk = db.h(min(xs), max(xs), ty, "metal4")
-            # trunks at exclusive Y should always be free; force-add
-            db.add("metal4", trunk)
-            lines += paint_h(min(xs), max(xs), ty, "metal4", W)
+    failures = []
+    trunk_xs: dict[str, list[float]] = {n: [] for n in track}
+    pending: list[tuple[str, float, float, float, str]] = []
+
+    for net, ty in track.items():
+        pts = sorted(resolved[net], key=lambda t: (-t[0][0], t[0][1]))
+        lines.append(f"# net {net}  trunk={ty:.3f}")
+        for (px, py), pname in pts:
+            cx = try_attach(net, px, py, ty, pname)
+            if cx is None:
+                pending.append((net, px, py, ty, pname))
+            else:
+                trunk_xs[net].append(cx)
+
+    for net, px, py, ty, pname in pending:
+        # Retry without exclusive-column guard (clearance still enforced in PaintDB)
+        cx = None
+        # Temporarily allow denser columns
+        saved = set(used_m3_cols)
+        used_m3_cols.clear()
+        cx = try_attach(net, px, py, ty, pname)
+        used_m3_cols.update(saved)
+        if cx is not None:
+            used_m3_cols.add(col_q(cx))
+            trunk_xs[net].append(cx)
+        else:
+            failures.append(f"{net} {pname} @ {px:.3f},{py:.3f}")
+
+    for net, xs in trunk_xs.items():
+        if not xs:
+            continue
+        ty = track[net]
+        trunk = db.h(min(xs), max(xs), ty)
+        db.add("metal4", trunk, net)
+        lines += paint_h(min(xs), max(xs), ty, "metal4", W)
 
     if failures:
         print(f"FAILED to place {len(failures)} pins:")
-        for f in failures[:20]:
+        for f in failures[:25]:
             print(" ", f)
 
     # Power spine
     xs_all = [p[0] for pts in resolved.values() for p, _ in pts] or [0.0, 70.0]
     x_lo, x_hi = min(xs_all) - 4, max(max(xs_all) + 4, 95.0)
-    # vdd_y/vss_y already set above
     lines += [
         f"box {x_lo:.3f}um {vdd_y-0.4:.3f}um {x_hi:.3f}um {vdd_y+0.4:.3f}um",
         "paint metal5",
@@ -527,7 +658,7 @@ def main():
             f"box {px-0.12:.3f}um {py-0.12:.3f}um {px+0.12:.3f}um {py+0.12:.3f}um",
             "paint metal1",
         ]
-        c += via("via1", "metal1", "metal2", px, py)
+        c += via("via1", "metal1", "metal2", px, py, paint_below=False)
         c += paint_h(px, ox, py, "metal2", W)
         c += via("via2", "metal2", "metal3", ox, py)
         c += via("via3", "metal3", "metal4", ox, py)

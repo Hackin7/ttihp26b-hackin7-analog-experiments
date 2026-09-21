@@ -1,0 +1,69 @@
+
+Magic 8.3 revision 681 - Compiled on Tue Aug 25 11:50:23 AM CEST 2026.
+Starting magic under Tcl interpreter
+Using the terminal as the console.
+WARNING: RLIMIT_NOFILE is above 1024 and Tcl_Version<9 this may cause runtime issues [rlim_cur=1048576]
+Using NULL graphics device.
+Processing system .magicrc file
+Switching to WIRING tool.
+Switching to NETLIST tool.
+Switching to PICK tool.
+Switching to BOX tool.
+Sourcing design .magicrc for technology ihp-sg13g2 ...
+2 Magic internal units = 1 Lambda
+Input style sg13g2(): scaleFactor=2, multiplier=2
+The following types are not handled by extraction and will be treated as non-electrical types:
+    pblock sealcont difffill nemitter hvnemitter hvisodiffres sealvia1 sealvia2 sealvia3 sealvia4 sealvia5 sealvia6 pillar solder seal glass thruvia inductor 
+Scaled tech values by 2 / 1 to match internal grid scaling
+Loading ihp-sg13g2 Device Generator Menu ...
+Loading "make_bare.tcl" from command line.
+Cell pll_analog read from current working directory
+Root cell box:
+           width x height  (   llx,  lly  ), (   urx,  ury  )  area (units^2)
+
+microns:  170.000 x 120.000  (-20.000, -60.000), ( 150.000,  60.000)  20400.000 
+lambda:   17000.00 x 12000.00  (-2000.00, -6000.00), ( 15000.00,  6000.00)  204000000.00
+internal:  34000 x 24000   ( -4000, -12000), ( 30000,  12000)  816000000 
+Root cell box:
+           width x height  (   llx,  lly  ), (   urx,  ury  )  area (units^2)
+
+microns:   0.500 x 0.500   (-1.750,  6.750), (-1.250,  7.250)  0.250     
+lambda:    50.00 x 50.00   (-175.00,  675.00), (-125.00,  725.00)  2500.00   
+internal:    100 x 100     (  -350,  1350 ), (  -250,  1450 )  10000     
+Moving label "clk_ref_gate" from space to metal1 in cell pll_analog.
+Root cell box:
+           width x height  (   llx,  lly  ), (   urx,  ury  )  area (units^2)
+
+microns:   0.500 x 0.500   (-1.750,  1.750), (-1.250,  2.250)  0.250     
+lambda:    50.00 x 50.00   (-175.00,  175.00), (-125.00,  225.00)  2500.00   
+internal:    100 x 100     (  -350,  350  ), (  -250,  450  )  10000     
+Moving label "vco_out_div" from space to metal1 in cell pll_analog.
+Root cell box:
+           width x height  (   llx,  lly  ), (   urx,  ury  )  area (units^2)
+
+microns:   0.500 x 0.500   ( 20.250,  12.250), ( 20.750,  12.750)  0.250     
+lambda:    50.00 x 50.00   ( 2025.00,  1225.00), ( 2075.00,  1275.00)  2500.00   
+internal:    100 x 100     (  4050,  2450 ), (  4150,  2550 )  10000     
+Moving label "VPWR" from space to metal1 in cell pll_analog.
+Root cell box:
+           width x height  (   llx,  lly  ), (   urx,  ury  )  area (units^2)
+
+microns:   0.500 x 0.500   ( 20.250, -19.250), ( 20.750, -18.750)  0.250     
+lambda:    50.00 x 50.00   ( 2025.00, -1925.00), ( 2075.00, -1875.00)  2500.00   
+internal:    100 x 100     (  4050, -3850 ), (  4150, -3750 )  10000     
+Moving label "VGND" from space to metal1 in cell pll_analog.
+Root cell box:
+           width x height  (   llx,  lly  ), (   urx,  ury  )  area (units^2)
+
+microns:   0.500 x 0.500   ( 74.250, -10.950), ( 74.750, -10.450)  0.250     
+lambda:    50.00 x 50.00   ( 7425.00, -1095.00), ( 7475.00, -1045.00)  2500.00   
+internal:    100 x 100     ( 14850, -2190 ), ( 14950, -2090 )  10000     
+Moving label "out" from space to metal1 in cell pll_analog.
+Root cell box:
+           width x height  (   llx,  lly  ), (   urx,  ury  )  area (units^2)
+
+microns:   0.500 x 0.500   ( 36.250,  22.750), ( 36.750,  23.250)  0.250     
+lambda:    50.00 x 50.00   ( 3625.00,  2275.00), ( 3675.00,  2325.00)  2500.00   
+internal:    100 x 100     (  7250,  4550 ), (  7350,  4650 )  10000     
+Moving label "vctrl" from space to metal1 in cell pll_analog.
+BARE_OK

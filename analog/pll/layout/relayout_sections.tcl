@@ -52,35 +52,35 @@ place sg13g2_and2_1   x3 13.8  2.4
 place sg13g2_inv_1    x4 17.2  4.8
 
 puts "=== CP switches ==="
-# Schematic top→bottom: M1, M3, M2, M4 (centers = FET origin)
+# Same stack at x=22; open vertical pitch 2.0 -> 4.0 (top FET stays)
 place sg13_lv_pmos_ESLPQL XM1 22.0  9.0
-place sg13_lv_pmos_XN8759 XM3 22.0  6.8
-place sg13_lv_nmos_VQD2M8 XM2 22.0  4.8
-place sg13_lv_nmos_WRM2S2 XM4 22.0  2.8
+place sg13_lv_pmos_XN8759 XM3 22.0  5.0
+place sg13_lv_nmos_VQD2M8 XM2 22.0  1.0
+place sg13_lv_nmos_WRM2S2 XM4 22.0 -3.0
 
 puts "=== Bias (R2 + mirrors, under PFD/CP) ==="
-# R2 origin is cell center; M6/M5/M7 along its top edge
+# R2 origin is cell center; M6/M5/M7 along its top edge (3.0 -> 4.5 pitch)
 place rhigh_R2_snake      XR2 10.6 -10.0
 place sg13_lv_nmos_WRM2S2 XM6 24.0  -3.0
-place sg13_lv_nmos_WRM2S2 XM5 27.0  -3.0
-place sg13_lv_pmos_ESLPQL XM7 30.5  -3.0
+place sg13_lv_nmos_WRM2S2 XM5 28.5  -3.0
+place sg13_lv_pmos_ESLPQL XM7 33.0  -3.0
 
 puts "=== Loop filter (R1, C1, C2) ==="
 # C1/C2 origins are centers. R1_snake origin is offset from geom center
-# local_center ≈ (-10.58, -7.835)
+# local_center ≈ (-10.58, -7.835); C2 nudged right for ~3 µm extra gap
 place cap_cmim_4SFK5Q XC1 36.0  0.0
-place cap_cmim_ZNKAVF XC2 51.0 -1.0
-# R1 stacked above C1 (0.5 µm gap)
+place cap_cmim_ZNKAVF XC2 54.0 -1.0
+# R1 stacked above C1
 place rhigh_R1_snake  XR1 [expr {36.0 + 10.58}] [expr {16.0 + 7.835}]
 
 puts "=== VCO (starved ring columns, schematic L→R) ==="
-# cols: bias | stage3 | stage1 | stage2 | buffer
+# Same region starting x0=60; col pitch 2.3 -> 4.5, row pitch ~2.5 -> 4.0
 set x0 60.0
-set dx 2.3
+set dx 4.5
 set yp 7.2
-set yi 4.6
-set yn 2.2
-set ys 0.0
+set yi 3.2
+set yn -0.8
+set ys -4.8
 
 # bias diode
 place sg13_lv_pmos_NJKCVT XMp8 $x0 $yp
@@ -128,9 +128,11 @@ pinlab vco_out_div   -2  1.5
 pinlab VPWR          20  12.5
 pinlab VGND          20 -19.5
 pinlab vctrl         36  22.5
-pinlab out           69.5 -11.8
+# just right of buffer at x0+4*dx ≈ 78
+pinlab out           81.0 -1.0
 
 save pll_analog
+file copy -force pll_analog.mag pll_analog_bare.mag
 
 select top cell
 set b [box values]
