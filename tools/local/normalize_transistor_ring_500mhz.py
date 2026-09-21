@@ -143,6 +143,39 @@ def fmt_rect(rect):
     return "        RECT %.3f %.3f %.3f %.3f ;" % rect
 
 
+def via_stack_obs_lines():
+    """Block M2-M5 via-stack pads so PnR fill cannot violate M2.b against GDS metal.
+
+    Magic puts Metal2-5 on VPWR/VGND PIN ports; the normalized LEF only exposes
+    Metal1 + TopMetal1 pins, so without OBS LibreLane metal fill lands ~0.03 um
+    from the VGND Metal2 pad (KLayout M2.b). Extend OBS to the PR-boundary on
+    the pad side so the fill channel is closed.
+    """
+    # Source LEF (pre-shift) stack pads + SHIFT_UM, then extend to edge.
+    sx, sy = SHIFT_UM
+    w, _h = SIZE_UM
+    vpwr_m2 = (round(-0.030 + sx, 3), round(3.670 + sy, 3), round(0.370 + sx, 3), round(4.070 + sy, 3))
+    vgnd_m2 = (round(13.900 + sx, 3), round(-0.200 + sy, 3), round(14.300 + sx, 3), round(0.200 + sy, 3))
+    vpwr_m5 = (round(-0.240 + sx, 3), round(3.460 + sy, 3), round(0.580 + sx, 3), round(4.280 + sy, 3))
+    vgnd_m5 = (round(13.690 + sx, 3), round(-0.410 + sy, 3), round(14.510 + sx, 3), round(0.410 + sy, 3))
+    # Extend pad-side OBS out to the macro edge (closes fill gap).
+    vpwr_m2_obs = (0.000, vpwr_m2[1], vpwr_m2[2], vpwr_m2[3])
+    vgnd_m2_obs = (vgnd_m2[0], vgnd_m2[1], w, vgnd_m2[3])
+    vpwr_m5_obs = (0.000, vpwr_m5[1], vpwr_m5[2], vpwr_m5[3])
+    vgnd_m5_obs = (vgnd_m5[0], vgnd_m5[1], w, vgnd_m5[3])
+    lines = []
+    for layer, rects in (
+        ("Metal2", (vpwr_m2_obs, vgnd_m2_obs)),
+        ("Metal3", (vpwr_m2_obs, vgnd_m2_obs)),
+        ("Metal4", (vpwr_m2_obs, vgnd_m2_obs)),
+        ("Metal5", (vpwr_m5_obs, vgnd_m5_obs)),
+    ):
+        lines.append("      LAYER %s ;" % layer)
+        for rect in rects:
+            lines.append(fmt_rect(rect))
+    return lines
+
+
 def normalize_lef():
     source = SOURCE_LEF.read_text(encoding="ascii").splitlines()
     obs_lines = []
@@ -182,6 +215,8 @@ def normalize_lef():
                 if overlaps_pin:
                     continue
             obs_lines.append(obs_rect)
+
+    obs_lines.extend(via_stack_obs_lines())
 
     lef = [
         "VERSION 5.7 ;",

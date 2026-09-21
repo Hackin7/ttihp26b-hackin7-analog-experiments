@@ -78,6 +78,18 @@ MACRO ring_oscillator
         RECT 11.745 2.335 13.075 2.495 ;
         RECT 11.745 1.340 11.975 2.335 ;
         RECT 12.760 2.250 13.075 2.335 ;
+      LAYER Metal2 ;
+        RECT 0.000 4.400 1.300 4.800 ;
+        RECT 14.830 0.530 16.130 0.930 ;
+      LAYER Metal3 ;
+        RECT 0.000 4.400 1.300 4.800 ;
+        RECT 14.830 0.530 16.130 0.930 ;
+      LAYER Metal4 ;
+        RECT 0.000 4.400 1.300 4.800 ;
+        RECT 14.830 0.530 16.130 0.930 ;
+      LAYER Metal5 ;
+        RECT 0.000 4.190 1.510 5.010 ;
+        RECT 14.620 0.320 16.130 1.140 ;
   END
 END ring_oscillator
 END LIBRARY
