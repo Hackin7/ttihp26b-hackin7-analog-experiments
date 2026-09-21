@@ -1,0 +1,24 @@
+* Open-loop VCO at fixed vctrl (set via .param) — used to hit 800 MHz / 1.1 GHz points.
+.include out/pdk.lib
+.include out/lch.param
+.include ../schematic/pll_vco.spice
+
+.param vctrl_dc=0.72
+
+Xvco out vctrl VPWR VGND pll_vco lch={lch}
+Vvctrl vctrl 0 dc {vctrl_dc}
+Vvdd VPWR 0 dc 1.2
+Vvss VGND 0 0
+.ic v(xvco.o0)=1.2 v(xvco.o1)=0 v(xvco.o2)=0 v(out)=0
+
+.control
+  tran 2p 40n uic
+  wrdata out/vco.dat v(out)
+  meas tran t2 when v(out)=0.6 rise=5
+  meas tran t22 when v(out)=0.6 rise=45
+  let period = (t22 - t2)/40
+  let freq = 1/period
+  print period freq
+  echo freq_hz = $&freq
+.endc
+.end

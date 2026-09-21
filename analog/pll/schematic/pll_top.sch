@@ -1,4 +1,4 @@
-v {xschem version=3.4.8RC file_version=1.3}
+﻿v {xschem version=3.4.8RC file_version=1.3}
 G {}
 K {}
 V {}
@@ -209,12 +209,12 @@ N 380 -120 410 -120 {lab=#net4}
 N 410 -150 410 -120 {lab=#net4}
 N 380 -150 410 -150 {lab=#net4}
 N 320 710 340 710 {lab=vbp}
-C {sg13g2_dfrbpq_1.sym} -10 -100 0 0 {name=x1 VDD=VPWR VSS=VDD prefix=sg13g2_ }
+C {sg13g2_dfrbpq_1.sym} -10 -100 0 0 {name=x1 VDD=VPWR VSS=VGND prefix=sg13g2_ }
 C {sg13g2_dfrbpq_1.sym} -10 90 0 0 {name=x2 VDD=VPWR VSS=VGND prefix=sg13g2_ }
 C {sg13g2_and2_1.sym} -20 -10 2 0 {name=x3 VDD=VPWR VSS=VGND prefix=sg13g2_ }
 C {ipin.sym} -160 -120 0 0 {name=clk_pin0 lab=clk_ref_gate}
 C {ipin.sym} -260 70 0 0 {name=clk_pin1 lab=vco_out_div}
-C {sg13g2_inv_1.sym} 250 -120 0 0 {name=x4 VDD=VDD VSS=VSS prefix=sg13g2_}
+C {sg13g2_inv_1.sym} 250 -120 0 0 {name=x4 VDD=VPWR VSS=VGND prefix=sg13g2_}
 C {sg13g2_pr/sg13_lv_pmos.sym} 360 -210 0 0 {name=M1
 l=1.0u
 w=1.0u
@@ -254,31 +254,30 @@ spiceprefix=X
 C {iopin.sym} 130 310 2 0 {name=p4 lab=VGND}
 C {sg13g2_pr/cap_cmim.sym} 610 50 0 0 {name=C1
 model=cap_cmim
- w=7.0e-6
- l=7.0e-6
+ w=20.0e-6
+ l=20.0e-6
  m=1
   mm_ok=1
  spiceprefix=X}
-C {sg13g2_pr/rppd.sym} 610 -10 0 0 {name=R1
-w=0.5e-6
-l=0.5e-6
-model=rppd
-body=sub!
+C {sg13g2_pr/rhigh.sym} 610 -10 0 0 {name=R1
+w=0.50e-6
+l=70.0e-6
+model=rhigh
+body=VGND
 spiceprefix=X
 b=0
- m=1
-  mm_ok=1
-value="expr_eng(  ( 70.0e-6 / @w + 260.0 * ( (@b + 1)* @l + ( 1.081*( @w + 6.0e-9 ) + 0.18e-6 )*@b ) / ( @w + 6.0e-9 ) ) / @m  )"
+m=1
+mm_ok=1
 }
 C {sg13g2_pr/cap_cmim.sym} 790 50 0 0 {name=C2
 model=cap_cmim
- w=7.0e-6
- l=7.0e-6
+ w=8.0e-6
+ l=8.0e-6
  m=1
   mm_ok=1
  spiceprefix=X}
 C {sg13g2_pr/sg13_lv_pmos.sym} 1410 -60 0 0 {name=Mp2
-l=1.97u
+l=0.25u
 w=1.12u
 ng=1
 m=1
@@ -286,7 +285,7 @@ model=sg13_lv_pmos
 spiceprefix=X
 }
 C {sg13g2_pr/sg13_lv_nmos.sym} 1410 60 0 0 {name=Mn2
-l=1.97u
+l=0.25u
 w=0.74u
 ng=1
 m=1
@@ -296,7 +295,7 @@ spiceprefix=X
 C {opin.sym} 1860 0 0 0 {name=p5 lab=out}
 C {iopin.sym} 1690 -300 0 0 {name=p6 lab=VPWR}
 C {sg13g2_pr/sg13_lv_pmos.sym} 1260 -60 0 0 {name=Mp1
-l=1.97u
+l=0.25u
 w=1.12u
 ng=1
 m=1
@@ -304,7 +303,7 @@ model=sg13_lv_pmos
 spiceprefix=X
 }
 C {sg13g2_pr/sg13_lv_nmos.sym} 1260 60 0 0 {name=Mn1
-l=1.97u
+l=0.25u
 w=0.74u
 ng=1
 m=1
@@ -312,7 +311,7 @@ model=sg13_lv_nmos
 spiceprefix=X
 }
 C {sg13g2_pr/sg13_lv_pmos.sym} 1120 -60 0 0 {name=Mp3
-l=1.97u
+l=0.25u
 w=1.12u
 ng=1
 m=1
@@ -320,7 +319,7 @@ model=sg13_lv_pmos
 spiceprefix=X
 }
 C {sg13g2_pr/sg13_lv_nmos.sym} 1120 60 0 0 {name=Mn3
-l=1.97u
+l=0.25u
 w=0.74u
 ng=1
 m=1
@@ -328,7 +327,7 @@ model=sg13_lv_nmos
 spiceprefix=X
 }
 C {sg13g2_pr/sg13_lv_pmos.sym} 1620 -60 0 0 {name=Mp4
-l=1.97u
+l=0.25u
 w=1.12u
 ng=1
 m=1
@@ -336,7 +335,7 @@ model=sg13_lv_pmos
 spiceprefix=X
 }
 C {sg13g2_pr/sg13_lv_nmos.sym} 1620 60 0 0 {name=Mn4
-l=1.97u
+l=0.25u
 w=0.74u
 ng=1
 m=1
@@ -344,7 +343,7 @@ model=sg13_lv_nmos
 spiceprefix=X
 }
 C {sg13g2_pr/sg13_lv_pmos.sym} 1410 -190 0 0 {name=Mp5
-l=1.97u
+l=0.25u
 w=1.12u
 ng=1
 m=1
@@ -352,7 +351,7 @@ model=sg13_lv_pmos
 spiceprefix=X
 }
 C {sg13g2_pr/sg13_lv_pmos.sym} 1260 -190 0 0 {name=Mp6
-l=1.97u
+l=0.25u
 w=1.12u
 ng=1
 m=1
@@ -360,7 +359,7 @@ model=sg13_lv_pmos
 spiceprefix=X
 }
 C {sg13g2_pr/sg13_lv_pmos.sym} 1120 -190 0 0 {name=Mp7
-l=1.97u
+l=0.25u
 w=1.12u
 ng=1
 m=1
@@ -368,7 +367,7 @@ model=sg13_lv_pmos
 spiceprefix=X
 }
 C {sg13g2_pr/sg13_lv_nmos.sym} 1260 140 0 0 {name=Mn5
-l=1.97u
+l=0.25u
 w=0.74u
 ng=1
 m=1
@@ -376,7 +375,7 @@ model=sg13_lv_nmos
 spiceprefix=X
 }
 C {sg13g2_pr/sg13_lv_nmos.sym} 1410 140 0 0 {name=Mn6
-l=1.97u
+l=0.25u
 w=0.74u
 ng=1
 m=1
@@ -384,7 +383,7 @@ model=sg13_lv_nmos
 spiceprefix=X
 }
 C {sg13g2_pr/sg13_lv_nmos.sym} 1120 140 0 0 {name=Mn7
-l=1.97u
+l=0.25u
 w=0.74u
 ng=1
 m=1
@@ -392,7 +391,7 @@ model=sg13_lv_nmos
 spiceprefix=X
 }
 C {sg13g2_pr/sg13_lv_pmos.sym} 970 -190 0 1 {name=Mp8
-l=1.97u
+l=0.25u
 w=1.12u
 ng=1
 m=1
@@ -400,7 +399,7 @@ model=sg13_lv_pmos
 spiceprefix=X
 }
 C {sg13g2_pr/sg13_lv_nmos.sym} 930 0 0 0 {name=Mn8
-l=1.97u
+l=0.25u
 w=0.74u
 ng=1
 m=1

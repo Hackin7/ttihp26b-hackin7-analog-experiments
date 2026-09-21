@@ -1,0 +1,35 @@
+* Closed-loop lock check: sized VCO + ideal phase detector + ÷16.
+* f_ref=50 MHz, N=16 -> expect f_out ~800 MHz if lock.
+.include out/pdk.lib
+.include out/lch.param
+.include ../schematic/pll_vco.spice
+.include ../schematic/pll_div16.spice
+
+Xvco out vctrl VPWR VGND pll_vco lch={lch}
+Xdiv out clk_fb VPWR VGND pll_div16
+
+Vvdd VPWR 0 dc 1.2
+Vvss VGND 0 0
+Vref clk_ref 0 pulse(0 1.2 0 50p 50p 10n 20n)
+
+* Ideal charge pump into loop filter (~1 uA scale)
+Bicp 0 vctrl I = '1.5u * (u(v(clk_ref)-0.6) - u(v(clk_fb)-0.6))'
+Rr vctrl mid 191k
+Cc1 mid 0 0.6p
+Cc2 vctrl 0 0.1p
+
+.ic v(vctrl)=0.75 v(xvco.o0)=1.2 v(xvco.o1)=0 v(xvco.o2)=0.6
+
+.control
+  tran 5p 800n uic
+  wrdata out/lock.dat v(out) v(clk_fb) v(vctrl)
+  meas tran t_a when v(out)=0.6 rise=200
+  meas tran t_b when v(out)=0.6 rise=400
+  let period = (t_b - t_a)/200
+  let freq = 1/period
+  print period freq
+  echo freq_hz = $&freq
+  meas tran vctrl_end find v(vctrl) at=800n
+  print vctrl_end
+.endc
+.end

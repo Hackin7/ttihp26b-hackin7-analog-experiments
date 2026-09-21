@@ -1,0 +1,28 @@
+* Classic NAND-based PFD (transistor-level, SG13G2 LV).
+* clk_ref, clk_fb -> up, dn (active high). up_b = ~up for PMOS CP switch.
+.subckt pll_pfd clk_ref clk_fb up up_b dn VPWR VGND
+* Tiny inverters for edge sharpening
+Xir1 r1 clk_ref VPWR VGND inv_tiny
+Xir2 r2 r1 VPWR VGND inv_tiny
+Xif1 f1 clk_fb VPWR VGND inv_tiny
+Xif2 f2 f1 VPWR VGND inv_tiny
+* NAND RS PFD core (simplified 2-NAND + reset AND)
+Xn1 n_up r2 n_rst VPWR VGND nand2_tiny
+Xn2 n_dn f2 n_rst VPWR VGND nand2_tiny
+Xn3 n_rst n_up n_dn VPWR VGND nand2_tiny
+Xiup up n_up VPWR VGND inv_tiny
+Xidn dn n_dn VPWR VGND inv_tiny
+Xiub up_b up VPWR VGND inv_tiny
+.ends pll_pfd
+
+.subckt inv_tiny y a VPWR VGND
+Xp y a VPWR VPWR sg13_lv_pmos w=0.3u l=0.13u ng=1 m=1
+Xn y a VGND VGND sg13_lv_nmos w=0.15u l=0.13u ng=1 m=1
+.ends inv_tiny
+
+.subckt nand2_tiny y a b VPWR VGND
+Xp1 y a VPWR VPWR sg13_lv_pmos w=0.3u l=0.13u ng=1 m=1
+Xp2 y b VPWR VPWR sg13_lv_pmos w=0.3u l=0.13u ng=1 m=1
+Xn1 mid a VGND VGND sg13_lv_nmos w=0.15u l=0.13u ng=1 m=1
+Xn2 y b mid VGND sg13_lv_nmos w=0.15u l=0.13u ng=1 m=1
+.ends nand2_tiny
