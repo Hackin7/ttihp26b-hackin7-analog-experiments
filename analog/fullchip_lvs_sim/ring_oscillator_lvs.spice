@@ -1,0 +1,15 @@
+* Tapeout ring (analog/transistor_ring_oscillator/macro/ring_oscillator.spice).
+* Slash hierarchy names sanitized for ngspice (x1/A -> x1___A).
+* Pin order out VPWR VGND matches Magic LVS Xu_ring_oscillator.
+.subckt cmos_inv Y A VSS VDD
+X0 Y A VDD VDD sg13_lv_pmos ad=0.3808p pd=2.92u as=0.3808p ps=2.92u w=1.12u l=1.45u
+X1 Y A VSS VSS sg13_lv_nmos ad=0.2516p pd=2.16u as=0.2516p ps=2.16u w=0.74u l=1.45u
+.ends
+
+.subckt ring_oscillator out VPWR VGND
+Xx0 x1___A out VGND VPWR cmos_inv
+Xx1 x2___A x1___A VGND VPWR cmos_inv
+Xx2 x3___A x2___A VGND VPWR cmos_inv
+Xx3 x4___A x3___A VGND VPWR cmos_inv
+Xx4 out x4___A VGND VPWR cmos_inv
+.ends ring_oscillator

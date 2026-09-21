@@ -1,0 +1,9 @@
+* DC stand-in for extclk mode. A live 3-inverter ring (L=130 nm) runs at
+* several GHz and forces tiny timesteps even when ui_in_1 selects tt clk.
+* Use ring_oscillator_sim.spice with --ring.
+.subckt ring_oscillator out VPWR VGND
+Rtie out VGND 1k
+Rn1 n1 VGND 1k
+Ctie out VGND 10f
+Rdummy VPWR VGND 10meg
+.ends ring_oscillator

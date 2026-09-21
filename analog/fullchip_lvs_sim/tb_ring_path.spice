@@ -1,0 +1,23 @@
+* Chip clock path only: tapeout 5-stage ring + mux + first CTS buffer.
+* Full-tile ring mode clocks 64 flops at GHz and does not finish in ngspice.
+.include out/pdk.lib
+.include out/dio.lib
+.include out/stdcells.spice
+.include out/ring.spice
+.include out/stim.spice
+
+.options reltol=1e-3 vntol=1e-3 abstol=1e-9 rshunt=1e12
+
+* Matches Magic LVS: Xu_ring_oscillator -> mux A1, ui_in_1 -> mux S,
+* mux X -> clkbuf_0_counter_clk (sg13g2_buf_16).
+Xu_ring_oscillator clk_ring VPWR VGND ring_oscillator
+Xinput4 sel ui_in_1 VPWR VGND sg13g2_buf_1
+X_279_ clk_sel clk clk_ring sel VPWR VGND sg13g2_mux2_1
+Xclkbuf_0 counter_clk clk_sel VPWR VGND sg13g2_buf_16
+Ctree counter_clk VGND 80f
+
+vvdd VPWR 0 dc 1.2
+vvss VGND 0 0
+
+.include out/analysis.spice
+.end

@@ -1,0 +1,7 @@
+* Three-stage inverter ring for full-chip LVS sim.
+* Uses PDK sg13g2_inv_1 pin order Y A VDD VSS (not the leaf's Y A VSS VDD).
+.subckt ring_oscillator out VPWR VGND
+XINV0 n1 out VPWR VGND sg13g2_inv_1
+XINV1 n2 n1  VPWR VGND sg13g2_inv_1
+XINV2 out n2 VPWR VGND sg13g2_inv_1
+.ends ring_oscillator
