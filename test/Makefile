@@ -23,8 +23,10 @@ else ifneq ($(GATES),yes)
 SIM_BUILD		= sim_build/rtl
 PROJECT_SOURCES		= project.v counter.v
 VERILOG_SOURCES		+= $(addprefix $(SRC_DIR)/,$(PROJECT_SOURCES))
-# Analog leaf is a GDS blackbox; use a behavioral stub for simulation.
+# Analog leaves are GDS blackboxes; use behavioral stubs for simulation.
 VERILOG_SOURCES		+= $(PWD)/ring_oscillator_sim.v
+VERILOG_SOURCES		+= $(PWD)/ring_oscillator_500mhz_sim.v
+VERILOG_SOURCES		+= $(PWD)/chips_art_sim.v
 
 else
 
@@ -40,6 +42,8 @@ VERILOG_SOURCES		+= $(PDK_ROOT)/ihp-sg13g2/libs.ref/sg13g2_stdcell/verilog/sg13g
 # this gets copied in by the GDS action workflow
 VERILOG_SOURCES		+= $(PWD)/gate_level_netlist.v
 VERILOG_SOURCES		+= $(PWD)/ring_oscillator_sim.v
+VERILOG_SOURCES		+= $(PWD)/ring_oscillator_500mhz_sim.v
+VERILOG_SOURCES		+= $(PWD)/chips_art_sim.v
 
 endif
 
