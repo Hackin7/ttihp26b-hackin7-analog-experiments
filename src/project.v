@@ -36,7 +36,7 @@ module tt_um_hackin7_analog_experiments #(
   wire       pll_clk_out;
   wire [3:0] pll_n_sel = uio_in[4:1];
   wire [4:0] pll_m_sel = {ui_in[6], uio_in[7:5]};
-  wire       pll_clk_vco_stub = 1'b0;
+  wire       pll_clk_vco_stub = counter_clk;
 
   pll_digital u_pll_digital (
       .clk_vco(pll_clk_vco_stub),

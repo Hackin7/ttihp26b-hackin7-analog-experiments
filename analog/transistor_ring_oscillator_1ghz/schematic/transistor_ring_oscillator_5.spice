@@ -1,0 +1,15 @@
+* Five-stage CMOS ring of IHP SG13G2 LV MOSFETs (main_5.sch).
+* Wp/Wn matches sg13g2_inv_1. lch=0.345u targets ~1 GHz post-PEX.
+* Port order: out VPWR VGND.
+.subckt trosc5 out VPWR VGND lch=0.345u
+Xp0 n1 out VPWR VPWR sg13_lv_pmos w=1.12u l={lch} ng=1 m=1
+Xn0 n1 out VGND VGND sg13_lv_nmos w=0.74u l={lch} ng=1 m=1
+Xp1 n2 n1 VPWR VPWR sg13_lv_pmos w=1.12u l={lch} ng=1 m=1
+Xn1 n2 n1 VGND VGND sg13_lv_nmos w=0.74u l={lch} ng=1 m=1
+Xp2 n3 n2 VPWR VPWR sg13_lv_pmos w=1.12u l={lch} ng=1 m=1
+Xn2 n3 n2 VGND VGND sg13_lv_nmos w=0.74u l={lch} ng=1 m=1
+Xp3 n4 n3 VPWR VPWR sg13_lv_pmos w=1.12u l={lch} ng=1 m=1
+Xn3 n4 n3 VGND VGND sg13_lv_nmos w=0.74u l={lch} ng=1 m=1
+Xp4 out n4 VPWR VPWR sg13_lv_pmos w=1.12u l={lch} ng=1 m=1
+Xn4 out n4 VGND VGND sg13_lv_nmos w=0.74u l={lch} ng=1 m=1
+.ends trosc5

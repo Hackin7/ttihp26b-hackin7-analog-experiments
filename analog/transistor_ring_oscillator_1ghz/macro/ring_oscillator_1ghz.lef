@@ -1,0 +1,95 @@
+VERSION 5.7 ;
+NOWIREEXTENSIONATPIN ON ;
+DIVIDERCHAR "/" ;
+BUSBITCHARS "[]" ;
+MACRO ring_oscillator_1ghz
+  CLASS BLOCK ;
+  FOREIGN ring_oscillator_1ghz 0.000 0.000 ;
+  ORIGIN 0.000 0.000 ;
+  SIZE 16.130 BY 5.330 ;
+  PIN out
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER Metal1 ;
+        RECT 13.520 2.130 14.520 3.130 ;
+    END
+  END out
+  PIN VPWR
+    DIRECTION INOUT ;
+    USE POWER ;
+    PORT
+      LAYER Metal1 ;
+        RECT 0.930 4.290 15.330 4.730 ;
+      LAYER TopMetal1 ;
+        RECT 0.000 3.690 2.200 5.330 ;
+    END
+  END VPWR
+  PIN VGND
+    DIRECTION INOUT ;
+    USE GROUND ;
+    PORT
+      LAYER Metal1 ;
+        RECT 0.930 0.510 15.330 0.950 ;
+      LAYER TopMetal1 ;
+        RECT 13.930 0.000 16.130 1.640 ;
+    END
+  END VGND
+  OBS
+      LAYER GatPoly ;
+        RECT 4.460 3.925 4.805 4.105 ;
+        RECT 7.340 3.925 7.685 4.105 ;
+        RECT 10.220 3.925 10.565 4.105 ;
+        RECT 13.100 3.925 13.445 4.105 ;
+        RECT 4.460 2.580 4.805 2.805 ;
+        RECT 7.340 2.580 7.685 2.805 ;
+        RECT 10.220 2.580 10.565 2.805 ;
+        RECT 13.100 2.580 13.445 2.805 ;
+        RECT 4.120 2.250 4.805 2.580 ;
+        RECT 7.000 2.250 7.685 2.580 ;
+        RECT 9.880 2.250 10.565 2.580 ;
+        RECT 12.760 2.250 13.445 2.580 ;
+        RECT 4.460 2.060 4.805 2.250 ;
+        RECT 7.340 2.060 7.685 2.250 ;
+        RECT 10.220 2.060 10.565 2.250 ;
+        RECT 13.100 2.060 13.445 2.250 ;
+        RECT 4.460 1.140 4.805 1.320 ;
+        RECT 7.340 1.140 7.685 1.320 ;
+        RECT 10.220 1.140 10.565 1.320 ;
+        RECT 13.100 1.140 13.445 1.320 ;
+      LAYER Metal1 ;
+        RECT 2.000 2.495 2.230 3.905 ;
+        RECT 4.120 2.495 4.435 2.580 ;
+        RECT 2.000 2.335 4.435 2.495 ;
+        RECT 2.000 1.340 2.230 2.335 ;
+        RECT 4.120 2.250 4.435 2.335 ;
+        RECT 4.880 2.495 5.110 3.905 ;
+        RECT 7.000 2.495 7.315 2.580 ;
+        RECT 4.880 2.335 7.315 2.495 ;
+        RECT 4.880 1.340 5.110 2.335 ;
+        RECT 7.000 2.250 7.315 2.335 ;
+        RECT 7.760 2.495 7.990 3.905 ;
+        RECT 9.880 2.495 10.195 2.580 ;
+        RECT 7.760 2.335 10.195 2.495 ;
+        RECT 7.760 1.340 7.990 2.335 ;
+        RECT 9.880 2.250 10.195 2.335 ;
+        RECT 10.640 2.495 10.870 3.905 ;
+        RECT 12.760 2.495 13.075 2.580 ;
+        RECT 10.640 2.335 13.075 2.495 ;
+        RECT 10.640 1.340 10.870 2.335 ;
+        RECT 12.760 2.250 13.075 2.335 ;
+      LAYER Metal2 ;
+        RECT 0.000 4.400 1.300 4.800 ;
+        RECT 14.830 0.530 16.130 0.930 ;
+      LAYER Metal3 ;
+        RECT 0.000 4.400 1.300 4.800 ;
+        RECT 14.830 0.530 16.130 0.930 ;
+      LAYER Metal4 ;
+        RECT 0.000 4.400 1.300 4.800 ;
+        RECT 14.830 0.530 16.130 0.930 ;
+      LAYER Metal5 ;
+        RECT 0.000 4.190 1.510 5.010 ;
+        RECT 14.620 0.320 16.130 1.140 ;
+  END
+END ring_oscillator_1ghz
+END LIBRARY
