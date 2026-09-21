@@ -1,0 +1,250 @@
+"""Origin-normalize the 5-stage transistor ring for LibreLane.
+
+Magic writes ring_oscillator with negative coordinates (feedback / TopMetal1
+overhang). LibreLane needs cell origin (0, 0), a PR-boundary, and Metal1 /
+TopMetal1 pins named out / VPWR / VGND.
+"""
+
+from pathlib import Path
+import re
+import struct
+
+ROOT = Path(__file__).resolve().parents[2]
+MACRO = ROOT / "analog/transistor_ring_oscillator_500mhz/macro"
+SOURCE_GDS = MACRO / "main_fixed.gds"
+SOURCE_LEF = MACRO / "ring_oscillator.lef"
+OUTPUT_GDS = MACRO / "ring_oscillator.gds"
+OUTPUT_LEF = MACRO / "ring_oscillator.lef"
+EXTRACTED_SPICE = MACRO / "ring_oscillator_extracted.spice"
+OUTPUT_SPICE = MACRO / "ring_oscillator.spice"
+
+UNIT_UM = 0.005
+SHIFT_UM = (0.930, 0.730)
+SHIFT_DBU = (930, 730)  # 1 nm database units
+SIZE_UM = (16.130, 5.330)
+SIZE_DBU = (16130, 5330)
+PR_BOUNDARY_LAYER = 189
+PR_BOUNDARY_DATATYPE = 4
+TOP_CELLS = ("ring_oscillator",)
+
+PIN_OUT_M1 = (13.730, 2.130, 14.730, 3.130)
+PIN_VPWR_M1 = (0.930, 4.290, 15.330, 4.730)
+PIN_VPWR_TM1 = (0.000, 3.690, 2.200, 5.330)
+PIN_VGND_M1 = (0.930, 0.510, 15.330, 0.950)
+PIN_VGND_TM1 = (13.930, 0.000, 16.130, 1.640)
+
+
+def record(record_type, data_type, payload):
+    if len(payload) % 2:
+        payload += b"\0"
+    return struct.pack(">HBB", len(payload) + 4, record_type, data_type) + payload
+
+
+def pr_boundary_element(width, height):
+    xy = struct.pack(
+        ">10i",
+        0, 0,
+        width, 0,
+        width, height,
+        0, height,
+        0, 0,
+    )
+    return b"".join(
+        [
+            record(0x08, 0, b""),
+            record(0x0D, 2, struct.pack(">H", PR_BOUNDARY_LAYER)),
+            record(0x0E, 2, struct.pack(">H", PR_BOUNDARY_DATATYPE)),
+            record(0x10, 3, xy),
+            record(0x11, 0, b""),
+        ]
+    )
+
+
+def normalize_gds():
+    raw = SOURCE_GDS.read_bytes()
+    output = []
+    offset = 0
+    structure = None
+    while offset < len(raw):
+        length, record_type, data_type = struct.unpack(">HBB", raw[offset : offset + 4])
+        payload = raw[offset + 4 : offset + length]
+        offset += length
+
+        if record_type == 0x06:
+            structure = payload.rstrip(b"\0").decode("ascii")
+        elif structure in TOP_CELLS and record_type == 0x10 and data_type == 3:
+            values = list(struct.unpack(">" + "i" * (len(payload) // 4), payload))
+            for index in range(0, len(values), 2):
+                values[index] += SHIFT_DBU[0]
+                values[index + 1] += SHIFT_DBU[1]
+            payload = struct.pack(">" + "i" * len(values), *values)
+
+        output.append(record(record_type, data_type, payload))
+
+    OUTPUT_GDS.write_bytes(b"".join(output))
+    inject_pr_boundary(OUTPUT_GDS)
+
+
+def inject_pr_boundary(path):
+    raw = path.read_bytes()
+    output = []
+    offset = 0
+    structure = None
+    in_top = False
+    has_pr = False
+    while offset < len(raw):
+        length, record_type, data_type = struct.unpack(">HBB", raw[offset : offset + 4])
+        payload = raw[offset + 4 : offset + length]
+        chunk = raw[offset : offset + length]
+        offset += length
+
+        if record_type == 0x06:
+            structure = payload.rstrip(b"\0").decode("ascii")
+            in_top = structure == "ring_oscillator"
+            has_pr = False
+        elif in_top and record_type == 0x0D and len(payload) >= 2:
+            if struct.unpack(">H", payload[:2])[0] == PR_BOUNDARY_LAYER:
+                has_pr = True
+        elif in_top and record_type == 0x07 and not has_pr:
+            output.append(pr_boundary_element(SIZE_DBU[0], SIZE_DBU[1]))
+            in_top = False
+
+        output.append(chunk)
+
+    path.write_bytes(b"".join(output))
+
+
+def shifted_rect(line):
+    match = re.match(
+        r"(\s*RECT\s+)([-0-9.]+)\s+([-0-9.]+)\s+([-0-9.]+)\s+([-0-9.]+)(\s*;)",
+        line,
+    )
+    if not match:
+        return line
+    x0, y0, x1, y1 = (float(match.group(i)) for i in range(2, 6))
+    return (
+        "%s%.3f %.3f %.3f %.3f%s"
+        % (
+            match.group(1),
+            x0 + SHIFT_UM[0],
+            y0 + SHIFT_UM[1],
+            x1 + SHIFT_UM[0],
+            y1 + SHIFT_UM[1],
+            match.group(6),
+        )
+    )
+
+
+def fmt_rect(rect):
+    return "        RECT %.3f %.3f %.3f %.3f ;" % rect
+
+
+def normalize_lef():
+    source = SOURCE_LEF.read_text(encoding="ascii").splitlines()
+    obs_lines = []
+    in_obs = False
+    layer = None
+    pin_rectangles = {
+        "Metal1": [PIN_OUT_M1, PIN_VPWR_M1, PIN_VGND_M1],
+        "TopMetal1": [PIN_VPWR_TM1, PIN_VGND_TM1],
+    }
+    for line in source:
+        stripped = line.strip()
+        if stripped == "OBS":
+            in_obs = True
+            continue
+        if in_obs and stripped == "END":
+            break
+        if in_obs:
+            layer_match = re.match(r"LAYER\s+(\S+)\s*;", stripped)
+            if layer_match:
+                layer = layer_match.group(1)
+                obs_lines.append(line)
+                continue
+            obs_rect = shifted_rect(line)
+            rect_match = re.match(
+                r"\s*RECT\s+([-0-9.]+)\s+([-0-9.]+)\s+([-0-9.]+)\s+([-0-9.]+)\s*;",
+                obs_rect,
+            )
+            if rect_match and layer in pin_rectangles:
+                rect = tuple(float(rect_match.group(index)) for index in range(1, 5))
+                overlaps_pin = any(
+                    rect[0] < pin[2]
+                    and rect[2] > pin[0]
+                    and rect[1] < pin[3]
+                    and rect[3] > pin[1]
+                    for pin in pin_rectangles[layer]
+                )
+                if overlaps_pin:
+                    continue
+            obs_lines.append(obs_rect)
+
+    lef = [
+        "VERSION 5.7 ;",
+        "NOWIREEXTENSIONATPIN ON ;",
+        'DIVIDERCHAR "/" ;',
+        'BUSBITCHARS "[]" ;',
+        "MACRO ring_oscillator",
+        "  CLASS BLOCK ;",
+        "  FOREIGN ring_oscillator 0.000 0.000 ;",
+        "  ORIGIN 0.000 0.000 ;",
+        "  SIZE %.3f BY %.3f ;" % SIZE_UM,
+        "  PIN out",
+        "    DIRECTION OUTPUT ;",
+        "    USE SIGNAL ;",
+        "    PORT",
+        "      LAYER Metal1 ;",
+        fmt_rect(PIN_OUT_M1),
+        "    END",
+        "  END out",
+        "  PIN VPWR",
+        "    DIRECTION INOUT ;",
+        "    USE POWER ;",
+        "    PORT",
+        "      LAYER Metal1 ;",
+        fmt_rect(PIN_VPWR_M1),
+        "      LAYER TopMetal1 ;",
+        fmt_rect(PIN_VPWR_TM1),
+        "    END",
+        "  END VPWR",
+        "  PIN VGND",
+        "    DIRECTION INOUT ;",
+        "    USE GROUND ;",
+        "    PORT",
+        "      LAYER Metal1 ;",
+        fmt_rect(PIN_VGND_M1),
+        "      LAYER TopMetal1 ;",
+        fmt_rect(PIN_VGND_TM1),
+        "    END",
+        "  END VGND",
+        "  OBS",
+        *obs_lines,
+        "  END",
+        "END ring_oscillator",
+        "END LIBRARY",
+        "",
+    ]
+    OUTPUT_LEF.write_text("\n".join(lef), encoding="ascii")
+
+
+def copy_spice():
+    if EXTRACTED_SPICE.exists():
+        OUTPUT_SPICE.write_text(EXTRACTED_SPICE.read_text(encoding="ascii"), encoding="ascii")
+
+
+def main():
+    if not SOURCE_GDS.exists():
+        raise SystemExit("missing %s; run layout_5/run_export_osic.sh first" % SOURCE_GDS)
+    # Read Magic LEF before overwriting ring_oscillator.lef.
+    if not SOURCE_LEF.exists():
+        raise SystemExit("missing %s" % SOURCE_LEF)
+    normalize_gds()
+    normalize_lef()
+    copy_spice()
+    print("wrote %s shift_dbu=%s" % (OUTPUT_GDS, SHIFT_DBU))
+    print("wrote %s SIZE %.3f x %.3f um" % (OUTPUT_LEF, SIZE_UM[0], SIZE_UM[1]))
+    print("wrote %s" % OUTPUT_SPICE)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,26 @@
+* SPICE3 file created from ring_oscillator.ext - technology: ihp-sg13g2
+
+.subckt ring_oscillator out VPWR VGND
+X0 x1/A out VPWR VPWR sg13_lv_pmos ad=0.3808p pd=2.92u as=0.3808p ps=2.92u w=1.12u l=0.555u
+X1 x1/A out VGND VGND sg13_lv_nmos ad=0.2516p pd=2.16u as=0.2516p ps=2.16u w=0.74u l=0.555u
+X2 x2/A x1/A VPWR VPWR sg13_lv_pmos ad=0.96272p pd=9.765u as=8.05852p ps=42.935u w=1.12u l=0.555u
+X3 x2/A x1/A VGND VGND sg13_lv_nmos ad=0 pd=0 as=7.62302p ps=39.585u w=0.74u l=0.555u
+X4 x3/A x2/A VPWR VPWR sg13_lv_pmos ad=0.96272p pd=9.925u as=0 ps=0 w=1.12u l=0.555u
+X5 x3/A x2/A VGND VGND sg13_lv_nmos ad=0 pd=0 as=0 ps=0 w=0.74u l=0.555u
+X6 x4/A x3/A VPWR VPWR sg13_lv_pmos ad=0.96272p pd=9.925u as=0 ps=0 w=1.12u l=0.555u
+X7 x4/A x3/A VGND VGND sg13_lv_nmos ad=0 pd=0 as=0 ps=0 w=0.74u l=0.555u
+X8 out x4/A VPWR VPWR sg13_lv_pmos ad=4.83672p pd=50.265u as=0 ps=0 w=1.12u l=0.555u
+X9 out x4/A VGND VGND sg13_lv_nmos ad=0 pd=0 as=0 ps=0 w=0.74u l=0.555u
+C0 VPWR x1/A 0.35436f
+C1 x2/A VPWR 0.35379f
+C2 VPWR x4/A 0.35442f
+C3 VPWR x3/A 0.35566f
+C4 out VPWR 0.37461f
+C5 out VGND 2.5878f
+C6 x4/A VGND 0.36674f
+C7 VPWR VGND 0.88844f
+C8 x3/A VGND 0.3584f
+C9 x2/A VGND 0.35971f
+C10 x1/A VGND 0.36277f
+
+.ends

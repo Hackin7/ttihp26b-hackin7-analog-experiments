@@ -1,0 +1,18 @@
+* Post-layout transient of extracted 5-stage transistor ring (mos_tt, 1.2 V).
+.include out/pdk.lib
+.include ../macro/ring_oscillator_extracted.spice
+
+Xdut out VPWR VGND ring_oscillator
+vvdd VPWR 0 dc 1.2
+vvss VGND 0 0
+.ic v(out)=0 v(xdut.x1/A)=1.2
+
+.control
+  tran 50p 200n uic
+  wrdata out/ring.dat v(out)
+  write out/ring.raw v(out)
+  meas tran t_r2 when v(out)=0.6 rise=2
+  meas tran t_r12 when v(out)=0.6 rise=12
+  print t_r2 t_r12
+.endc
+.end

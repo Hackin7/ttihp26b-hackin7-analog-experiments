@@ -1,0 +1,21 @@
+* Pre-layout transient of 5-stage transistor ring (~500 MHz, mos_tt, 1.2 V).
+.include out/pdk.lib
+.include out/lch.param
+.include ../schematic/transistor_ring_oscillator_5.spice
+
+.param pre_layout=1
+
+Xdut out VPWR VGND trosc5 lch={lch}
+vvdd VPWR 0 dc 1.2
+vvss VGND 0 0
+.ic v(xdut.n1)=1.2 v(out)=0 v(xdut.n2)=0 v(xdut.n3)=0 v(xdut.n4)=0
+
+.control
+  tran 50p 200n uic
+  wrdata out/ring.dat v(out) v(xdut.n1) v(xdut.n2)
+  write out/ring.raw v(out) v(xdut.n1) v(xdut.n2)
+  meas tran t_r2 when v(out)=0.6 rise=2
+  meas tran t_r12 when v(out)=0.6 rise=12
+  print t_r2 t_r12
+.endc
+.end
