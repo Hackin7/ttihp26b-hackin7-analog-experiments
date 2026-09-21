@@ -1,6 +1,6 @@
 * NGSPICE file created from pll_analog.ext - technology: ihp-sg13g2
 
-.subckt sg13g2_dfrbpq_1 VDD D Q CLK VSS RESET_B
+.subckt sg13g2_dfrbpq_1 VDD D Q CLK VSS RESET_B a_38_114# a_324_432#
 X0 VDD RESET_B a_298_337# VDD sg13_lv_pmos ad=0.1563p pd=1.22u as=0.147p ps=1.54u w=0.42u l=0.13u
 X1 VSS RESET_B a_132_114# VSS sg13_lv_nmos ad=0.1626p pd=1.415u as=60.89999f ps=0.71u w=0.42u l=0.13u
 X2 a_550_127# RESET_B VSS VSS sg13_lv_nmos ad=37.8f pd=0.6u as=0.1701p ps=1.65u w=0.42u l=0.13u
@@ -50,7 +50,7 @@ X1 Y A VSS VSS sg13_lv_nmos ad=0.2516p pd=2.16u as=0.2516p ps=2.16u w=0.74u l=0.
 .ends
 
 .subckt rhigh_R1_snake B R1 R2
-X0 R1 R1 B rhigh l=0.15044m w=0.16382m
+X0 R1 R1 B rhigh l=0.15044m w=0.16383m
 .ends
 
 .subckt sg13_lv_pmos_NJKCVT D S G
@@ -58,7 +58,7 @@ X0 S G D w_n155_n174# sg13_lv_pmos ad=0.3808p pd=2.92u as=0.3808p ps=2.92u w=1.1
 .ends
 
 .subckt rhigh_R2_snake B R1 R2
-X0 R1 R1 B rhigh l=0.54004m w=0.16382m
+X0 R1 R1 B rhigh l=0.54004m w=0.16383m
 .ends
 
 .subckt sg13_lv_nmos_RUYN9Y D S G sub
@@ -89,37 +89,37 @@ X0 C1 C2 cap_cmim l=20u w=20u
 X0 C1 C2 cap_cmim l=8u w=8u
 .ends
 
-.subckt pll_analog clk_ref_gate vco_out_div VPWR VGND out
-Xx1 VPWR VPWR x4/A clk_ref_gate VGND x3/X sg13g2_dfrbpq_1
-Xx3 x3/X VGND VPWR x4/A x3/A sg13g2_and2_1
-Xx2 VPWR VPWR x3/A vco_out_div VGND x3/X sg13g2_dfrbpq_1
-Xx4 x4/Y x4/A VGND VPWR sg13g2_inv_1
-XXR1 VGND vctrl XR1/R2 rhigh_R1_snake
-XXMp1 XMp3/S XMp3/S XMp1/G sg13_lv_pmos_NJKCVT
-XXR2 VGND VPWR XM6/G rhigh_R2_snake
-XXMp2 XMp2/D XMp2/S XMp2/G sg13_lv_pmos_NJKCVT
-XXMp3 XMp3/S XMp3/S XMp4/G sg13_lv_pmos_NJKCVT
-XXMn1 XMn1/D XMn1/S XMn1/G VGND sg13_lv_nmos_RUYN9Y
-XXMp4 XMp4/D VPWR XMp4/G sg13_lv_pmos_NJKCVT
-XXMn2 XMn2/D XMn2/S XMp4/G VGND sg13_lv_nmos_RUYN9Y
-XXM1 XM3/S VPWR XM7/G sg13_lv_pmos_ESLPQL
-XXMn4 XMn4/D VGND XMp4/G VGND sg13_lv_nmos_RUYN9Y
-XXMp5 XMp5/D VPWR XMp8/G sg13_lv_pmos_NJKCVT
-XXMp6 XMp6/D VPWR XMp8/G sg13_lv_pmos_NJKCVT
-XXMn3 VGND XMn3/S XMp4/G VGND sg13_lv_nmos_RUYN9Y
-XXM2 XM2/D XM4/D x3/A VGND sg13_lv_nmos_VQD2M8
-XXMp7 XMp7/D VPWR XMp8/G sg13_lv_pmos_NJKCVT
-XXMn5 VGND VGND vctrl VGND sg13_lv_nmos_RUYN9Y
-XXM3 XM3/D XM3/S x4/Y sg13_lv_pmos_XN8759
-XXMn6 VGND VGND vctrl VGND sg13_lv_nmos_RUYN9Y
-XXMp8 XMp8/G VPWR XMp8/G sg13_lv_pmos_NJKCVT
-XXM4 XM4/D VGND XM6/G VGND sg13_lv_nmos_WRM2S2
-XXMn7 XMn7/D VGND vctrl VGND sg13_lv_nmos_RUYN9Y
-XXM5 XM7/G VGND XM6/G VGND sg13_lv_nmos_WRM2S2
-XXMn8 XMp8/G VGND vctrl VGND sg13_lv_nmos_RUYN9Y
-XXM6 XM6/G VGND XM6/G VGND sg13_lv_nmos_WRM2S2
-XXM7 XM7/G VPWR XM7/G sg13_lv_pmos_ESLPQL
-XXC1 XC1/C1 VGND cap_cmim_4SFK5Q
-XXC2 XC2/C1 VGND cap_cmim_ZNKAVF
+.subckt pll_analog clk_ref_gate VPWR VGND out
+Xx1 out out out clk_ref_gate out x3/X out out sg13g2_dfrbpq_1
+Xx2 out out out out out x3/X out out sg13g2_dfrbpq_1
+Xx3 x3/X out out out out sg13g2_and2_1
+Xx4 out out out out sg13g2_inv_1
+XXR1 out out XR1/R2 rhigh_R1_snake
+XXMp1 out out out sg13_lv_pmos_NJKCVT
+XXR2 out out out rhigh_R2_snake
+XXMp2 out out out sg13_lv_pmos_NJKCVT
+XXMn1 out out out out sg13_lv_nmos_RUYN9Y
+XXMp3 out out out sg13_lv_pmos_NJKCVT
+XXM1 out out out sg13_lv_pmos_ESLPQL
+XXMn2 out out out out sg13_lv_nmos_RUYN9Y
+XXMp4 out out out sg13_lv_pmos_NJKCVT
+XXM2 out out out out sg13_lv_nmos_VQD2M8
+XXMn3 out out out out sg13_lv_nmos_RUYN9Y
+XXMn4 out out out out sg13_lv_nmos_RUYN9Y
+XXMp5 out out out sg13_lv_pmos_NJKCVT
+XXMp6 out out out sg13_lv_pmos_NJKCVT
+XXM3 out out out sg13_lv_pmos_XN8759
+XXMn5 out out out out sg13_lv_nmos_RUYN9Y
+XXMp7 out out out sg13_lv_pmos_NJKCVT
+XXM4 out out out out sg13_lv_nmos_WRM2S2
+XXMn6 out out out out sg13_lv_nmos_RUYN9Y
+XXMp8 out out out sg13_lv_pmos_NJKCVT
+XXM5 out out out out sg13_lv_nmos_WRM2S2
+XXMn7 out out out out sg13_lv_nmos_RUYN9Y
+XXM6 out out out out sg13_lv_nmos_WRM2S2
+XXMn8 out out out out sg13_lv_nmos_RUYN9Y
+XXM7 out out out sg13_lv_pmos_ESLPQL
+XXC1 XC1/C1 out cap_cmim_4SFK5Q
+XXC2 XC2/C1 out cap_cmim_ZNKAVF
 .ends
 

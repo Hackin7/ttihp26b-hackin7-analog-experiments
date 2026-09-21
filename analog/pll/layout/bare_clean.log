@@ -1,0 +1,109 @@
+
+Magic 8.3 revision 681 - Compiled on Tue Aug 25 11:50:23 AM CEST 2026.
+Starting magic under Tcl interpreter
+Using the terminal as the console.
+WARNING: RLIMIT_NOFILE is above 1024 and Tcl_Version<9 this may cause runtime issues [rlim_cur=1048576]
+Using NULL graphics device.
+Processing system .magicrc file
+Switching to WIRING tool.
+Switching to NETLIST tool.
+Switching to PICK tool.
+Switching to BOX tool.
+Sourcing design .magicrc for technology ihp-sg13g2 ...
+2 Magic internal units = 1 Lambda
+Input style sg13g2(): scaleFactor=2, multiplier=2
+The following types are not handled by extraction and will be treated as non-electrical types:
+    pblock sealcont difffill nemitter hvnemitter hvisodiffres sealvia1 sealvia2 sealvia3 sealvia4 sealvia5 sealvia6 pillar solder seal glass thruvia inductor 
+Scaled tech values by 2 / 1 to match internal grid scaling
+Loading ihp-sg13g2 Device Generator Menu ...
+Loading "bare_clean.tcl" from command line.
+Cell pll_analog read from current working directory
+Root cell box:
+           width x height  (   llx,  lly  ), (   urx,  ury  )  area (units^2)
+
+microns:  130.000 x 115.000  (-15.000, -60.000), ( 115.000,  55.000)  14950.000 
+lambda:   13000.00 x 11500.00  (-1500.00, -6000.00), ( 11500.00,  5500.00)  149500000.00
+internal:  26000 x 23000   ( -3000, -12000), ( 23000,  11000)  598000000 
+Root cell box:
+           width x height  (   llx,  lly  ), (   urx,  ury  )  area (units^2)
+
+microns:   0.500 x 0.500   (-1.750,  6.750), (-1.250,  7.250)  0.250     
+lambda:    50.00 x 50.00   (-175.00,  675.00), (-125.00,  725.00)  2500.00   
+internal:    100 x 100     (  -350,  1350 ), (  -250,  1450 )  10000     
+Moving label "clk_ref_gate" from space to metal1 in cell pll_analog.
+Root cell box:
+           width x height  (   llx,  lly  ), (   urx,  ury  )  area (units^2)
+
+microns:   0.500 x 0.500   (-1.750,  1.750), (-1.250,  2.250)  0.250     
+lambda:    50.00 x 50.00   (-175.00,  175.00), (-125.00,  225.00)  2500.00   
+internal:    100 x 100     (  -350,  350  ), (  -250,  450  )  10000     
+Moving label "vco_out_div" from space to metal1 in cell pll_analog.
+Root cell box:
+           width x height  (   llx,  lly  ), (   urx,  ury  )  area (units^2)
+
+microns:   0.500 x 0.500   ( 20.250,  12.250), ( 20.750,  12.750)  0.250     
+lambda:    50.00 x 50.00   ( 2025.00,  1225.00), ( 2075.00,  1275.00)  2500.00   
+internal:    100 x 100     (  4050,  2450 ), (  4150,  2550 )  10000     
+Moving label "VPWR" from space to metal1 in cell pll_analog.
+Root cell box:
+           width x height  (   llx,  lly  ), (   urx,  ury  )  area (units^2)
+
+microns:   0.500 x 0.500   ( 20.250, -19.250), ( 20.750, -18.750)  0.250     
+lambda:    50.00 x 50.00   ( 2025.00, -1925.00), ( 2075.00, -1875.00)  2500.00   
+internal:    100 x 100     (  4050, -3850 ), (  4150, -3750 )  10000     
+Moving label "VGND" from space to metal1 in cell pll_analog.
+Root cell box:
+           width x height  (   llx,  lly  ), (   urx,  ury  )  area (units^2)
+
+microns:   0.500 x 0.500   ( 66.720, -12.170), ( 67.220, -11.670)  0.250     
+lambda:    50.00 x 50.00   ( 6672.00, -1217.00), ( 6722.00, -1167.00)  2500.00   
+internal:    100 x 100     ( 13344, -2434 ), ( 13444, -2334 )  10000     
+Moving label "out" from space to metal1 in cell pll_analog.
+Cell sg13g2_dfrbpq_1 read from current working directory
+Cell sg13g2_and2_1 read from current working directory
+Cell sg13g2_inv_1 read from current working directory
+Cell sg13_lv_pmos_ESLPQL read from current working directory
+Cell sg13_lv_nmos_VQD2M8 read from current working directory
+Cell sg13_lv_pmos_XN8759 read from current working directory
+Cell sg13_lv_nmos_WRM2S2 read from current working directory
+Cell rhigh_R2_snake read from current working directory
+Cell cap_cmim_4SFK5Q read from current working directory
+Scaled magic input cell cap_cmim_4SFK5Q geometry by factor of 2
+Cell cap_cmim_ZNKAVF read from current working directory
+Scaled magic input cell cap_cmim_ZNKAVF geometry by factor of 2
+Cell sg13_lv_nmos_RUYN9Y read from current working directory
+Cell sg13_lv_pmos_NJKCVT read from current working directory
+Cell rhigh_R1_snake read from current working directory
+Extracting sg13g2_dfrbpq_1 into sg13g2_dfrbpq_1.ext:
+Processing sg13g2_dfrbpq_1
+Extracting sg13g2_and2_1 into sg13g2_and2_1.ext:
+Processing sg13g2_and2_1
+Extracting sg13g2_inv_1 into sg13g2_inv_1.ext:
+Processing sg13g2_inv_1
+Extracting sg13_lv_pmos_ESLPQL into sg13_lv_pmos_ESLPQL.ext:
+Processing sg13_lv_pmos_ESLPQL
+Extracting sg13_lv_nmos_VQD2M8 into sg13_lv_nmos_VQD2M8.ext:
+Processing sg13_lv_nmos_VQD2M8
+Extracting sg13_lv_pmos_XN8759 into sg13_lv_pmos_XN8759.ext:
+Processing sg13_lv_pmos_XN8759
+Extracting sg13_lv_nmos_WRM2S2 into sg13_lv_nmos_WRM2S2.ext:
+Processing sg13_lv_nmos_WRM2S2
+Extracting rhigh_R2_snake into rhigh_R2_snake.ext:
+Processing rhigh_R2_snake
+rhigh_R2_snake: 1 warning
+Extracting cap_cmim_4SFK5Q into cap_cmim_4SFK5Q.ext:
+Processing cap_cmim_4SFK5Q
+Extracting cap_cmim_ZNKAVF into cap_cmim_ZNKAVF.ext:
+Processing cap_cmim_ZNKAVF
+Extracting sg13_lv_nmos_RUYN9Y into sg13_lv_nmos_RUYN9Y.ext:
+Processing sg13_lv_nmos_RUYN9Y
+Extracting sg13_lv_pmos_NJKCVT into sg13_lv_pmos_NJKCVT.ext:
+Processing sg13_lv_pmos_NJKCVT
+Extracting rhigh_R1_snake into rhigh_R1_snake.ext:
+Processing rhigh_R1_snake
+rhigh_R1_snake: 1 warning
+Extracting pll_analog_bare into pll_analog_bare.ext:
+Processing pll_analog_bare
+Total of 2 warnings.
+exttospice finished.
+EXTRACT_DONE

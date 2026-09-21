@@ -4,11 +4,8 @@ cd /repo/analog/pll/layout
 load pll_analog
 select top cell
 
-# Clean prior extract artifacts
-foreach f [glob -nocomplain *.ext *.spice] {
-  # keep only layout extracts in cwd; don't delete leaf mags
-}
-catch {file delete {*}[glob -nocomplain pll_analog.ext *.ext]}
+# Clean prior extract artifacts (stale .ext files cause false shorts)
+catch {file delete {*}[glob -nocomplain *.ext]}
 
 extract do local
 extract all

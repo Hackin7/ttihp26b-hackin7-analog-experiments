@@ -1,0 +1,148 @@
+magic
+tech ihp-sg13g2
+magscale 1 2
+timestamp 1790015880
+<< checkpaint >>
+rect -5000 -14000 25000 13000
+<< metal1 >>
+rect 4050 2450 4150 2550
+rect -350 1350 -250 1450
+rect -350 350 -250 450
+rect 13344 -2434 13444 -2334
+rect 4050 -3850 4150 -3750
+use sg13g2_dfrbpq_1  x1
+timestamp 1790011989
+transform 1 0 48 0 1 1016
+box -48 -56 2640 834
+use sg13g2_dfrbpq_1  x2
+timestamp 1790011989
+transform 1 0 48 0 1 56
+box -48 -56 2640 834
+use sg13g2_and2_1  x3
+timestamp 1790011989
+transform -1 0 3288 0 -1 1314
+box -48 -56 528 834
+use sg13g2_inv_1  x4
+timestamp 1790011989
+transform 1 0 3510 0 1 538
+box -48 -56 336 834
+use cap_cmim_4SFK5Q  XC1
+timestamp 1790007449
+transform 1 0 6904 0 1 -1182
+box -2120 -2120 2120 2120
+use cap_cmim_ZNKAVF  XC2
+timestamp 1790007449
+transform 1 0 10070 0 1 -2390
+box -920 -920 920 920
+use sg13_lv_pmos_ESLPQL  XM1
+timestamp 1790007449
+transform 1 0 4344 0 1 1446
+box -230 -174 230 174
+use sg13_lv_nmos_VQD2M8  XM2
+timestamp 1790007449
+transform 1 0 4195 0 1 770
+box -81 -124 81 124
+use sg13_lv_pmos_XN8759  XM3
+timestamp 1790007449
+transform 1 0 4257 0 1 1034
+box -143 -124 143 124
+use sg13_lv_nmos_WRM2S2  XM4
+timestamp 1790007449
+transform 1 0 4280 0 1 478
+box -168 -124 168 124
+use sg13_lv_nmos_WRM2S2  XM5
+timestamp 1790007449
+transform 1 0 4438 0 1 -574
+box -168 -124 168 124
+use sg13_lv_nmos_WRM2S2  XM6
+timestamp 1790007449
+transform 1 0 4440 0 1 -264
+box -168 -124 168 124
+use sg13_lv_pmos_ESLPQL  XM7
+timestamp 1790007449
+transform -1 0 4492 0 -1 -916
+box -230 -174 230 174
+use sg13_lv_nmos_RUYN9Y  XMn1
+timestamp 1790007449
+transform 1 0 12089 0 1 -2660
+box -93 -148 93 148
+use sg13_lv_nmos_RUYN9Y  XMn2
+timestamp 1790007449
+transform 1 0 12549 0 1 -2660
+box -93 -148 93 148
+use sg13_lv_nmos_RUYN9Y  XMn3
+timestamp 1790007449
+transform 1 0 11629 0 1 -2660
+box -93 -148 93 148
+use sg13_lv_nmos_RUYN9Y  XMn4
+timestamp 1790007449
+transform 1 0 13009 0 1 -2660
+box -93 -148 93 148
+use sg13_lv_nmos_RUYN9Y  XMn5
+timestamp 1790007449
+transform 1 0 12089 0 1 -3100
+box -93 -148 93 148
+use sg13_lv_nmos_RUYN9Y  XMn6
+timestamp 1790007449
+transform 1 0 12549 0 1 -3100
+box -93 -148 93 148
+use sg13_lv_nmos_RUYN9Y  XMn7
+timestamp 1790007449
+transform 1 0 11629 0 1 -3100
+box -93 -148 93 148
+use sg13_lv_nmos_RUYN9Y  XMn8
+timestamp 1790007449
+transform 1 0 11169 0 1 -2660
+box -93 -148 93 148
+use sg13_lv_pmos_NJKCVT  XMp1
+timestamp 1790007449
+transform 1 0 12151 0 1 -2142
+box -155 -186 155 186
+use sg13_lv_pmos_NJKCVT  XMp2
+timestamp 1790007449
+transform 1 0 12611 0 1 -2142
+box -155 -186 155 186
+use sg13_lv_pmos_NJKCVT  XMp3
+timestamp 1790007449
+transform 1 0 11691 0 1 -2142
+box -155 -186 155 186
+use sg13_lv_pmos_NJKCVT  XMp4
+timestamp 1790007449
+transform 1 0 13071 0 1 -2142
+box -155 -186 155 186
+use sg13_lv_pmos_NJKCVT  XMp5
+timestamp 1790007449
+transform 1 0 12611 0 1 -1622
+box -155 -186 155 186
+use sg13_lv_pmos_NJKCVT  XMp6
+timestamp 1790007449
+transform 1 0 12151 0 1 -1622
+box -155 -186 155 186
+use sg13_lv_pmos_NJKCVT  XMp7
+timestamp 1790007449
+transform 1 0 11691 0 1 -1622
+box -155 -186 155 186
+use sg13_lv_pmos_NJKCVT  XMp8
+timestamp 1790007449
+transform 1 0 11231 0 1 -1622
+box -155 -186 155 186
+use rhigh_R1_snake  XR1
+timestamp 1790007409
+transform 1 0 12380 0 1 1326
+box -3252 -2534 -980 -600
+use rhigh_R2_snake  XR2
+timestamp 1790007408
+transform 1 0 2124 0 1 -1713
+box -2116 -1567 2116 1567
+<< labels >>
+flabel metal1 -350 1350 -250 1450 1 FreeSans 1120 0 0 0 clk_ref_gate
+port 1 nsew
+flabel metal1 -350 350 -250 450 1 FreeSans 1120 0 0 0 vco_out_div
+port 2 nsew
+flabel metal1 4050 2450 4150 2550 1 FreeSans 1120 0 0 0 VPWR
+port 3 nsew
+flabel metal1 4050 -3850 4150 -3750 1 FreeSans 1120 0 0 0 VGND
+port 4 nsew
+flabel metal1 13344 -2434 13444 -2334 1 FreeSans 1120 0 0 0 out
+port 5 nsew
+<< end >>

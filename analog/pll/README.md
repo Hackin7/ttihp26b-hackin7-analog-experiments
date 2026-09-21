@@ -1,7 +1,9 @@
 # Analog PLL (manual): ~1.1 GHz VCO class, 50 MHz reference
 
 Type-II PFD–CP PLL schematic in [`schematic/pll_top.sch`](schematic/pll_top.sch).
-Pre-layout ngspice decks under [`sim/`](sim/). Feedback divider RTL: [`rtl/pll_div_n.v`](rtl/pll_div_n.v).
+Pre-layout ngspice decks under [`sim/`](sim/). Digital dividers:
+[`rtl/pll_div_n.v`](rtl/pll_div_n.v) (÷div core) and [`rtl/pll_digital.v`](rtl/pll_digital.v)
+(feedback ÷N + output ÷M). Canonical copies also live under `src/` for the TT top.
 
 ## Spec
 
@@ -40,18 +42,28 @@ From [`sim/out/vco_sweep.txt`](sim/out/vco_sweep.txt):
 
 Point check: vctrl=0.78 → **1.068 GHz** (near 1.1 GHz / N=22).
 
-## Verilog divider
+## Verilog dividers (`pll_digital`)
+
+Runtime-programmable 5-bit cores:
+
+| Path | Ratio | Notes |
+| --- | --- | --- |
+| Feedback `clk_fb` | **N = clamp(8 + n_sel, 8..22)** | closes loop into `vco_out_div` (when analog bound) |
+| Output `clk_out` | **M = 16 if m_sel=0 else m_sel (1..31)** | probe on `uio[0]`; optional counter clock via `ui[7]` |
+
+TT pin straps (change under reset): `n_sel=uio[4:1]`, `m_sel={ui[6],uio[7:5]}`.
+`clk_vco` is **stubbed to 0** in `src/project.v` until `pll_analog` is wired.
 
 ```bash
 docker run --rm -v "$PWD:/repo" -w /repo/analog/pll/sim \
   --entrypoint /bin/bash hpretl/iic-osic-tools -lc 'bash ./run_div_rtl.sh'
 ```
 
-Result: **PASS** `pll_div_n` N=8/16/22 (edge counts 1250/625/455 at 1 GHz / 10 µs).
+Runs `tb_div_n` + `tb_pll_digital` (1 GHz / 10 µs edge-count checks).
 
 ## Closed-loop note
 
-`tb_pll_lock.spice` instantiates [`schematic/pll_top.spice`](schematic/pll_top.spice) (transistor PFD/CP/filter/VCO) plus a behavioral switch ÷16 on `vco_out_div`. RTL `pll_div_n` remains a separate digital check.
+`tb_pll_lock.spice` instantiates [`schematic/pll_top.spice`](schematic/pll_top.spice) (transistor PFD/CP/filter/VCO) plus a behavioral switch ÷16 on `vco_out_div`. RTL `pll_digital` remains a separate digital check until the analog macro is bound.
 
 ## Layout (xschem Mag seed)
 
@@ -79,9 +91,9 @@ Floorplan is schematic-ordered L→R via [`layout/relayout_sections.tcl`](layout
 Manhattan layer-aware seed routing (Metal1 verticals, Metal2 trunks, Via1):
 [`layout/gen_route_pll.py`](layout/gen_route_pll.py) → [`layout/route_pll.tcl`](layout/route_pll.tcl).
 
-LVS (extract + netgen): [`layout/extract_lvs.tcl`](layout/extract_lvs.tcl), [`layout/run_lvs_osic.sh`](layout/run_lvs_osic.sh) → [`macro/lvs.out`](macro/lvs.out). **Currently FAIL** — Mag extract sees top ports shorted together by the seed routes.
+LVS (extract + netgen): [`layout/extract_lvs.tcl`](layout/extract_lvs.tcl), [`layout/run_lvs_osic.sh`](layout/run_lvs_osic.sh) → [`macro/lvs.out`](macro/lvs.out). **Currently FAIL** — ports are no longer shorted, but the geometry-aware spine router still leaves ~20+ pins unrouted in the dense VCO (opens → extra nets / missing devices after parallel merge). Regenerator: [`layout/gen_route_pll.py`](layout/gen_route_pll.py).
 
-**Not done yet:** DRC-clean / LVS-clean routing, macro export, TT bind.
+**Not done yet:** full LVS-clean connectivity, DRC-clean routing, macro export, TT bind.
 
 ## Simulate
 
@@ -109,7 +121,9 @@ bash sim/run_div_rtl.sh   # inside IIC-OSIC image
 | `schematic/pll_top.spice` | Netlist DUT for ngspice (+ Mag/LVS intent) |
 | `layout/pll_analog.mag` | Mag seed + snaked R |
 | `layout/rebuild_analog_snake.tcl` | Regenerate Mag seed |
-| `rtl/pll_div_n.v` | Parameterized ÷N |
+| `rtl/pll_div_n.v` | Runtime ÷div (5-bit) |
+| `rtl/pll_digital.v` | Feedback ÷N + output ÷M wrapper |
+| `sim/tb_pll_digital.v` | RTL TB for pin decode + dual paths |
 | `sim/tb_vco_point.spice` | Open-loop via `Xpll.vctrl` force |
 | `sim/tb_pll_lock.spice` | Closed-loop `pll_top` + behavioral ÷16 |
 | `sim/` | runners + RTL TB |

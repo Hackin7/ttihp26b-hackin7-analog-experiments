@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Generate Magic TCL to route pll_analog with layer-aware M1/M2 + vias.
+"""DRC-aware LVS spine router with geometry-aware paint (no overlapping same-layer rects).
 
-Routing rules (avoid same-layer shorts):
-  - Signal horizontals: Metal2 on unique track Y per net
-  - Signal verticals:   Metal1 from pin to track
-  - Via1 at each (pin_x, track_y) junction
-  - Power: Metal2 rails; Metal1 stubs + Via1 up to rail
+Signals: exclusive M3 columns + exclusive M4 trunks; jogs on M2/M3/M4 chosen
+so the jog rectangle does not overlap any prior paint on that layer.
+Widths/enclosure/spacing target IHP sg13g2 Magic DRC (W/VIA>=0.20, CLEAR>=0.21).
+
+Power: M2 escape to far-right spine, via-up to M5 there only.
 """
 from __future__ import annotations
 
@@ -14,8 +14,8 @@ import re
 
 LAYOUT = Path(__file__).resolve().parent
 UM = 0.005
-
 SECTION_LABELS = {"PFD", "CP", "BIAS", "FILTER", "VCO"}
+SCH_PORTS = {"clk_ref_gate", "vco_out_div", "VGND", "out", "VPWR"}
 
 NETS: dict[str, list[tuple[str, str]]] = {
     "clk_ref_gate": [("PORT", "clk_ref_gate"), ("x1", "CLK")],
@@ -25,15 +25,8 @@ NETS: dict[str, list[tuple[str, str]]] = {
     "net1": [("x1", "RESET_B"), ("x2", "RESET_B"), ("x3", "X")],
     "net2": [("x4", "Y"), ("XM3", "G")],
     "vctrl": [
-        ("PORT", "vctrl"),
-        ("XM2", "D"),
-        ("XM3", "D"),
-        ("XR1", "R1"),
-        ("XC2", "C1"),
-        ("XMn5", "G"),
-        ("XMn6", "G"),
-        ("XMn7", "G"),
-        ("XMn8", "G"),
+        ("PORT", "vctrl"), ("XM2", "D"), ("XM3", "D"), ("XR1", "R1"),
+        ("XC2", "C1"), ("XMn5", "G"), ("XMn6", "G"), ("XMn7", "G"), ("XMn8", "G"),
     ],
     "net4": [("XM1", "D"), ("XM3", "S")],
     "net3": [("XM2", "S"), ("XM4", "D")],
@@ -41,8 +34,7 @@ NETS: dict[str, list[tuple[str, str]]] = {
     "vbn": [("XM4", "G"), ("XM5", "G"), ("XM6", "D"), ("XM6", "G"), ("XR2", "R2")],
     "net15": [("XR1", "R2"), ("XC1", "C1")],
     "net6": [
-        ("XMp2", "D"), ("XMn2", "D"),
-        ("XMp3", "G"), ("XMn3", "G"),
+        ("XMp2", "D"), ("XMn2", "D"), ("XMp3", "G"), ("XMn3", "G"),
         ("XMp4", "G"), ("XMn4", "G"),
     ],
     "net7": [("XMp1", "D"), ("XMn1", "D"), ("XMp2", "G"), ("XMn2", "G")],
@@ -61,8 +53,7 @@ NETS: dict[str, list[tuple[str, str]]] = {
     "VPWR": [
         ("x1", "VDD"), ("x2", "VDD"), ("x3", "VDD"), ("x4", "VDD"),
         ("x1", "D"), ("x2", "D"),
-        ("XM1", "S"), ("XM7", "S"),
-        ("XR2", "R1"),
+        ("XM1", "S"), ("XM7", "S"), ("XR2", "R1"),
         ("XMp4", "S"), ("XMp5", "S"), ("XMp6", "S"), ("XMp7", "S"), ("XMp8", "S"),
     ],
     "VGND": [
@@ -70,12 +61,11 @@ NETS: dict[str, list[tuple[str, str]]] = {
         ("XM4", "S"), ("XM5", "S"), ("XM6", "S"),
         ("XR1", "B"), ("XR2", "B"),
         ("XC1", "C2"), ("XC2", "C2"),
-        ("XMn1", "S"), ("XMn2", "S"), ("XMn3", "S"), ("XMn4", "S"),
+        ("XMn4", "S"),
         ("XMn5", "S"), ("XMn6", "S"), ("XMn7", "S"), ("XMn8", "S"),
     ],
 }
 
-# Nets routed in the upper M2 channel vs lower (near VCO)
 UPPER_NETS = {
     "clk_ref_gate", "vco_out_div", "pfd_up", "pfd_down", "net1", "net2",
     "vctrl", "net4", "net3", "vbp", "vbn", "net15",
@@ -85,9 +75,50 @@ LOWER_NETS = {
     "net5", "net8", "net10", "net12", "out",
 }
 
-W = 0.28          # signal wire width (µm)
-PITCH = 0.55      # M2 track pitch (µm) — keeps ~0.27 µm spacing
-VIA = 0.22        # via1 square (µm)
+# IHP sg13g2 DRC targets (Magic rules):
+#   metal/via width >= 0.20um, metal spacing >= 0.21um,
+#   via enclosure >= 0.045um, metal min area >= 0.144um^2
+W = 0.20
+VIA = 0.20
+ENCL = 0.10  # pad=0.40um -> area 0.16 >= 0.144; enclosure > 0.045
+CLEAR = 0.21
+PITCH_Y = 0.70  # trunk pitch: W + CLEAR + margin
+PITCH_X = 0.65  # col pitch: via-pad + CLEAR
+SPINE = 82.0  # unused; power vias are local at pin+offset
+
+
+# ---- geometry ----
+Rect = tuple[float, float, float, float]  # x0,y0,x1,y1
+
+
+def overlaps(a: Rect, b: Rect, clear: float = CLEAR) -> bool:
+    return not (
+        a[2] + clear <= b[0] or b[2] + clear <= a[0]
+        or a[3] + clear <= b[1] or b[3] + clear <= a[1]
+    )
+
+
+class PaintDB:
+    def __init__(self):
+        self.layers: dict[str, list[Rect]] = {
+            L: [] for L in ("metal1", "metal2", "metal3", "metal4", "metal5")
+        }
+
+    def can(self, layer: str, r: Rect) -> bool:
+        return all(not overlaps(r, e) for e in self.layers[layer])
+
+    def add(self, layer: str, r: Rect):
+        self.layers[layer].append(r)
+
+    def h(self, x0, x1, y, layer, w=W) -> Rect:
+        lo, hi = sorted([x0, x1])
+        hw = w / 2
+        return (lo - hw, y - hw, hi + hw, y + hw)
+
+    def v(self, x, y0, y1, layer, w=W) -> Rect:
+        lo, hi = sorted([y0, y1])
+        hw = w / 2
+        return (x - hw, lo - hw, x + hw, hi + hw)
 
 
 def parse_uses(mag: Path) -> dict[str, tuple]:
@@ -102,8 +133,7 @@ def parse_uses(mag: Path) -> dict[str, tuple]:
             while j < len(lines) and not lines[j].startswith("transform"):
                 j += 1
             if j < len(lines):
-                t = list(map(int, lines[j].split()[1:7]))
-                uses[inst] = (cell, *t)
+                uses[inst] = (cell, *map(int, lines[j].split()[1:7]))
             i = j + 1
             continue
         i += 1
@@ -173,23 +203,51 @@ def paint_v(x, y0, y1, layer, w=W):
     ]
 
 
-def via1(x, y, s=VIA):
+def via(layer_via, layer_below, layer_above, x, y, s=VIA, e=ENCL):
     h = s / 2
-    # via + landing pads on both metals
     return [
-        f"box {x-h-0.04:.3f}um {y-h-0.04:.3f}um {x+h+0.04:.3f}um {y+h+0.04:.3f}um",
-        "paint metal1",
+        f"box {x-h-e:.3f}um {y-h-e:.3f}um {x+h+e:.3f}um {y+h+e:.3f}um",
+        f"paint {layer_below}",
         f"box {x-h:.3f}um {y-h:.3f}um {x+h:.3f}um {y+h:.3f}um",
-        "paint via1",
-        f"box {x-h-0.04:.3f}um {y-h-0.04:.3f}um {x+h+0.04:.3f}um {y+h+0.04:.3f}um",
-        "paint metal2",
+        f"paint {layer_via}",
+        f"box {x-h-e:.3f}um {y-h-e:.3f}um {x+h+e:.3f}um {y+h+e:.3f}um",
+        f"paint {layer_above}",
     ]
 
 
+def stack_to(layer: str, x: float, y: float) -> list[str]:
+    out = via("via1", "metal1", "metal2", x, y)
+    if layer == "metal2":
+        return out
+    out += via("via2", "metal2", "metal3", x, y)
+    if layer == "metal3":
+        return out
+    out += via("via3", "metal3", "metal4", x, y)
+    return out
+
+
+def via_pad_rect(x, y) -> Rect:
+    h = VIA / 2 + ENCL
+    return (x - h, y - h, x + h, y + h)
+
+
 def main():
-    uses = parse_uses(LAYOUT / "pll_analog.mag")
-    top = parse_top_labels(LAYOUT / "pll_analog.mag")
-    leaf: dict[str, dict] = {}
+    bare = LAYOUT / "pll_analog_bare.mag"
+    mag_path = bare if bare.exists() else LAYOUT / "pll_analog.mag"
+    uses = parse_uses(mag_path)
+    top = parse_top_labels(mag_path)
+    for k, (x, y) in {
+        "clk_ref_gate": (-1.5, 7.0),
+        "vco_out_div": (-1.5, 2.0),
+        "VPWR": (20.5, 12.5),
+        "VGND": (20.5, -19.0),
+        "out": (66.97, -11.92),
+        "vctrl": (36.5, 23.0),
+    }.items():
+        if k not in top:
+            top[k] = (x / UM, y / UM)
+
+    leaf = {}
     for inst, (cell, *_) in uses.items():
         p = LAYOUT / f"{cell}.mag"
         if p.exists():
@@ -199,15 +257,14 @@ def main():
         if inst == "PORT":
             return um(top[pin]) if pin in top else None
         if inst not in uses:
-            print("WARN no inst", inst)
             return None
         cell, *t = uses[inst]
         if cell not in leaf or pin not in leaf[cell]:
-            print(f"WARN no pin {inst}/{pin} ({cell})")
+            print(f"WARN {inst}/{pin}")
             return None
         return um(xform(leaf[cell][pin], tuple(t)))
 
-    resolved: dict[str, list[tuple[tuple[float, float], str]]] = {}
+    resolved = {}
     for net, pins in NETS.items():
         pts = []
         for inst, pin in pins:
@@ -218,161 +275,289 @@ def main():
                 print(f"SKIP {net} {inst}/{pin}")
         resolved[net] = pts
 
-    with (LAYOUT / "pin_report.txt").open("w") as f:
+    with (LAYOUT / "pin_report.txt").open("w", encoding="utf-8") as f:
         for net, pts in resolved.items():
-            f.write(f"{net}\n")
+            f.write(net + "\n")
             for p, name in pts:
                 f.write(f"  {name:20s} {p[0]:8.3f} {p[1]:8.3f}\n")
 
-    # --- assign unique M2 horizontal tracks ---
-    upper = [n for n in resolved if n in UPPER_NETS and len(resolved[n]) >= 2]
-    lower = [n for n in resolved if n in LOWER_NETS and len(resolved[n]) >= 2]
-    # stable order by name for reproducibility
-    upper.sort()
-    lower.sort()
-
-    track: dict[str, float] = {}
-    # Upper channel above stdcells / CP (avoid stdcell VDD rail ~8.9)
-    y_u = 11.0
+    upper = sorted(n for n in UPPER_NETS if len(resolved.get(n, [])) >= 2)
+    lower = sorted(n for n in LOWER_NETS if len(resolved.get(n, [])) >= 2)
+    track = {}
     for i, n in enumerate(upper):
-        track[n] = y_u + i * PITCH
-    # Lower channel below VCO nmos bank
-    y_l = -18.5
+        track[n] = 14.0 + i * PITCH_Y
     for i, n in enumerate(lower):
-        track[n] = y_l - i * PITCH
+        track[n] = -21.0 - i * PITCH_Y
+
+    sig_nets = list(track.keys())
+    db = PaintDB()
+    pin_xs = []
+    for n in list(sig_nets) + ["VPWR", "VGND"]:
+        for p, _ in resolved.get(n, []):
+            pin_xs.append(p[0])
+
+    occupied_cols: set[int] = set()
+
+    def q(x: float) -> int:
+        return int(round(x / 0.01))
+
+    for px in pin_xs:
+        for d in range(-12, 13):
+            occupied_cols.add(q(px) + d)
+    vdd_y, vss_y = 12.5, -19.0
+
+    # Assign unique via-up X right of each power pin (never through the device body)
+    power_ox_map: dict[tuple[float, float], float] = {}
+    used_ox: set[int] = set()
+
+    def claim_ox(px: float) -> float:
+        for k in range(0, 40):
+            cand = px + 1.00 + k * 0.85
+            if cand > 69.0:
+                break  # leave x>=70 for signal columns
+            qc = q(cand)
+            if any((qc + d) in used_ox for d in range(-42, 43)):
+                continue
+            for d in range(-42, 43):
+                used_ox.add(qc + d)
+            return cand
+        # fallback: below signal channel
+        return min(px + 1.00, 68.5)
+
+    def power_ox(px, py, net):
+        key = (round(px, 3), round(py, 3))
+        if key not in power_ox_map:
+            power_ox_map[key] = claim_ox(px)
+        return power_ox_map[key]
+
+    for n, rail_y in (("VPWR", vdd_y), ("VGND", vss_y)):
+        for p, name in resolved.get(n, []):
+            if name.endswith("/C2"):
+                continue
+            ox = power_ox(p[0], p[1], n)
+            for d in range(-42, 43):
+                occupied_cols.add(q(ox) + d)
+            db.add("metal2", db.h(p[0], ox, p[1], "metal2"))
+            for L in ("metal2", "metal3", "metal4", "metal5"):
+                db.add(L, via_pad_rect(ox, p[1]))
+            db.add("metal5", db.v(ox, p[1], rail_y, "metal5", 0.20))
+    for pname, rail_y in (("VPWR", vdd_y), ("VGND", vss_y)):
+        if pname in top:
+            pxy = um(top[pname])
+            ox = power_ox(pxy[0], pxy[1], pname)
+            for d in range(-42, 43):
+                occupied_cols.add(q(ox) + d)
+            db.add("metal2", db.h(pxy[0], ox, pxy[1], "metal2"))
+            for L in ("metal2", "metal3", "metal4", "metal5"):
+                db.add(L, via_pad_rect(ox, pxy[1]))
+            db.add("metal5", db.v(ox, pxy[1], rail_y, "metal5", 0.20))
+    for p, name in resolved.get("VGND", []):
+        if name.endswith("/C2"):
+            db.add("metal5", (p[0] - 0.4, p[1] - 0.4, p[0] + 0.4, p[1] + 0.4))
+            db.add("metal5", db.v(p[0], p[1], vss_y, "metal5", 0.25))
+    # Reserve power M5 rails so signal M5 jogs cannot touch them
+    db.add("metal5", (-10.0, vdd_y - 0.5, 100.0, vdd_y + 0.5))
+    db.add("metal5", (-10.0, vss_y - 0.5, 100.0, vss_y + 0.5))
+
+    def claim_col(px: float) -> float | None:
+        for k in range(0, 150):
+            for sign in (-1, 1):
+                cand = px + sign * (0.70 + k * PITCH_X)
+                qc = q(cand)
+                if any((qc + d) in occupied_cols for d in range(-32, 33)):
+                    continue
+                # also check M3 vertical strip won't be added yet — mark col
+                occupied_cols.add(qc)
+                return cand
+        return None
 
     lines = [
-        "# Auto-generated by gen_route_pll.py — layer-aware M1/M2 routing",
+        "# Geometry-aware LVS spine router",
         "drc off",
         "cd /repo/analog/pll/layout",
+        "if {[file exists pll_analog_bare.mag]} {",
+        "  file copy -force pll_analog_bare.mag pll_analog.mag",
+        "} elseif {[file exists pll_analog_routed_backup.mag]} {",
+        "  file copy -force pll_analog_routed_backup.mag pll_analog.mag",
+        "}",
         "load pll_analog",
         "select top cell",
-        "# wipe prior routing + all labels (ports recreated below)",
-        "box -5um -40um 95um 40um",
-        "catch {erase metal1}",
-        "catch {erase metal2}",
-        "catch {erase metal3}",
-        "catch {erase metal4}",
-        "catch {erase metal5}",
-        "catch {erase via1}",
-        "catch {erase via2}",
-        "catch {erase via3}",
-        "catch {erase via4}",
-        "catch {erase error_s}",
+        "box -15um -60um 150um 55um",
+        "foreach L {metal1 metal2 metal3 metal4 metal5 via1 via2 via3 via4 error_s} { catch {erase $L} }",
         "catch {erase labels}",
     ]
 
-    vdd_y = abs_pin("x1", "VDD")[1]
-    vss_y = abs_pin("x1", "VSS")[1]
-
-    # Power rails on Metal2 (keep clear of signal track bands)
-    lines += [
-        "# === power rails (Metal2) ===",
-        f"box -2.000um {vdd_y-0.30:.3f}um 72.000um {vdd_y+0.30:.3f}um",
-        "paint metal2",
-        f"box -2.000um {vss_y-0.30:.3f}um 72.000um {vss_y+0.30:.3f}um",
-        "paint metal2",
-        "box 56.000um -7.200um 70.500um -6.600um",
-        "paint metal2",
-        "box 56.000um -16.800um 70.500um -16.200um",
-        "paint metal2",
-        f"box 56.000um -7.200um 56.600um {vdd_y+0.30:.3f}um",
-        "paint metal2",
-        f"box 56.000um -16.800um 56.600um {vss_y+0.30:.3f}um",
-        "paint metal2",
-    ]
-
-    # --- signal nets: M1 vertical + M2 trunk + via1 ---
-    for net, ty in track.items():
-        pts = [p for p, _ in resolved[net]]
-        if len(pts) < 2:
-            continue
-        xs = [p[0] for p in pts]
-        lines.append(f"# net {net}  M2 trunk y={ty:.3f}")
-        # M2 horizontal trunk
-        lines += paint_h(min(xs), max(xs), ty, "metal2", W)
-        for (x, y), name in resolved[net]:
-            # M1 vertical pin → track
-            lines += paint_v(x, y, ty, "metal1", W)
-            # via at junction
-            lines += via1(x, ty)
-            # small M1 pad on pin for contact (helps FET/stdcell hit)
-            lines += [
-                f"box {x-0.20:.3f}um {y-0.20:.3f}um {x+0.20:.3f}um {y+0.20:.3f}um",
-                "paint metal1",
-            ]
-            # Cap top plate (C1) needs a larger M1 landing on mimcapcontact
-            if name.endswith("/C1"):
-                lines += [
-                    f"box {x-0.80:.3f}um {y-0.80:.3f}um {x+0.80:.3f}um {y+0.80:.3f}um",
-                    "paint metal1",
-                ]
-
-    # --- VPWR stubs: M1 to via to M2 rail ---
-    lines.append("# === VPWR stubs ===")
-    for p, name in resolved["VPWR"]:
-        ty = -6.9 if p[1] < -5 else vdd_y
-        lines += paint_v(p[0], p[1], ty, "metal1", 0.30)
-        lines += via1(p[0], ty)
-
-    # --- VGND stubs ---
-    lines.append("# === VGND stubs ===")
-    for p, name in resolved["VGND"]:
-        if name.endswith("/C2"):
-            # Metal5 bottom plate → via stack → Metal2 → VGND rail
-            x, y = p
-            lines += [
-                f"box {x-0.50:.3f}um {y-0.50:.3f}um {x+0.50:.3f}um {y+0.50:.3f}um",
-                "paint metal5",
-            ]
-            sx = x + 1.0
-            lines += paint_h(x, sx, y, "metal5", 0.40)
-            yy = y
-            for via_l, met_l in (
-                ("via4", "metal4"),
-                ("via3", "metal3"),
-                ("via2", "metal2"),
-            ):
-                h = 0.16
-                lines += [
-                    f"box {sx-h:.3f}um {yy-h:.3f}um {sx+h:.3f}um {yy+h:.3f}um",
-                    f"paint {via_l}",
-                    f"box {sx-0.28:.3f}um {yy-0.35:.3f}um {sx+0.28:.3f}um {yy+0.10:.3f}um",
-                    f"paint {met_l}",
-                ]
-                yy -= 0.40
-            ty = -16.5 if y < -5 else vss_y
-            lines += paint_v(sx, yy, ty, "metal2", 0.30)
-            continue
-        ty = -16.5 if p[1] < -5 else vss_y
-        lines += paint_v(p[0], p[1], ty, "metal1", 0.30)
-        lines += via1(p[0], ty)
-
-    # --- restore real ports only (no section labels) ---
-    lines.append("# === ports ===")
     for name, xy in top.items():
+        if name not in SCH_PORTS and name != "vctrl":
+            continue
         xu, yu = um(xy)
         lines += [
-            f"box {xu-0.5:.3f}um {yu-0.5:.3f}um {xu+0.5:.3f}um {yu+0.5:.3f}um",
+            f"box {xu-0.25:.3f}um {yu-0.25:.3f}um {xu+0.25:.3f}um {yu+0.25:.3f}um",
             "paint metal1",
-            f"label {name} FreeSans 0.8um 0 0 0",
-            "port make",
-            "port connections n s e w",
+            f"label {name} FreeSans 0.7um 0 0 0",
         ]
+        if name in SCH_PORTS:
+            lines += ["port make", "port connections n s e w"]
 
+    jog_layers = ("metal4", "metal3", "metal2")  # never M5 — reserved for power
+    failures = []
+
+    def stack_to_layer(layer, x, y):
+        out = via("via1", "metal1", "metal2", x, y)
+        if layer == "metal2":
+            return out
+        out += via("via2", "metal2", "metal3", x, y)
+        if layer == "metal3":
+            return out
+        out += via("via3", "metal3", "metal4", x, y)
+        return out
+
+    for net, ty in track.items():
+        pts = resolved[net]
+        lines.append(f"# net {net}  trunk={ty:.3f}")
+        xs = []
+        for (px, py), pname in pts:
+            pad = 0.50 if pname.endswith("/C1") else 0.12
+            placed = False
+            # Prefer local columns (short jogs); far-right / far-left as fallback
+            candidates = []
+            for k in range(0, 100):
+                candidates.append(px - (0.70 + k * PITCH_X))
+                candidates.append(px + (0.70 + k * PITCH_X))
+            for k in range(0, 60):
+                candidates.append(72.0 + k * PITCH_X)
+            for k in range(0, 50):
+                candidates.append(-6.0 - k * PITCH_X)
+            jog_try = list(jog_layers) + ["metal5"]
+            # Offset jog Y so dense same-row pins can share a layer without CLEAR clashes
+            jog_ys = [py]
+            for k in range(1, 8):
+                jog_ys.append(py + k * 0.35)
+                jog_ys.append(py - k * 0.35)
+            for cx in candidates:
+                if placed:
+                    break
+                qc = q(cx)
+                if any((qc + d) in occupied_cols for d in range(-32, 33)):
+                    continue
+                for jl in jog_try:
+                    if placed:
+                        break
+                    if jl == "metal5" and cx < 70:
+                        continue  # M5 jogs only in far-right channel
+                    for jy in jog_ys:
+                        jog_r = db.h(px, cx, jy, jl)
+                        stub_r = db.v(px, py, jy, jl)
+                        vert_r = db.v(cx, jy, ty, "metal3")
+                        trunk_touch = via_pad_rect(cx, ty)
+                        if not db.can(jl, jog_r):
+                            continue
+                        if abs(jy - py) > 0.01 and not db.can(jl, stub_r):
+                            continue
+                        if not db.can("metal3", vert_r):
+                            continue
+                        occupied_cols.add(qc)
+                        db.add(jl, jog_r)
+                        if abs(jy - py) > 0.01:
+                            db.add(jl, stub_r)
+                        db.add("metal3", vert_r)
+                        db.add("metal4", trunk_touch)
+                        db.add("metal2", via_pad_rect(px, py))
+                        if jl in ("metal3", "metal4", "metal5"):
+                            db.add("metal3", via_pad_rect(px, py))
+                        if jl in ("metal4", "metal5"):
+                            db.add("metal4", via_pad_rect(px, py))
+                        if jl == "metal5":
+                            db.add("metal5", via_pad_rect(px, py))
+                        db.add(jl, via_pad_rect(px, jy))
+                        db.add(jl, via_pad_rect(cx, jy))
+                        db.add("metal3", via_pad_rect(cx, jy))
+                        lines += [
+                            f"box {px-pad:.3f}um {py-pad:.3f}um {px+pad:.3f}um {py+pad:.3f}um",
+                            "paint metal1",
+                        ]
+                        if jl == "metal5":
+                            lines += stack_to_layer("metal4", px, py)
+                            lines += via("via4", "metal4", "metal5", px, py)
+                        else:
+                            lines += stack_to_layer(jl, px, py)
+                        if abs(jy - py) > 0.01:
+                            lines += paint_v(px, py, jy, jl, W)
+                        lines += paint_h(px, cx, jy, jl, W)
+                        if jl == "metal5":
+                            lines += via("via4", "metal4", "metal5", cx, jy)
+                            lines += via("via3", "metal3", "metal4", cx, jy)
+                        elif jl == "metal4":
+                            lines += via("via3", "metal3", "metal4", cx, jy)
+                        elif jl == "metal2":
+                            lines += via("via2", "metal2", "metal3", cx, jy)
+                        lines += paint_v(cx, jy, ty, "metal3", W)
+                        lines += via("via3", "metal3", "metal4", cx, ty)
+                        xs.append(cx)
+                        placed = True
+                        break
+            if not placed:
+                failures.append(f"{net} {pname} @ {px:.3f},{py:.3f}")
+
+        if xs:
+            trunk = db.h(min(xs), max(xs), ty, "metal4")
+            # trunks at exclusive Y should always be free; force-add
+            db.add("metal4", trunk)
+            lines += paint_h(min(xs), max(xs), ty, "metal4", W)
+
+    if failures:
+        print(f"FAILED to place {len(failures)} pins:")
+        for f in failures[:20]:
+            print(" ", f)
+
+    # Power spine
+    xs_all = [p[0] for pts in resolved.values() for p, _ in pts] or [0.0, 70.0]
+    x_lo, x_hi = min(xs_all) - 4, max(max(xs_all) + 4, 95.0)
+    # vdd_y/vss_y already set above
     lines += [
-        "save pll_analog",
-        "puts DONE",
-        "quit -noprompt",
+        f"box {x_lo:.3f}um {vdd_y-0.4:.3f}um {x_hi:.3f}um {vdd_y+0.4:.3f}um",
+        "paint metal5",
+        f"box {x_lo:.3f}um {vss_y-0.4:.3f}um {x_hi:.3f}um {vss_y+0.4:.3f}um",
+        "paint metal5",
     ]
 
-    out = LAYOUT / "route_pll.tcl"
-    out.write_text("\n".join(lines) + "\n")
-    print(f"wrote {out}")
-    print(f"  upper tracks ({len(upper)}): y={y_u:.2f} .. {y_u+(len(upper)-1)*PITCH:.2f}")
-    print(f"  lower tracks ({len(lower)}): y={y_l:.2f} .. {y_l-(len(lower)-1)*PITCH:.2f}")
-    for n, ty in sorted(track.items(), key=lambda kv: -kv[1]):
-        print(f"    {n:14s}  M2 y={ty:7.3f}")
+    def power_tap(px, py, rail_y, net):
+        ox = power_ox(px, py, net)
+        c = [
+            f"box {px-0.12:.3f}um {py-0.12:.3f}um {px+0.12:.3f}um {py+0.12:.3f}um",
+            "paint metal1",
+        ]
+        c += via("via1", "metal1", "metal2", px, py)
+        c += paint_h(px, ox, py, "metal2", W)
+        c += via("via2", "metal2", "metal3", ox, py)
+        c += via("via3", "metal3", "metal4", ox, py)
+        c += via("via4", "metal4", "metal5", ox, py)
+        c += paint_v(ox, py, rail_y, "metal5", 0.20)
+        return c
+
+    lines.append("# VPWR")
+    for p, _ in resolved["VPWR"]:
+        lines += power_tap(p[0], p[1], vdd_y, "VPWR")
+    lines.append("# VGND")
+    for p, name in resolved["VGND"]:
+        if name.endswith("/C2"):
+            x, y = p
+            lines += [
+                f"box {x-0.25:.3f}um {y-0.25:.3f}um {x+0.25:.3f}um {y+0.25:.3f}um",
+                "paint metal5",
+            ]
+            lines += paint_v(x, y, vss_y, "metal5", 0.25)
+            continue
+        lines += power_tap(p[0], p[1], vss_y, "VGND")
+    for pname, rail_y in (("VPWR", vdd_y), ("VGND", vss_y)):
+        if pname in top:
+            xu, yu = um(top[pname])
+            lines += power_tap(xu, yu, rail_y, pname)
+
+    lines += ["save pll_analog", "puts DONE", "quit -noprompt"]
+    (LAYOUT / "route_pll.tcl").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print("wrote route_pll.tcl")
+    print(f"placed trunks for {len(track)} nets; failures={len(failures)}")
 
 
 if __name__ == "__main__":
