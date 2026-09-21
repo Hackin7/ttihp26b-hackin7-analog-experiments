@@ -10,6 +10,6 @@ END UNITS
 MACRO chips_art
    CLASS COVER ;
    FOREIGN chips_art 0 0 ;
-   SIZE 78.720 BY 82.000 ;
+   SIZE 16.400 BY 16.400 ;
    SYMMETRY X Y ;
 END chips_art
