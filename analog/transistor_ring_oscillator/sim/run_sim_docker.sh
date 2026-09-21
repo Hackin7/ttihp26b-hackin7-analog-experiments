@@ -5,6 +5,8 @@ REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 docker run --rm --entrypoint /bin/bash \
   -e "LCH=${LCH:-}" \
   -e "SWEEP=${SWEEP:-}" \
+  -e "TB=${TB:-}" \
+  -e "LCH_LIST=${LCH_LIST:-}" \
   -v "$REPO:/repo" \
   -w /repo/analog/transistor_ring_oscillator/sim \
   hpretl/iic-osic-tools \

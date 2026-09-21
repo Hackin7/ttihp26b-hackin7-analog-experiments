@@ -32,8 +32,9 @@ if [ -f "$SPICEINIT" ]; then
   cp "$SPICEINIT" "$SIM_DIR/.spiceinit"
 fi
 
-LCH="${LCH:-0.81u}"
+LCH="${LCH:-1.97u}"
+TB="${TB:-tb_tran.spice}"
 printf '.param lch=%s\n' "$LCH" > "$OUT_DIR/lch.param"
-echo "[run_sim] PDK_ROOT=$PDK_ROOT lch=$LCH"
-ngspice -b -o "$OUT_DIR/ngspice.log" tb_tran.spice
+echo "[run_sim] PDK_ROOT=$PDK_ROOT lch=$LCH tb=$TB"
+ngspice -b -o "$OUT_DIR/ngspice.log" "$TB"
 python3 extract_freq.py "$@"

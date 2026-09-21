@@ -1,7 +1,7 @@
 * Schematic reference netlist: three-stage CMOS ring of IHP SG13G2 LV MOSFETs.
-* Wp/Wn matches sg13g2_inv_1. lch=0.81u targets ~500 MHz pre-layout.
+* Wp/Wn matches sg13g2_inv_1. lch=1.97u targets ~100 MHz pre-layout.
 * Port order: out VPWR VGND.
-.subckt trosc out VPWR VGND lch=0.81u
+.subckt trosc out VPWR VGND lch=1.97u
 * stage 0: in=out, out=n1
 Xp0 n1 out VPWR VPWR sg13_lv_pmos w=1.12u l={lch} ng=1 m=1
 Xn0 n1 out VGND VGND sg13_lv_nmos w=0.74u l={lch} ng=1 m=1

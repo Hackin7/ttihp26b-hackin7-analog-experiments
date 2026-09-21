@@ -1,16 +1,14 @@
-* Pre-layout transient of transistor ring oscillator (mos_tt, 1.2 V).
-* PDK .lib line is written by run_sim.sh into out/pdk.lib.
-* lch is written by run_sim.sh into out/lch.param.
+* Pre-layout transient of 5-stage transistor ring (main_5.sch, mos_tt, 1.2 V).
 .include out/pdk.lib
 .include out/lch.param
-.include ../schematic/transistor_ring_oscillator.spice
+.include ../schematic/transistor_ring_oscillator_5.spice
 
 .param pre_layout=1
 
-Xdut out VPWR VGND trosc lch={lch}
+Xdut out VPWR VGND trosc5 lch={lch}
 vvdd VPWR 0 dc 1.2
 vvss VGND 0 0
-.ic v(xdut.n1)=1.2 v(out)=0 v(xdut.n2)=0
+.ic v(xdut.n1)=1.2 v(out)=0 v(xdut.n2)=0 v(xdut.n3)=0 v(xdut.n4)=0
 
 .control
   tran 50p 200n uic

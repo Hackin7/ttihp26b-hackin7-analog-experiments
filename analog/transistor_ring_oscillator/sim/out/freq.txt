@@ -1,7 +1,9 @@
-period_s=1.978924e-09
-freq_hz=5.053250e+08
-n_cycles=19
-period_std_s=1.719071e-14
-lch_um=0.81
+period_s=9.909086e-09
+freq_hz=1.009175e+08
+n_cycles=20
+period_std_s=1.294472e-11
+stages=5
+lch_um=1.45
 wn_um=0.74
 wp_um=1.12
+sch=main_5.sch
