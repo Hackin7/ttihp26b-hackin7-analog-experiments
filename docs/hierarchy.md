@@ -7,10 +7,13 @@ The Tiny Tapeout cell `tt_um_hackin7_analog_experiments` is a thin assembler:
   - `ring_oscillator_500mhz` (~500 MHz, `analog/transistor_ring_oscillator_500mhz/`) at `[53.28, 40.0]`
 - Decorative `chips_art` (TopMetal1 COVER macro)
 - Digital leaf: `digital_counter` (RTL in `src/counter.v`, synthesized into the top)
+- Digital leaf: `pll_digital` (÷N feedback + ÷M output; `clk_vco` stubbed until `pll_analog`)
 - Glue: clock mux in `src/project.v`
+  - `ui_in[7]=1` → PLL ÷M (`pll_clk_out`, stubbed idle for now)
   - `ui_in[1]=0` → Tiny Tapeout `clk`
   - `ui_in[1]=1`, `ui_in[5]=0` → 100 MHz ring
   - `ui_in[1]=1`, `ui_in[5]=1` → 500 MHz ring
+  - `uio[0]` = PLL ÷M probe; `uio[4:1]` = N select; `{ui[6],uio[7:5]}` = M select
 
 `tt_tool.py --harden` runs LibreLane on this top. Every Verilog signal net is
 auto-routed, including `clk_ring_100` / `clk_ring_500`. Power uses PDN.

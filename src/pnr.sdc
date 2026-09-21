@@ -18,7 +18,10 @@ set_clock_groups -logically_exclusive \
   -group [get_clocks clk_ring_500]
 
 # Reset and clock selection are asynchronous controls. Change ui_in[1]/ui_in[5]
-# only while reset is asserted.
+# / ui_in[6]/ui_in[7] / uio config straps only while reset is asserted.
 set_false_path -from [get_ports rst_n]
 set_false_path -from [get_ports {ui_in[1]}]
 set_false_path -from [get_ports {ui_in[5]}]
+set_false_path -from [get_ports {ui_in[6]}]
+set_false_path -from [get_ports {ui_in[7]}]
+set_false_path -from [get_ports {uio_in[*]}]

@@ -3,7 +3,7 @@ project:
   title:        "TinyAnalogExperiments"      # Project title
   author:       "Hackin7"      # Your name
   discord:      "Hackin7"      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
-  description:  "Dual ring oscillators (100/500 MHz) and 64-bit counter"      # One line description of what your project does
+  description:  "Dual ring oscillators, PLL digital dividers, and 64-bit counter"      # One line description of what your project does
   language:     "Verilog" # other examples include Verilog, Amaranth, VHDL, etc
   clock_hz:     50000000 # External clock used for digital timing
 
@@ -17,6 +17,8 @@ project:
   source_files:
     - "project.v"
     - "counter.v"
+    - "pll_div_n.v"
+    - "pll_digital.v"
     - "ring_oscillator.v"
     - "ring_oscillator_500mhz.v"
     - "chips_art.v"
@@ -31,8 +33,8 @@ pinout:
   ui[3]: "counter_byte_select[1]"
   ui[4]: "counter_byte_select[2]"
   ui[5]: "clock_select_500mhz"
-  ui[6]: ""
-  ui[7]: ""
+  ui[6]: "pll_m_sel[4]"
+  ui[7]: "counter_clock_select_pll"
 
   # Outputs
   uo[0]: "counter_byte[0]"
@@ -45,14 +47,14 @@ pinout:
   uo[7]: "counter_byte[7]"
 
   # Bidirectional pins
-  uio[0]: ""
-  uio[1]: ""
-  uio[2]: ""
-  uio[3]: ""
-  uio[4]: ""
-  uio[5]: ""
-  uio[6]: ""
-  uio[7]: ""
+  uio[0]: "pll_clk_out_div"
+  uio[1]: "pll_n_sel[0]"
+  uio[2]: "pll_n_sel[1]"
+  uio[3]: "pll_n_sel[2]"
+  uio[4]: "pll_n_sel[3]"
+  uio[5]: "pll_m_sel[0]"
+  uio[6]: "pll_m_sel[1]"
+  uio[7]: "pll_m_sel[2]"
 
 # Do not change!
 yaml_version: 6

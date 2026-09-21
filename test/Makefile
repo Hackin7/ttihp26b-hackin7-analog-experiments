@@ -21,7 +21,7 @@ else ifneq ($(GATES),yes)
 
 # RTL simulation of the Tiny Tapeout top:
 SIM_BUILD		= sim_build/rtl
-PROJECT_SOURCES		= project.v counter.v
+PROJECT_SOURCES		= project.v counter.v pll_div_n.v pll_digital.v
 VERILOG_SOURCES		+= $(addprefix $(SRC_DIR)/,$(PROJECT_SOURCES))
 # Analog leaves are GDS blackboxes; use behavioral stubs for simulation.
 VERILOG_SOURCES		+= $(PWD)/ring_oscillator_sim.v

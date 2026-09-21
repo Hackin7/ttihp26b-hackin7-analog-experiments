@@ -19,3 +19,6 @@ set_clock_groups -logically_exclusive \
 set_false_path -from [get_ports rst_n]
 set_false_path -from [get_ports {ui_in[1]}]
 set_false_path -from [get_ports {ui_in[5]}]
+set_false_path -from [get_ports {ui_in[6]}]
+set_false_path -from [get_ports {ui_in[7]}]
+set_false_path -from [get_ports {uio_in[*]}]
