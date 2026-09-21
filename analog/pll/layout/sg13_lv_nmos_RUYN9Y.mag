@@ -1,0 +1,91 @@
+magic
+tech ihp-sg13g2
+magscale 1 2
+timestamp 1790007449
+<< nmos >>
+rect -25 -74 25 74
+<< ndiff >>
+rect -93 60 -25 74
+rect -93 -60 -79 60
+rect -47 -60 -25 60
+rect -93 -74 -25 -60
+rect 25 60 93 74
+rect 25 -60 47 60
+rect 79 -60 93 60
+rect 25 -74 93 -60
+<< ndiffc >>
+rect -79 -60 -47 60
+rect 47 -60 79 60
+<< poly >>
+rect -30 134 30 148
+rect -30 102 -16 134
+rect 16 102 30 134
+rect -30 88 30 102
+rect -25 74 25 88
+rect -25 -88 25 -74
+rect -30 -102 30 -88
+rect -30 -134 -16 -102
+rect 16 -134 30 -102
+rect -30 -148 30 -134
+<< polycont >>
+rect -16 102 16 134
+rect -16 -134 16 -102
+<< metal1 >>
+rect -43 138 43 139
+rect -43 98 -20 138
+rect 20 98 43 138
+rect -43 97 43 98
+rect -89 38 -79 60
+rect -47 38 -37 60
+rect -89 -38 -83 38
+rect -43 -38 -37 38
+rect -89 -60 -79 -38
+rect -47 -60 -37 -38
+rect 37 38 47 60
+rect 79 38 89 60
+rect 37 -38 43 38
+rect 83 -38 89 38
+rect 37 -60 47 -38
+rect 79 -60 89 -38
+rect -43 -98 43 -97
+rect -43 -138 -20 -98
+rect 20 -138 43 -98
+rect -43 -139 43 -138
+<< via1 >>
+rect -20 134 20 138
+rect -20 102 -16 134
+rect -16 102 16 134
+rect 16 102 20 134
+rect -20 98 20 102
+rect -83 -38 -79 38
+rect -79 -38 -47 38
+rect -47 -38 -43 38
+rect 43 -38 47 38
+rect 47 -38 79 38
+rect 79 -38 83 38
+rect -20 -102 20 -98
+rect -20 -134 -16 -102
+rect -16 -134 16 -102
+rect 16 -134 20 -102
+rect -20 -138 20 -134
+<< metal2 >>
+rect -20 138 20 147
+rect -20 89 20 98
+rect -83 38 -43 47
+rect -83 -47 -43 -38
+rect 43 38 83 47
+rect 43 -47 83 -38
+rect -20 -98 20 -89
+rect -20 -147 20 -138
+<< labels >>
+rlabel ndiffc -63 0 -63 0 0 D
+port 22 nsew
+rlabel ndiffc 63 0 63 0 0 S
+port 23 nsew
+rlabel polycont 0 118 0 118 0 G
+port 24 nsew
+<< properties >>
+string gencell sg13_lv_nmos
+string library sg13g2
+string parameters w 0.74 l 0.25 m 1 ng 1 diffcov 100 polycov 100 guard 0 glc 1 grc 1 gtc 1 gbc 1 tbcov 100 rlcov 100 topc 1 botc 1 poverlap 0 doverlap 1 lmin 0.13 wmin 0.15 class mosfet compatible {sg13_lv_nmos sg13_hv_nmos} full_metal 1 conn_gates 0 gate_ring 0 doports 1 viasrc 100 viadrn 100 viagate 100 ccols 1 viagb 0 viagr 0 viagl 0 viagt 0
+<< end >>

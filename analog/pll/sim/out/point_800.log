@@ -1,0 +1,42 @@
+[run_sim] PDK_ROOT=/foss/pdks lch=0.25u tb=out/tb_800.spice
+******
+** ngspice-47 : Circuit level simulation program
+** Compiled with KLU Direct Linear Solver
+** The U. C. Berkeley CAD Group
+** Copyright 1985-1994, Regents of the University of California.
+** Copyright 2001-2026, The ngspice team.
+** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html
+** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html
+** Creation Date: Tue Aug 25 10:03:38 UTC 2026
+******
+
+Batch mode
+
+Comments and warnings go to log-file: /repo/analog/pll/sim/out/ngspice.log
+
+
+Note: No compatibility mode selected!
+
+
+Circuit: * open-loop vco at fixed vctrl (set via .param) — used to hit 800 mhz / 1.1 ghz points.
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+Operating point simulation skipped by 'uic',
+  now using transient initial conditions.
+
+No. of Data Rows : 20013
+t2                  =  3.20272e-09
+
+Error: measure  t22  when(WHEN) : out of interval
+ meas tran t22 when v(out)=0.6 rise=45 failed!
+
+Warning from checkvalid: vector t22 is not available or has zero length.
+Error: RHS "(t22 - t2)/40" invalid
+Warning from checkvalid: vector period is not available or has zero length.
+Error: RHS "1/period" invalid
+Warning from checkvalid: vector period is not available or has zero length.
+Error: &freq: no such variable.
+freq_hz =
+Note: Simulation executed from .control section 

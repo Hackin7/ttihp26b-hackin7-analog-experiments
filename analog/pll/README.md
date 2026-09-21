@@ -51,7 +51,28 @@ Result: **PASS** `pll_div_n` N=8/16/22 (edge counts 1250/625/455 at 1 GHz / 10 �
 
 ## Closed-loop note
 
-`tb_pll_lock.spice` exercises VCO + ideal PD + switch-based ÷16. Full transistor PFD/CP + robust digital ÷N lock is a follow-up (XSPICE `d_dff` pin syntax differs on ngspice-47; switch TFF was unreliable at GHz). Open-loop + RTL cover the sizing and divider goals.
+`tb_pll_lock.spice` exercises VCO + ideal PD + switch-based ÷16. Full transistor PFD/CP + robust digital ÷N lock is a follow-up. Open-loop + RTL cover the sizing and divider goals.
+
+## Layout (xschem Mag seed)
+
+Primary Mag cell: [`layout/pll_analog.mag`](layout/pll_analog.mag) — devices from [`schematic/pll_analog.spice`](schematic/pll_analog.spice) via IHP gencells, plus snaked `rhigh`.
+
+| Resistor | Snaked Mag bbox |
+| --- | --- |
+| R2 (~700 kΩ) | **21 × 16** µm (`rhigh_R2_snake`, `nx=20`) |
+| R1 (~191 kΩ) | **11 × 10** µm (`rhigh_R1_snake`, `nx=10`) |
+| `pll_analog` seed | ~62 × 51 µm (~10% of a TT die) |
+
+Rebuild snaked leaf:
+
+```bash
+docker run --rm --entrypoint /bin/bash \
+  -v "$PWD:/repo" -w /repo/analog/pll/layout \
+  hpretl/iic-osic-tools -lc \
+  'magic -dnull -noconsole -rcfile /foss/pdks/ihp-sg13g2/libs.tech/magic/ihp-sg13g2.magicrc rebuild_analog_snake.tcl'
+```
+
+**Not done yet:** full routing, PFD stdcell assemble, DRC/LVS macro export, TT bind.
 
 ## Simulate
 
@@ -60,7 +81,7 @@ Result: **PASS** `pll_div_n` N=8/16/22 (edge counts 1250/625/455 at 1 GHz / 10 �
 LCH=0.25u TB=tb_vco_point.spice bash sim/run_sim_docker.sh
 
 # VCO sweep
-SWEEP=1 LCH=0.25u bash sim/run_sim_docker.sh
+bash sim/sweep_vctrl.sh   # or SWEEP via run_sim_docker.sh if wired
 
 # Divider RTL
 bash sim/run_div_rtl.sh   # inside IIC-OSIC image
@@ -71,8 +92,12 @@ bash sim/run_div_rtl.sh   # inside IIC-OSIC image
 | Path | Role |
 | --- | --- |
 | `schematic/pll_top.sch` | xschem source |
-| `schematic/pll_vco.spice` | VCO netlist for ngspice |
+| `schematic/pll_top.spice` | Cleaned hierarchical netlist (Mag/LVS gold intent) |
+| `schematic/pll_analog.spice` | Analog leaf for Mag gencells |
+| `schematic/pll_vco.spice` | VCO for ngspice |
 | `schematic/pll_cp_filt.spice` | CP + filter (sim) |
 | `schematic/pll_pfd.spice` | NAND PFD (sim) |
+| `layout/pll_analog.mag` | Mag seed + snaked R |
+| `layout/rebuild_analog_snake.tcl` | Regenerate Mag seed |
 | `rtl/pll_div_n.v` | Parameterized ÷N |
 | `sim/` | TBs + docker runners |

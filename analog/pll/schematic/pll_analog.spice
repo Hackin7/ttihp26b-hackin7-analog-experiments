@@ -1,0 +1,33 @@
+* Analog leaf from pll_top.sch (VCO+CP+filter) for Magic netlist_to_layout.
+* PFD stdcells placed separately from sg13g2_stdcell.gds.
+.subckt pll_analog vctrl up_b pfd_down out VPWR VGND
+
+XM1 net4 vbp VPWR VPWR sg13_lv_pmos w=1.0u l=1.0u ng=1 m=1
+XM3 vctrl up_b net4 VPWR sg13_lv_pmos w=0.5u l=0.13u ng=1 m=1
+XM2 vctrl pfd_down net3 VGND sg13_lv_nmos w=0.5u l=0.13u ng=1 m=1
+XM4 net3 vbn VGND VGND sg13_lv_nmos w=0.5u l=1.0u ng=1 m=1
+* Bias R2 + filter R1: Mag places snaked rhigh_*_snake (same ohms as sch)
+XM6 vbn vbn VGND VGND sg13_lv_nmos w=0.5u l=1.0u ng=1 m=1
+XM5 vbp vbn VGND VGND sg13_lv_nmos w=0.5u l=1.0u ng=1 m=1
+XM7 vbp vbp VPWR VPWR sg13_lv_pmos w=1.0u l=1.0u ng=1 m=1
+XC1 vz VGND cap_cmim w=20.0e-6 l=20.0e-6 m=1
+XC2 vctrl VGND cap_cmim w=8.0e-6 l=8.0e-6 m=1
+XMn8 n_bias vctrl VGND VGND sg13_lv_nmos w=0.74u l=0.25u ng=1 m=1
+XMp8 n_bias n_bias VPWR VPWR sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1
+XMp7 vs0 n_bias VPWR VPWR sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1
+XMp3 o0 o2 vs0 VPWR sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1
+XMn3 o0 o2 nt0 VGND sg13_lv_nmos w=0.74u l=0.25u ng=1 m=1
+XMn7 nt0 vctrl VGND VGND sg13_lv_nmos w=0.74u l=0.25u ng=1 m=1
+XMp6 vs1 n_bias VPWR VPWR sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1
+XMp1 o1 o0 vs1 VPWR sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1
+XMn1 o1 o0 nt1 VGND sg13_lv_nmos w=0.74u l=0.25u ng=1 m=1
+XMn5 nt1 vctrl VGND VGND sg13_lv_nmos w=0.74u l=0.25u ng=1 m=1
+XMp5 vs2 n_bias VPWR VPWR sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1
+XMp2 o2 o1 vs2 VPWR sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1
+XMn2 o2 o1 nt2 VGND sg13_lv_nmos w=0.74u l=0.25u ng=1 m=1
+XMn6 nt2 vctrl VGND VGND sg13_lv_nmos w=0.74u l=0.25u ng=1 m=1
+XMp4 out o2 VPWR VPWR sg13_lv_pmos w=1.12u l=0.25u ng=1 m=1
+XMn4 out o2 VGND VGND sg13_lv_nmos w=0.74u l=0.25u ng=1 m=1
+
+.ends pll_analog
+.end

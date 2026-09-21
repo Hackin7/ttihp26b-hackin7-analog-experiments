@@ -1,0 +1,23 @@
+magic
+tech ihp-sg13g2
+timestamp 1790007449
+<< metal5 >>
+rect -1060 -1060 1060 1060
+<< mimcap >>
+rect -1000 980 1000 1000
+rect -1000 -980 -980 980
+rect 980 -980 1000 980
+rect -1000 -1000 1000 -980
+<< mimcapcontact >>
+rect -980 -980 980 980
+<< labels >>
+rlabel mimcapcontact 0 0 0 0 0 C1
+port 1 nsew
+rlabel metal5 1010 0 1010 0 0 C2
+port 2 nsew
+<< properties >>
+string FIXED_BBOX -1060 -1060 1060 1060
+string gencell cap_cmim
+string library sg13g2
+string parameters w 20.0 l 20.0 val 615.2 carea 1.50 cperi 0.19 class capacitor compatible {cap_cmim cap_rfcmim} nx 1 ny 1 dummy 0 square 0 lmin 2.00 wmin 2.00 lmax 30.0 wmax 30.0 dc 0 tabwidth 1.0 upcontact 0 bconnect 1 tconnect 1 ccov 100 doports 1
+<< end >>

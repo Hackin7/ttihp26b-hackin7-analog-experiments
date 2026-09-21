@@ -1,0 +1,35 @@
+[run_sim] PDK_ROOT=/foss/pdks lch=0.25u tb=out/tb_1100.spice
+******
+** ngspice-47 : Circuit level simulation program
+** Compiled with KLU Direct Linear Solver
+** The U. C. Berkeley CAD Group
+** Copyright 1985-1994, Regents of the University of California.
+** Copyright 2001-2026, The ngspice team.
+** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html
+** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html
+** Creation Date: Tue Aug 25 10:03:38 UTC 2026
+******
+
+Batch mode
+
+Comments and warnings go to log-file: /repo/analog/pll/sim/out/ngspice.log
+
+
+Note: No compatibility mode selected!
+
+
+Circuit: * open-loop vco at fixed vctrl (set via .param) — used to hit 800 mhz / 1.1 ghz points.
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+Operating point simulation skipped by 'uic',
+  now using transient initial conditions.
+
+No. of Data Rows : 20013
+t2                  =  2.51487e-09
+t22                 =  3.99525e-08
+period = 9.359411e-10
+freq = 1.068443e+09
+freq_hz = 1.06844E+09
+Note: Simulation executed from .control section 
